@@ -1,0 +1,62 @@
+/*
+  This is an example of reading and writing an image using the ppmIO.c
+  routines.  To manipulate the image, change the pixel color values.
+
+  Bruce A. Maxwell updated 2021-09-05
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "../include/ppmIO.h"
+#include "../include/alphaMask.h"
+
+int main(int argc, char *argv[])
+{
+    Pixel *image;
+    int rows, cols, colors;
+    long imagesize;
+    long i;
+
+    if (argc < 3)
+    {
+        printf("Usage: alphaMask <input file> <output file>\n");
+        exit(-1);
+    }
+
+    /* read in the image */
+    image = readPPM(&rows, &cols, &colors, argv[1]);
+    if (!image)
+    {
+        fprintf(stderr, "Unable to read %s\n", argv[1]);
+        exit(-1);
+    }
+
+    /* calculate the image size */
+    imagesize = (long)rows * (long)cols;
+
+    /* create the alpha mask, but converting the blue/green screen to 0 and 255 for foreground.  */
+    for (i = 0; i < imagesize; i++)
+    {
+
+        // this piece converts the green/blue screen to black (background) and the remaining
+        // to white (foreground)
+        if (isGreenScreen(image[i]))
+        {
+            image[i].r = 0;
+            image[i].g = 0;
+            image[i].b = 0;
+        }
+    }
+
+    /* write out the resulting image */
+    writePPM(image, rows, cols, colors /* s/b 255 */, argv[2]);
+
+    /* free the image memory */
+#if USECPP
+    delete[] image;
+#else
+    free(image);
+#endif
+
+    return (0);
+}
