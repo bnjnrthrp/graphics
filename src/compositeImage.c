@@ -16,8 +16,7 @@ int main(int argc, char *argv[])
 {
     Pixel *bgImage, *fgImage, *mask; // background image, foreground image, and mask
     int bgRows, bgCols, bgColors, fgRows, fgCols, fgColors, maskRows, maskCols, maskColors;
-    long bgImageSize, fgImageSize;
-    long i;
+    long fgImageSize, dx, dy;
 
     if (argc < 5)
     {
@@ -50,19 +49,21 @@ int main(int argc, char *argv[])
     }
 
     /* calculate the output image size */
-    bgImageSize = (long)bgRows * (long)bgCols;
     fgImageSize = (long)fgRows * (long)fgCols;
-    /* loop through the background and mask, adding the foreground image where the mask allows it  */
-    for (i = 0; i < bgImageSize; i++)
+    long j = 0; // index tracker for image 2
+    dx = 350;
+    dy = 200;
+    for (long r = 0; r < bgRows; r++)
     {
-        // Ensure i is within the boundaries of the foregound image
-        if (i < fgImageSize)
-        {
-            /// Convert everything to [i]
-            bgImage[i].r = blendColors(fgImage[i].r, bgImage[i].r, mask[i].r);
-            bgImage[i].g = blendColors(fgImage[i].g, bgImage[i].g, mask[i].g);
-            bgImage[i].b = blendColors(fgImage[i].b, bgImage[i].b, mask[i].b);
-        }
+        for (long c = 0; c < bgCols; c++)
+            if (c >= dx && c < fgCols + dx)
+            {
+                /// Convert everything to [i]
+                bgImage[r * bgCols + c].r = blendColors(fgImage[j].r, bgImage[(r - dy) * bgCols + c - dx].r, mask[j].r);
+                bgImage[r * bgCols + c].g = blendColors(fgImage[j].g, bgImage[(r - dy) * bgCols + c - dx].g, mask[j].g);
+                bgImage[r * bgCols + c].b = blendColors(fgImage[j].b, bgImage[(r - dy) * bgCols + c - dx].b, mask[j].b);
+                j++;
+            }
     }
 
     /* write out the resulting image */
