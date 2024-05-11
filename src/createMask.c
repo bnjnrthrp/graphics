@@ -1,9 +1,12 @@
-/*
-  This is an example of reading and writing an image using the ppmIO.c
-  routines.  To manipulate the image, change the pixel color values.
-
-  Bruce A. Maxwell updated 2021-09-05
-*/
+/**
+ * This program will take an image with a green screen background
+ * and create an alpha mask so it may be composited with another
+ * image.
+ *
+ * @author Benji Northrop
+ * CS5310
+ * Summer 2024
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,6 +48,12 @@ int main(int argc, char *argv[])
             image[i].r = 0;
             image[i].g = 0;
             image[i].b = 0;
+        }
+        else
+        {
+            image[i].r = 255;
+            image[i].g = 255;
+            image[i].b = 255;
         }
     }
 

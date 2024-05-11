@@ -18,10 +18,19 @@
  */
 bool isGreenScreen(Pixel pixel)
 {
-    float threshold = 1.5;
-    // Converts values of 0 to 1 to remove issues with divide by 0, otherwise keep it the same.
-    pixel.r = pixel.r == 0 ? 1 : pixel.r;
-    pixel.b = pixel.b == 0 ? 1 : pixel.b;
+  float threshold = 1.5;
+  // Converts values of 0 to 1 to remove issues with divide by 0, otherwise keep it the same.
+  pixel.r = pixel.r == 0 ? 1 : pixel.r;
+  pixel.b = pixel.b == 0 ? 1 : pixel.b;
 
-    return (float)pixel.g / (float)pixel.r >= threshold && (float)pixel.g / (float)pixel.b >= threshold;
+  return (float)pixel.g / (float)pixel.r >= threshold && (float)pixel.g / (float)pixel.b >= threshold;
+};
+
+unsigned char blendColors(unsigned char foreground, unsigned char background, unsigned char mask)
+{
+  // Convert mask color value to the range [0, 1]
+  mask = (float)mask / 255;
+
+  // Returns the value of the foreground
+  return (unsigned char)mask * ((int)foreground) + (1 - mask) * ((int)background);
 };

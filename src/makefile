@@ -32,10 +32,10 @@ _DEPS = ppmIO.h alphaMask.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = ppmtest lab1 createMask
+EXECUTABLES = ppmtest lab1 createMask composite
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = tiffmain.o ppmmain.o createMask.o
+_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -64,6 +64,9 @@ lab1: $(ODIR)/lab1.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 alphaMask: $(ODIR)/createMask.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+composite: $(ODIR)/compositeImage.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean
