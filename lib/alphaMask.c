@@ -29,8 +29,8 @@ bool isGreenScreen(Pixel pixel)
 unsigned char blendColors(unsigned char foreground, unsigned char background, unsigned char mask)
 {
   // Convert mask color value to the range [0, 1]
-  mask = (float)mask / 255;
+  float alpha = mask / 255;
+  unsigned char result = (alpha * (int)foreground) + ((1 - alpha) * (int)background);
 
-  // Returns the value of the foreground
-  return (unsigned char)mask * ((int)foreground) + (1 - mask) * ((int)background);
+  return result;
 };

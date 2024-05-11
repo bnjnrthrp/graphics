@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[])
 {
-    Pixel *bgImage, *fgImage, *mask, *blendedImage; // background image, foreground image, and mask
+    Pixel *bgImage, *fgImage, *mask; // background image, foreground image, and mask
     int bgRows, bgCols, bgColors, fgRows, fgCols, fgColors, maskRows, maskCols, maskColors;
     long bgImageSize, fgImageSize;
     long i;
@@ -52,8 +52,6 @@ int main(int argc, char *argv[])
     /* calculate the output image size */
     bgImageSize = (long)bgRows * (long)bgCols;
     fgImageSize = (long)fgRows * (long)fgCols;
-
-    blendedImage = bgImage; // new pointer to original background image
     /* loop through the background and mask, adding the foreground image where the mask allows it  */
     for (i = 0; i < bgImageSize; i++)
     {
@@ -61,14 +59,14 @@ int main(int argc, char *argv[])
         if (i < fgImageSize)
         {
             /// Convert everything to [i]
-            blendedImage[i].r = blendColors(fgImage[i].r, bgImage[i].r, mask[i].r);
-            blendedImage[i].g = blendColors(fgImage[i].g, bgImage[i].g, mask[i].g);
-            blendedImage[i].b = blendColors(fgImage[i].b, bgImage[i].b, mask[i].b);
+            bgImage[i].r = blendColors(fgImage[i].r, bgImage[i].r, mask[i].r);
+            bgImage[i].g = blendColors(fgImage[i].g, bgImage[i].g, mask[i].g);
+            bgImage[i].b = blendColors(fgImage[i].b, bgImage[i].b, mask[i].b);
         }
     }
 
     /* write out the resulting image */
-    writePPM(blendedImage, bgRows, bgCols, bgColors /* s/b 255 */, argv[4]);
+    writePPM(bgImage, bgRows, bgCols, bgColors /* s/b 255 */, argv[4]);
 
     /* free the image memory */
 
