@@ -50,18 +50,24 @@ int main(int argc, char *argv[])
 
     /* calculate the output image size */
     fgImageSize = (long)fgRows * (long)fgCols;
+
+    /**
+     * TODO: Add scale function to scale the foreground image down by integer amount
+     */
+
     long j = 0; // index tracker for image 2
-    dx = 350;
-    dy = 200;
+    dx = 400;
+    dy = 80;
     for (long r = 0; r < bgRows; r++)
     {
         for (long c = 0; c < bgCols; c++)
-            if (c >= dx && c < fgCols + dx)
+            // If the background image index is at the offset of the foreground image, start compositing images
+            if (c >= dx && c < fgCols + dx && r >= dy && r < fgRows + dy)
             {
                 /// Convert everything to [i]
-                bgImage[r * bgCols + c].r = blendColors(fgImage[j].r, bgImage[(r - dy) * bgCols + c - dx].r, mask[j].r);
-                bgImage[r * bgCols + c].g = blendColors(fgImage[j].g, bgImage[(r - dy) * bgCols + c - dx].g, mask[j].g);
-                bgImage[r * bgCols + c].b = blendColors(fgImage[j].b, bgImage[(r - dy) * bgCols + c - dx].b, mask[j].b);
+                bgImage[r * bgCols + c].r = blendColors(fgImage[j].r, bgImage[(r)*bgCols + c].r, mask[j].r);
+                bgImage[r * bgCols + c].g = blendColors(fgImage[j].g, bgImage[(r)*bgCols + c].g, mask[j].g);
+                bgImage[r * bgCols + c].b = blendColors(fgImage[j].b, bgImage[(r)*bgCols + c].b, mask[j].b);
                 j++;
             }
     }

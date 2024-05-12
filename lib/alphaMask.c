@@ -18,7 +18,7 @@
  */
 bool isGreenScreen(Pixel pixel)
 {
-  float threshold = 1.5;
+  float threshold = 1.4;
   // Converts values of 0 to 1 to remove issues with divide by 0, otherwise keep it the same.
   pixel.r = pixel.r == 0 ? 1 : pixel.r;
   pixel.b = pixel.b == 0 ? 1 : pixel.b;
