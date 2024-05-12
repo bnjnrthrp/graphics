@@ -34,3 +34,7 @@ unsigned char blendColors(unsigned char foreground, unsigned char background, un
 
   return result;
 };
+
+Pixel *scaleImage(Pixel *original, int originalSize, float factor)
+{
+}

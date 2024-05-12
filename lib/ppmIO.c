@@ -5,9 +5,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ppmIO.h"
+#include "../include/ppmIO.h"
 
 #define USECPP 0
+
+Pixel *newImage1d(int rows, int cols)
+{
+  int size = rows * cols;
+
+  Pixel *image = (Pixel *)malloc(sizeof(Pixel) * size);
+  if (image == NULL)
+  {
+    fprintf(stderr, "Memory allocation failed\n");
+    exit(1);
+  }
+  // Initializes color to black
+  for (int i = 0; i < size; i++)
+  {
+    image[i].r = 0;
+    image[i].g = 0;
+    image[i].b = 0;
+  }
+  return image;
+}
 
 // read in rgb values from the ppm file output by cqcam
 Pixel *readPPM(int *rows, int *cols, int *colors, char *filename)

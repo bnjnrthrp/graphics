@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[])
 {
-    Pixel *bgImage, *fgImage, *mask; // background image, foreground image, and mask
+    Pixel *bgImage, *fgImage, *mask, *scaled; // background image, foreground image, and mask
     int bgRows, bgCols, bgColors, fgRows, fgCols, fgColors, maskRows, maskCols, maskColors;
     long fgImageSize, dx, dy;
 
@@ -62,13 +62,14 @@ int main(int argc, char *argv[])
     {
         for (long c = 0; c < bgCols; c++)
             // If the background image index is at the offset of the foreground image, start compositing images
+            // This allows for a smaller foreground dimension
             if (c >= dx && c < fgCols + dx && r >= dy && r < fgRows + dy)
             {
-                /// Convert everything to [i]
+                /// Blend each channel at i (the background), and j (foreground)
                 bgImage[r * bgCols + c].r = blendColors(fgImage[j].r, bgImage[(r)*bgCols + c].r, mask[j].r);
                 bgImage[r * bgCols + c].g = blendColors(fgImage[j].g, bgImage[(r)*bgCols + c].g, mask[j].g);
                 bgImage[r * bgCols + c].b = blendColors(fgImage[j].b, bgImage[(r)*bgCols + c].b, mask[j].b);
-                j++;
+                j++; // Increment the foreground
             }
     }
 
