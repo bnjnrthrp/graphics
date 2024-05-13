@@ -26,6 +26,15 @@ bool isGreenScreen(Pixel pixel)
   return (float)pixel.g / (float)pixel.r >= threshold && (float)pixel.g / (float)pixel.b >= threshold;
 };
 
+/**
+ * Blends the colors together using an alpha mask to composite a foreground and
+ * background image using a(foreground) + (1-a)(background). Works in one channel only.
+ *
+ * @param foreground the foreground pixel value (r, g, or b)
+ * @param backround the background pixel value
+ * @param mask the alpha mask value
+ * @return the value of blended pixel
+ */
 unsigned char blendColors(unsigned char foreground, unsigned char background, unsigned char mask)
 {
   // Convert mask color value to the range [0, 1]
@@ -35,6 +44,13 @@ unsigned char blendColors(unsigned char foreground, unsigned char background, un
   return result;
 };
 
+/**
+ * Helper function that averages the red channels of an array of pixels.
+ * Only does a balanced average
+ * @param pixels the array of pixels to average
+ * @param size the size of the array
+ * @return unsigned char of the average size of the pixel
+ */
 unsigned char __averageReds(Pixel pixels[], long size)
 {
 
@@ -45,6 +61,14 @@ unsigned char __averageReds(Pixel pixels[], long size)
   }
   return sum / size;
 }
+
+/**
+ * Helper function that averages the green channels of an array of pixels.
+ * Only does a balanced average
+ * @param pixels the array of pixels to average
+ * @param size the size of the array
+ * @return unsigned char of the average size of the pixel
+ */
 unsigned char __averageGreens(Pixel pixels[], long size)
 {
 
@@ -55,6 +79,14 @@ unsigned char __averageGreens(Pixel pixels[], long size)
   }
   return sum / size;
 }
+
+/**
+ * Helper function that averages the blue channels of an array of pixels.
+ * Only does a balanced average
+ * @param pixels the array of pixels to average
+ * @param size the size of the array
+ * @return unsigned char of the average size of the pixel
+ */
 unsigned char __averageBlues(Pixel pixels[], long size)
 {
 
@@ -66,6 +98,13 @@ unsigned char __averageBlues(Pixel pixels[], long size)
   return sum / size;
 }
 
+/**
+ * Helper function to determine the average value of a channel in a pixel.
+ * @param pixels[] an array of the pixels to average
+ * @param size the size of the pixel array
+ * @param channel the channel to average. 0 = red, 1 = green, 2 = blue
+ * @return the average value of that pixel in that channel
+ */
 unsigned char averagePixel(Pixel pixels[], long size, int channel)
 {
   switch (channel)
@@ -81,6 +120,13 @@ unsigned char averagePixel(Pixel pixels[], long size, int channel)
   }
 }
 
+/**
+ * Scales an image down to 25% the original by reducing each dimension by 50%
+ * @param original the original image
+ * @param rows the number of rows of the original image
+ * @param cols the number of columns of the original image
+ * @return a pointer to the scaled pixel image
+ */
 Pixel *scaleImageHalf(Pixel *original, int rows, int cols)
 {
   long scaledRows, scaledCols;
