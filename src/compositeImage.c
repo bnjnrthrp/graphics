@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[])
 {
-    Pixel *bgImage, *fgImage, *mask, *scaled; // background image, foreground image, and mask
+    Pixel *bgImage, *fgImage, *mask, *scaled, *scaledMask; // background image, foreground image, and mask
     int bgRows, bgCols, bgColors, fgRows, fgCols, fgColors, maskRows, maskCols, maskColors;
     long fgImageSize, dx, dy;
 
@@ -55,20 +55,26 @@ int main(int argc, char *argv[])
      * TODO: Add scale function to scale the foreground image down by integer amount
      */
 
+    scaled = scaleImageHalf(fgImage, fgRows, fgCols);
+    long scaledRows = fgRows / 2;
+    long scaledCols = fgCols / 2;
+
+    scaledMask = scaleImageHalf(mask, fgRows, fgCols);
+
     long j = 0; // index tracker for image 2
-    dx = 400;
+    dx = 520;
     dy = 80;
     for (long r = 0; r < bgRows; r++)
     {
         for (long c = 0; c < bgCols; c++)
             // If the background image index is at the offset of the foreground image, start compositing images
             // This allows for a smaller foreground dimension
-            if (c >= dx && c < fgCols + dx && r >= dy && r < fgRows + dy)
+            if (c >= dx && c < scaledCols + dx && r >= dy && r < scaledRows + dy)
             {
                 /// Blend each channel at i (the background), and j (foreground)
-                bgImage[r * bgCols + c].r = blendColors(fgImage[j].r, bgImage[(r)*bgCols + c].r, mask[j].r);
-                bgImage[r * bgCols + c].g = blendColors(fgImage[j].g, bgImage[(r)*bgCols + c].g, mask[j].g);
-                bgImage[r * bgCols + c].b = blendColors(fgImage[j].b, bgImage[(r)*bgCols + c].b, mask[j].b);
+                bgImage[r * bgCols + c].r = blendColors(scaled[j].r, bgImage[(r)*bgCols + c].r, scaledMask[j].r);
+                bgImage[r * bgCols + c].g = blendColors(scaled[j].g, bgImage[(r)*bgCols + c].g, scaledMask[j].g);
+                bgImage[r * bgCols + c].b = blendColors(scaled[j].b, bgImage[(r)*bgCols + c].b, scaledMask[j].b);
                 j++; // Increment the foreground
             }
     }
@@ -77,7 +83,7 @@ int main(int argc, char *argv[])
     writePPM(bgImage, bgRows, bgCols, bgColors /* s/b 255 */, argv[4]);
 
     /* free the image memory */
-
+    free(scaled);
     free(bgImage);
     free(fgImage);
     free(mask);

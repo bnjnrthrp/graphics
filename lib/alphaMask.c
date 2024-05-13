@@ -35,6 +35,73 @@ unsigned char blendColors(unsigned char foreground, unsigned char background, un
   return result;
 };
 
-Pixel *scaleImage(Pixel *original, int originalSize, float factor)
+unsigned char __averageReds(Pixel pixels[], long size)
 {
+
+  int sum = 0;
+  for (int i = 0; i < size; i++)
+  {
+    sum += pixels[i].r;
+  }
+  return sum / size;
+}
+unsigned char __averageGreens(Pixel pixels[], long size)
+{
+
+  int sum = 0;
+  for (int i = 0; i < size; i++)
+  {
+    sum += pixels[i].g;
+  }
+  return sum / size;
+}
+unsigned char __averageBlues(Pixel pixels[], long size)
+{
+
+  int sum = 0;
+  for (int i = 0; i < size; i++)
+  {
+    sum += pixels[i].b;
+  }
+  return sum / size;
+}
+
+unsigned char averagePixel(Pixel pixels[], long size, int channel)
+{
+  switch (channel)
+  {
+  case 0:
+    return __averageReds(pixels, size);
+  case 1:
+    return __averageGreens(pixels, size);
+  case 2:
+    return __averageBlues(pixels, size);
+  default:
+    return -1;
+  }
+}
+
+Pixel *scaleImageHalf(Pixel *original, int rows, int cols)
+{
+  long scaledRows, scaledCols;
+  scaledRows = rows / 2;
+  scaledCols = cols / 2;
+  Pixel *scaled = newImage1d(rows / 2, cols / 2);
+  for (long r = 0; r < rows / 2; r++)
+  {
+    for (long c = 0; c < cols / 2; c++)
+    {
+      Pixel upperLeft = original[(2 * r * cols) + (2 * c)];
+      Pixel upperRight = original[(2 * r * cols) + (2 * c + 1)];
+      Pixel lowerLeft = original[(2 * r * cols + cols) + (2 * c)];
+      Pixel lowerRight = original[(2 * r * cols + cols) + (2 * c + 1)];
+
+      Pixel orig[] = {upperLeft, upperRight, lowerLeft, lowerRight};
+      // check if there are 2 cols available
+      scaled[r * scaledCols + c].r = averagePixel(orig, 4, 0);
+      scaled[r * scaledCols + c].g = averagePixel(orig, 4, 1);
+      scaled[r * scaledCols + c].b = averagePixel(orig, 4, 2);
+    }
+  }
+  return scaled;
 }
