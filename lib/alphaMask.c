@@ -12,19 +12,20 @@
 #include "../include/alphaMask.h"
 
 /**
- * This function will determine if the green channel is the dominant (1.5 ratio or more) channel in a pixel
+ * This function will determine if the green channel is the dominant channel in a pixel
  * @param pixel the pixel in question
  * @returns boolean, true if the green channel is 1.5 greater than the green and blue channels.
  */
 bool isGreenScreen(Pixel pixel)
 {
-  float blueThreshold = 1.5;
-  float redThreshold = 1.3;
+  float threshold = 1.3;
   // Converts values of 0 to 1 to remove issues with divide by 0, otherwise keep it the same.
   pixel.r = pixel.r == 0 ? 1 : pixel.r;
   pixel.b = pixel.b == 0 ? 1 : pixel.b;
 
-  return (float)pixel.g / (float)pixel.r >= redThreshold && (float)pixel.g / (float)pixel.b >= blueThreshold;
+  // returns true under 3 criteria: green is > 50, and the ratio between green and the others is >1.3
+
+  return pixel.g > 50 && (float)pixel.g / (float)pixel.r >= threshold && (float)pixel.g / (float)pixel.b >= threshold;
 };
 
 /**
