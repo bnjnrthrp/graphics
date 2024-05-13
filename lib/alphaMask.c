@@ -1,8 +1,8 @@
 /*
-  This is an example of reading and writing an image using the ppmIO.c
-  routines.  To manipulate the image, change the pixel color values.
+  This file has utility functions for creating an alpha mask from a green screen image
+  and scaling an image down.
 
-  Bruce A. Maxwell updated 2021-09-05
+  @author Benji Northrop
 */
 
 #include <stdio.h>
@@ -18,12 +18,13 @@
  */
 bool isGreenScreen(Pixel pixel)
 {
-  float threshold = 1.4;
+  float blueThreshold = 1.5;
+  float redThreshold = 1.3;
   // Converts values of 0 to 1 to remove issues with divide by 0, otherwise keep it the same.
   pixel.r = pixel.r == 0 ? 1 : pixel.r;
   pixel.b = pixel.b == 0 ? 1 : pixel.b;
 
-  return (float)pixel.g / (float)pixel.r >= threshold && (float)pixel.g / (float)pixel.b >= threshold;
+  return (float)pixel.g / (float)pixel.r >= redThreshold && (float)pixel.g / (float)pixel.b >= blueThreshold;
 };
 
 /**
@@ -132,7 +133,7 @@ Pixel *scaleImageHalf(Pixel *original, int rows, int cols)
   long scaledRows, scaledCols;
   scaledRows = rows / 2;
   scaledCols = cols / 2;
-  Pixel *scaled = newImage1d(rows / 2, cols / 2);
+  Pixel *scaled = newImage1d(scaledRows, scaledCols);
   for (long r = 0; r < rows / 2; r++)
   {
     for (long c = 0; c < cols / 2; c++)

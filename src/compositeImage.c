@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 {
     Pixel *bgImage, *fgImage, *mask, *scaled, *scaledMask; // background image, foreground image, and mask
     int bgRows, bgCols, bgColors, fgRows, fgCols, fgColors, maskRows, maskCols, maskColors;
-    long fgImageSize, dx, dy;
+    long dx, dy;
 
     if (argc < 5)
     {
@@ -47,9 +47,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unable to read %s\n", argv[3]);
         exit(-1);
     }
-
-    /* calculate the output image size */
-    fgImageSize = (long)fgRows * (long)fgCols;
 
     // Scales the foreground image, making it 25% of the original
     scaled = scaleImageHalf(fgImage, fgRows, fgCols);
