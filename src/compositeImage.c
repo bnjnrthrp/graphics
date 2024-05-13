@@ -51,10 +51,7 @@ int main(int argc, char *argv[])
     /* calculate the output image size */
     fgImageSize = (long)fgRows * (long)fgCols;
 
-    /**
-     * TODO: Add scale function to scale the foreground image down by integer amount
-     */
-
+    // Scales the foreground image, making it 25% of the original
     scaled = scaleImageHalf(fgImage, fgRows, fgCols);
     long scaledRows = fgRows / 2;
     long scaledCols = fgCols / 2;
@@ -84,6 +81,7 @@ int main(int argc, char *argv[])
 
     /* free the image memory */
     free(scaled);
+    free(scaledMask);
     free(bgImage);
     free(fgImage);
     free(mask);
