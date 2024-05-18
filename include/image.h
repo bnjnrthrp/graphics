@@ -11,7 +11,7 @@ typedef struct
     int cols;
     float a;
     float z;
-    unsigned char maxval;
+    float maxval;
     char filename[MAX_FILENAME_LENGTH];
 } Image;
 

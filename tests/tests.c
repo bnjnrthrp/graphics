@@ -12,6 +12,8 @@
 #include "../include/Image.h"
 #include "testing_util.h"
 
+#define EPSILON .0001
+
 /******************** TESTS ******************/
 
 /**
@@ -20,30 +22,83 @@
  */
 bool test_image_create()
 {
+    PRINT_DEBUG("Testing the image_create function\n");
     bool passed = true;
     Image *image = image_create(3, 3);
-    passed += ASSERT_NULL(image->data);
-    passed += ASSERT_EQUAL(image->rows, 0);
-    passed += ASSERT_EQUAL(image->cols, 0);
-    passed += ASSERT_EQUAL(image->a, 0);
-    passed += ASSERT_EQUAL(image->maxval, 1);
+    passed &= ASSERT_NOT_NULL(image->data);
+    passed &= ASSERT_EQUAL(image->rows, 3);
+    PRINT_DEBUG("rows %d\n", image->rows);
+    passed &= ASSERT_EQUAL(image->cols, 3);
+    PRINT_DEBUG("cols %d\n", image->cols);
+    passed &= ASSERT_EQUAL(image->a, 1.0);
+    PRINT_DEBUG("a channel %.1f\n", image->a);
+    passed &= ASSERT_EQUAL(image->z, 1.0);
+    PRINT_DEBUG("z channel %.1f\n", image->z);
     for (int i = 0; i < MAX_FILENAME_LENGTH; i++)
     {
-        passed += ASSERT_EQUAL(image->filename[i], 0);
+        passed &= ASSERT_EQUAL(image->filename[i], 0);
     }
-    free(image);
+    image_free(image);
     return passed;
 }
 
-// bool testResizeImage()
-// {
-//     bool passed = true;
-//     int origRows = 12;
-//     int origCols = 12;
-//     FPixel *pixel = newImage1d(origRows, origCols);
+bool test_image_init()
+{
+    PRINT_DEBUG("Testing the image_init function\n");
+    bool passed = true;
+    Image *image = (Image *)malloc(sizeof(Image)); // Setup
+    image_init(image);
+    passed &= ASSERT_NULL(image->data);
+    passed &= ASSERT_EQUAL(image->rows, 0);
+    PRINT_DEBUG("rows %d\n", image->rows);
+    passed &= ASSERT_EQUAL(image->cols, 0);
+    PRINT_DEBUG("cols %d\n", image->cols);
 
-//     free(pixel);
-// }
+    for (int i = 0; i < MAX_FILENAME_LENGTH; i++)
+    {
+        passed &= ASSERT_EQUAL(image->filename[i], 0);
+    }
+    free(image); // Not an actual image, so free this malloc
+    return passed;
+}
+
+bool test_image_alloc()
+{
+    PRINT_DEBUG("Testing the image_alloc function\n");
+    bool passed = true;
+    int rows, cols;
+    rows = cols = 3;
+
+    Image *image = image_create(rows, cols); // Setup
+
+    PRINT_DEBUG("Checking the data in the Image\n");
+    for (int i = 0; i < rows * cols; i++)
+    {
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[0], 0);
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[1], 0);
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[2], 0);
+    }
+    passed &= ASSERT_EQUAL(image->rows, 3);
+    PRINT_DEBUG("rows %d\n", image->rows);
+    passed &= ASSERT_EQUAL(image->cols, 3);
+    PRINT_DEBUG("cols %d\n", image->cols);
+    passed &= ASSERT_EQUAL(image->a, 1.0);
+    PRINT_DEBUG("a channel %.1f\n", image->a);
+    passed &= ASSERT_EQUAL(image->z, 1.0);
+    PRINT_DEBUG("z channel %.1f\n", image->z);
+    passed &= ASSERT_EQUAL(image->maxval, 1.0);
+    PRINT_DEBUG("maxvalue %.1f\n", image->maxval);
+    for (int i = 0; i < MAX_FILENAME_LENGTH; i++)
+    {
+        passed &= ASSERT_EQUAL(image->filename[i], 0);
+    }
+    image_free(image);
+    return passed;
+}
+
+bool test_read_write_image()
+{
+}
 
 /*************************** end tests ***********/
 
@@ -54,7 +109,9 @@ bool test_image_create()
 TestingSet *init_testing_set()
 {
     TestingSet *set = new_testing_set();
-    add_test(set, "testing Image_create, creating a new image", test_image_create);
+    add_test(set, "testing image_create, creating a new image", test_image_create);
+    add_test(set, "testing image_init, initializing a new image", test_image_init);
+    add_test(set, "testing image_alloc, allocating a new image", test_image_alloc);
 
     return set;
 }
