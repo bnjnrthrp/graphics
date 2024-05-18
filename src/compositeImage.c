@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[])
 {
-    Pixel *bgImage, *fgImage, *mask, *scaled, *scaledMask; // background image, foreground image, and mask
+    FPixel *bgImage, *fgImage, *mask, *scaled, *scaledMask; // background image, foreground image, and mask
     int bgRows, bgCols, bgColors, fgRows, fgCols, fgColors, maskRows, maskCols, maskColors;
     long dx, dy;
 

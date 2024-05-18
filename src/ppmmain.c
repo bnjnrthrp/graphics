@@ -12,7 +12,7 @@
 #define USECPP 0
 
 int main(int argc, char *argv[]) {
-  Pixel *image;
+  FPixel *image;
   int rows, cols, colors;
   long imagesize;
   long i, j;
