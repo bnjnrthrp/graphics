@@ -9,10 +9,10 @@ typedef struct
   unsigned char b;
 } Pixel;
 
-FPixel *newImage1d(int rows, int cols);
+Pixel *newImage1d(int rows, int cols);
 
-FPixel *readPPM(int *rows, int *cols, int *colors, char *filename);
-void writePPM(FPixel *image, int rows, int cols, int colors, char *filename);
+Pixel *readPPM(int *rows, int *cols, int *colors, char *filename);
+void writePPM(Pixel *image, int rows, int cols, int colors, char *filename);
 
 unsigned char *readPGM(int *rows, int *cols, int *intensities, char *filename);
 void writePGM(unsigned char *image, long rows, long cols, int intensities, char *filename);
