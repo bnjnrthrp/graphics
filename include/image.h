@@ -4,7 +4,7 @@
 
 typedef struct
 {
-    FPixel **data;
+    Pixel **data;
     int rows;
     int cols;
     float a;

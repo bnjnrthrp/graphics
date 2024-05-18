@@ -11,21 +11,24 @@
 
 #define USECPP 0
 
-int main(int argc, char *argv[]) {
-  FPixel *image;
+int main(int argc, char *argv[])
+{
+  Pixel *image;
   int rows, cols, colors;
   long imagesize;
   long i, j;
   int min;
 
-  if(argc < 3) {
+  if (argc < 3)
+  {
     printf("Usage: ppmtest <input file> <output file>\n");
     exit(-1);
   }
 
   /* read in the image */
   image = readPPM(&rows, &cols, &colors, argv[1]);
-  if(!image) {
+  if (!image)
+  {
     fprintf(stderr, "Unable to read %s\n", argv[1]);
     exit(-1);
   }
@@ -34,7 +37,8 @@ int main(int argc, char *argv[]) {
   imagesize = (long)rows * (long)cols;
 
   /* mess with the image here  */
-  for(i=0;i<imagesize;i++) {
+  for (i = 0; i < imagesize; i++)
+  {
 
     // this little piece of code thresholds out very red pixels
     // the resulting image will be very red where there is red stuff
@@ -42,11 +46,13 @@ int main(int argc, char *argv[]) {
     j = (int)image[i].r - ((int)image[i].g + (int)image[i].b) / 2;
     min = image[i].g < image[i].b ? image[i].g : image[i].b;
     min = image[i].r < min ? image[i].r : min;
-    min = min < 128 ? min : min/2;
-    if(j > 10) {
-      image[i].r = image[i].r < 128 ? image[i].r*2 : image[i].r;
+    min = min < 128 ? min : min / 2;
+    if (j > 10)
+    {
+      image[i].r = image[i].r < 128 ? image[i].r * 2 : image[i].r;
     }
-    else {
+    else
+    {
       image[i].r = min;
     }
     image[i].g = image[i].b = min;
@@ -62,5 +68,5 @@ int main(int argc, char *argv[]) {
   free(image);
 #endif
 
-  return(0);
+  return (0);
 }

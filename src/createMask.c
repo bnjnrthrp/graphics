@@ -15,7 +15,7 @@
 
 int main(int argc, char *argv[])
 {
-    FPixel *image;
+    Pixel *image;
     int rows, cols, colors;
     long imagesize;
     long i;

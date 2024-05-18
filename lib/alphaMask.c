@@ -16,7 +16,7 @@
  * @param pixel the pixel in question
  * @returns boolean, true if the green channel is 1.5 greater than the green and blue channels.
  */
-bool isGreenScreen(FPixel pixel)
+bool isGreenScreen(Pixel pixel)
 {
   float threshold = 1.3;
   // Converts values of 0 to 1 to remove issues with divide by 0, otherwise keep it the same.
@@ -53,7 +53,7 @@ unsigned char blendColors(unsigned char foreground, unsigned char background, un
  * @param size the size of the array
  * @return unsigned char of the average size of the pixel
  */
-unsigned char __averageReds(FPixel pixels[], long size)
+unsigned char __averageReds(Pixel pixels[], long size)
 {
 
   int sum = 0;
@@ -71,7 +71,7 @@ unsigned char __averageReds(FPixel pixels[], long size)
  * @param size the size of the array
  * @return unsigned char of the average size of the pixel
  */
-unsigned char __averageGreens(FPixel pixels[], long size)
+unsigned char __averageGreens(Pixel pixels[], long size)
 {
 
   int sum = 0;
@@ -89,7 +89,7 @@ unsigned char __averageGreens(FPixel pixels[], long size)
  * @param size the size of the array
  * @return unsigned char of the average size of the pixel
  */
-unsigned char __averageBlues(FPixel pixels[], long size)
+unsigned char __averageBlues(Pixel pixels[], long size)
 {
 
   int sum = 0;
@@ -107,7 +107,7 @@ unsigned char __averageBlues(FPixel pixels[], long size)
  * @param channel the channel to average. 0 = red, 1 = green, 2 = blue
  * @return the average value of that pixel in that channel
  */
-unsigned char averagePixel(FPixel pixels[], long size, int channel)
+unsigned char averagePixel(Pixel pixels[], long size, int channel)
 {
   switch (channel)
   {
@@ -129,22 +129,22 @@ unsigned char averagePixel(FPixel pixels[], long size, int channel)
  * @param cols the number of columns of the original image
  * @return a pointer to the scaled pixel image
  */
-FPixel *scaleImageHalf(FPixel *original, int rows, int cols)
+Pixel *scaleImageHalf(Pixel *original, int rows, int cols)
 {
   long scaledRows, scaledCols;
   scaledRows = rows / 2;
   scaledCols = cols / 2;
-  FPixel *scaled = newImage1d(scaledRows, scaledCols);
+  Pixel *scaled = newImage1d(scaledRows, scaledCols);
   for (long r = 0; r < rows / 2; r++)
   {
     for (long c = 0; c < cols / 2; c++)
     {
-      FPixel upperLeft = original[(2 * r * cols) + (2 * c)];
-      FPixel upperRight = original[(2 * r * cols) + (2 * c + 1)];
-      FPixel lowerLeft = original[(2 * r * cols + cols) + (2 * c)];
-      FPixel lowerRight = original[(2 * r * cols + cols) + (2 * c + 1)];
+      Pixel upperLeft = original[(2 * r * cols) + (2 * c)];
+      Pixel upperRight = original[(2 * r * cols) + (2 * c + 1)];
+      Pixel lowerLeft = original[(2 * r * cols + cols) + (2 * c)];
+      Pixel lowerRight = original[(2 * r * cols + cols) + (2 * c + 1)];
 
-      FPixel orig[] = {upperLeft, upperRight, lowerLeft, lowerRight};
+      Pixel orig[] = {upperLeft, upperRight, lowerLeft, lowerRight};
       // check if there are 2 cols available
       scaled[r * scaledCols + c].r = averagePixel(orig, 4, 0);
       scaled[r * scaledCols + c].g = averagePixel(orig, 4, 1);

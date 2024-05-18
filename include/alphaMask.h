@@ -3,11 +3,11 @@
 #include <stdbool.h>
 #include "ppmIO.h"
 
-bool isGreenScreen(FPixel pixel);
+bool isGreenScreen(Pixel pixel);
 unsigned char blendColors(unsigned char foreground, unsigned char background, unsigned char mask);
-FPixel *scaleImageHalf(FPixel *original, int rows, int cols);
-unsigned char averagePixel(FPixel pixels[], long size, int channel);
-unsigned char __averageReds(FPixel pixels[], long size);
-unsigned char __averageGreens(FPixel pixels[], long size);
-unsigned char __averageBlues(FPixel pixels[], long size);
+Pixel *scaleImageHalf(Pixel *original, int rows, int cols);
+unsigned char averagePixel(Pixel pixels[], long size, int channel);
+unsigned char __averageReds(Pixel pixels[], long size);
+unsigned char __averageGreens(Pixel pixels[], long size);
+unsigned char __averageBlues(Pixel pixels[], long size);
 #endif // ALPHAMASK_H

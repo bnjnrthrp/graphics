@@ -7,7 +7,7 @@ typedef struct
   unsigned char r;
   unsigned char g;
   unsigned char b;
-} FPixel;
+} Pixel;
 
 FPixel *newImage1d(int rows, int cols);
 
