@@ -9,8 +9,8 @@ typedef struct
     FPixel **data;
     int rows;
     int cols;
-    float a;
-    float z;
+    float *a;
+    float *z;
     float maxval;
     char filename[MAX_FILENAME_LENGTH];
 } Image;

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "../include/Image.h"
 
 /**
@@ -56,8 +57,8 @@ void image_init(Image *src)
     src->data = NULL;
     src->rows = 0;
     src->cols = 0;
-    src->a = 0;
-    src->z = 0;
+    src->a = NULL;
+    src->z = NULL;
     src->maxval = 1;
 
     for (int i = 0; i < MAX_FILENAME_LENGTH; i++)
@@ -94,13 +95,13 @@ int image_alloc(Image *src, int rows, int cols)
     // Set the data fields to defaults.
     src->rows = rows;
     src->cols = cols;
-    src->a = 1.0;
-    src->z = 1.0;
     src->maxval = 1.0;
 
-    // Allocate the row pointers
+    // Allocate the row pointers, a channel, and z channel arrays
     src->data = (FPixel **)malloc(sizeof(FPixel *) * rows);
-    if (src->data == NULL)
+    src->a = (float *)malloc(sizeof(float) * rows * cols);
+    src->z = (float *)malloc(sizeof(float) * rows * cols);
+    if (src->data == NULL || src->a == NULL || src->z == NULL)
     {
         fprintf(stderr, "Data allocation failed\n");
         return -1;
@@ -125,6 +126,8 @@ int image_alloc(Image *src, int rows, int cols)
         src->data[0][i].rgb[0] = 0;
         src->data[0][i].rgb[1] = 0;
         src->data[0][i].rgb[2] = 0;
+        src->a[i] = 1.0;
+        src->z[i] = 1.0;
     }
 
     return 0;
@@ -154,6 +157,10 @@ void image_dealloc(Image *src)
     // Free the array of pointers
     free(src->data);
 
+    // Free the a and z channels
+    free(src->a);
+    free(src->z);
+
     // Reset the fields of the image
     image_init(src);
     return;
@@ -171,75 +178,9 @@ void image_dealloc(Image *src)
  */
 Image *image_read(char *filename)
 {
-    char tag[40];
-    Image *image;
-    FILE *fp;
-    int read, num[3], curchar, rows, cols, colors;
-
-    if (filename != NULL && strlen(filename))
-    {
-        fp = fopen(filename, "r");
-    }
-    else
-    {
-        fp = stdin;
-    }
-
-    if (fp)
-    {
-        fscanf(fp, "%s\n", tag);
-
-        // Read the "magic number" at the beginning of the ppm
-        if (strncmp(tag, "P6", 40) != 0)
-        {
-            fprintf(stderr, "not a ppm!\n");
-            exit(1);
-        }
-
-        // Read the rows, columns, and color depth output by cqcam
-        // need to read in three numbers and skip any lines that start with a #
-        read = 0;
-        while (read < 3)
-        {
-            curchar = fgetc(fp);
-            if ((char)curchar == '#')
-            { // skip this line
-                while (fgetc(fp) != '\n')
-                    /* do nothing */;
-            }
-            else
-            {
-                ungetc(curchar, fp);
-                fscanf(fp, "%d", &(num[read]));
-                read++;
-            }
-        }
-        while (fgetc(fp) != '\n')
-            /* pass the last newline character */;
-
-        cols = num[0];
-        rows = num[1];
-        colors = num[2];
-
-        if (cols > 0 && rows > 0)
-        {
-            image = image_create(rows, cols);
-
-            if (image)
-            {
-                fread(image, sizeof(Image), rows * cols, fp);
-
-                if (fp != stdin)
-                {
-                    fclose(fp);
-                }
-                return image;
-            }
-        }
-    }
-
-    return NULL;
-};
+    Image *src = NULL;
+    return src;
+}
 /**
  * writes a PPM image to the given filename. Returns 0 on success.
  * Optionally, you can look at the filename extension and write different
@@ -248,22 +189,153 @@ Image *image_read(char *filename)
  * @param filename the output filename
  * @return 0 if successful
  */
-int image_write(Image *src, int rows, int cols, int colors, char *filename)
+int image_write(Image *src, char *filename)
 {
-    FILE *fp;
+    return 0;
+};
 
-    if (filename != NULL && strlen(filename))
-        fp = fopen(filename, "w");
-    else
-        fp = stdout;
+// Setters and getters
+/**
+ * Gets a pixel from a location
+ * @param src the image
+ * @param r the row index
+ * @param c the col index
+ * @return the Pixel at location r, c
+ */
+FPixel image_getf(Image *src, int r, int c)
+{
+    return src->data[r][c];
+};
 
-    if (fp)
+/**
+ * Gets a color value from a specific pixel and channel
+ * @param src the image
+ * @param r the row index
+ * @param c the col index
+ * @param b the channel index [0,2]
+ * @return the color channel in float format
+ */
+float image_getc(Image *src, int r, int c, int b)
+{
+    return src->data[r][c].rgb[b];
+};
+
+/**
+ * Gets the a channel value from a specific pixel
+ * @param src the image
+ * @param r the row index
+ * @param c the col index
+ * @return the alpha channel in float format
+ */
+float image_geta(Image *src, int r, int c)
+{
+    return src->a[r * src->rows + c];
+};
+/**
+ * Gets the z channel value from a specific pixel
+ * @param src the image
+ * @param r the row index
+ * @param c the col index
+ * @return the z channel in float format
+ */
+float image_getz(Image *src, int r, int c)
+{
+    return src->z[r * src->rows + c];
+};
+
+/**
+ * sets the values of pixel (r,c) to the FPixel val.
+ * If your FPixel contains just r, g, b values then this function should
+ * not modify the corresponding alpha or z values.
+ *
+ * @param src the source image
+ * @param r the row index
+ * @param c the col index
+ * @param val the new pixel values to use
+ */
+void image_setf(Image *src, int r, int c, FPixel val)
+{
+    for (int i = 0; i < 3; i++)
     {
-        fprintf(fp, "P6\n");
-        fprintf(fp, "%d %d\n%d\n", cols, rows, colors);
+        if (val.rgb[i] < 0)
+        {
+            src->data[r][c].rgb[i] = 0;
+        }
+        else if (val.rgb[i] > src->maxval)
+        {
+            src->data[r][c].rgb[i] = src->maxval;
+        }
+        else
+        {
+            src->data[r][c].rgb[i] = val.rgb[i];
+        }
+    }
+};
 
-        fwrite(src, sizeof(Image), rows * cols, fp);
+/**
+ * Sets the value of a specific color channel for a pixel
+ * @param src the image
+ * @param r the row index
+ * @param c the col index
+ * @param b the color channel index (RGB) [0, 2]
+ * @param val the new value [0, 1]
+ *
+ */
+void image_setc(Image *src, int r, int c, int b, float val)
+{
+    if (b < 0 || b > 2)
+    {
+        fprintf(stderr, "Invalid b channel index provided\n");
+        return;
     }
 
-    fclose(fp);
+    if (val < 0)
+    {
+        val = 0;
+    }
+    else if (val > src->maxval)
+    {
+        val = src->maxval;
+    }
+    src->data[r][c].rgb[b] = val;
+};
+
+/**
+ * Sets the alpha channel value for a given position
+ * @param src the image
+ * @param r the row index
+ * @param c the col index
+ * @param val the new value in range [0, 1]
+ */
+void image_seta(Image *src, int r, int c, float val)
+{
+    if (val < 0)
+    {
+        val = 0;
+    }
+    else if (val > 1)
+    {
+        val = 1;
+    }
+    src->a[r * src->rows + c] = val;
+};
+
+/**
+ * Sets the z channel value for a given position
+ * @param src the image
+ * @param r the row index
+ * @param c the col index
+ * @param val the new value in range [0, 1]
+ */
+void image_setz(Image *src, int r, int c, float val)
+{
+    if (val < 0)
+    {
+        val = 0;
+    }
+    else if (val > 1)
+    {
+        val = 1;
+    }
+    src->z[r * src->rows + c] = val;
 };
