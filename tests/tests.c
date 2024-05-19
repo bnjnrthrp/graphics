@@ -224,6 +224,65 @@ bool test_seta_geta()
     return passed;
 }
 
+bool test_utility()
+{
+    bool passed = true;
+    PRINT_DEBUG("Creating new 3x3 image\n");
+    Image *image = image_create(3, 3);
+    int size = image->rows * image->cols;
+    // Create and fill RGB with basic pixel
+    FPixel newPixel;
+    newPixel.rgb[0] = (float).5;
+    newPixel.rgb[1] = (float).5;
+    newPixel.rgb[2] = (float).5;
+
+    image_fill(image, newPixel);
+    for (int i = 0; i < size; i++)
+    {
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[0], (float).5);
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[1], (float).5);
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[2], (float).5);
+    }
+    // Fill RGB with middle values
+    image_fillrgb(image, .25, .25, .25);
+    for (int i = 0; i < size; i++)
+    {
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[0], (float).25);
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[1], (float).25);
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[2], (float).25);
+    }
+
+    // Fill a and z with middle values
+    image_filla(image, .5);
+    {
+        for (int i = 0; i < size; i++)
+        {
+            passed &= ASSERT_EQUAL(image->a[i], (float).5);
+        }
+    }
+
+    image_fillz(image, .25);
+    {
+        for (int i = 0; i < size; i++)
+        {
+            passed &= ASSERT_EQUAL(image->z[i], (float).25);
+        }
+    }
+
+    // Reset all
+
+    image_reset(image);
+    for (int i = 0; i < size; i++)
+    {
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[0], 0);
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[1], 0);
+        passed &= ASSERT_EQUAL(image->data[0][i].rgb[2], 0);
+        passed &= ASSERT_EQUAL(image->a[i], 1);
+        passed &= ASSERT_EQUAL(image->z[i], 1);
+    }
+    return passed;
+}
+
 /*************************** end tests ***********/
 
 /**
@@ -241,6 +300,7 @@ init_testing_set()
     add_test(set, "testing setc_getc, setters and getters", test_setc_getc);
     add_test(set, "testing setz_getz, setters and getters", test_setz_getz);
     add_test(set, "testing seta_geta, setters and getters", test_seta_geta);
+    add_test(set, "testing test_utility, utility functions", test_utility);
 
     return set;
 }

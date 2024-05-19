@@ -339,3 +339,125 @@ void image_setz(Image *src, int r, int c, float val)
     }
     src->z[r * src->rows + c] = val;
 };
+
+// Utility
+/**
+ * Resets every pixel to a default value (Black, alpha value
+ * of 1.0, z value of 1.0)
+ * @param src the source image
+ */
+void image_reset(Image *src)
+{
+    int size = src->rows * src->cols;
+    // Iterate every every pixel in the image
+    for (int i = 0; i < size; i++)
+    {
+        // Set each channel to 0
+        src->data[0][i].rgb[0] = 0;
+        src->data[0][i].rgb[1] = 0;
+        src->data[0][i].rgb[2] = 0;
+        src->a[i] = 1.0;
+        src->z[i] = 1.0;
+        src->maxval = 1.0;
+    }
+};
+
+/**
+ * Sets every FPixel to the given value
+ * @param src the source image
+ * @param val the pixel data to copy into every pixel
+ */
+void image_fill(Image *src, FPixel val)
+{
+    int size = src->rows * src->cols;
+    for (int i = 0; i < size; i++)
+    {
+        src->data[0][i].rgb[0] = val.rgb[0];
+        src->data[0][i].rgb[1] = val.rgb[1];
+        src->data[0][i].rgb[2] = val.rgb[2];
+    }
+};
+
+/**
+ * sets the (r, g, b) values of each pixel to the given color
+ * @param src the image to fill
+ * @param r the red channel value
+ * @param g the green channel value
+ * @param b the blue channel value
+ */
+void image_fillrgb(Image *src, float r, float g, float b)
+{
+    int size = src->rows * src->cols;
+    // Check values and ensure within min/max
+    if (r < 0)
+    {
+        r = 0;
+    }
+    else if (r > src->maxval)
+    {
+        r = src->maxval;
+    }
+    if (g < 0)
+    {
+        g = 0;
+    }
+    else if (g > src->maxval)
+    {
+        g = src->maxval;
+    }
+    if (b < 0)
+    {
+        b = 0;
+    }
+    else if (b > src->maxval)
+    {
+        b = src->maxval;
+    }
+
+    for (int i = 0; i < size; i++)
+    {
+        src->data[0][i].rgb[0] = r;
+        src->data[0][i].rgb[1] = g;
+        src->data[0][i].rgb[2] = b;
+    }
+};
+
+/**
+ * sets the alpha value of each pixel to the given value
+ * @param src the image to fill
+ * @param a the alpha channel to set
+ */
+void image_filla(Image *src, float a)
+{
+    int size = src->rows * src->cols;
+    // Value check and clip illegal values to the respective min/max
+    if (a < 0)
+    {
+        a = 0;
+    }
+    else if (a > 1.0)
+    {
+        a = 1.0;
+    }
+    for (int i = 0; i < size; i++)
+    {
+        src->a[i] = a;
+    }
+};
+void image_fillz(Image *src, float z)
+{
+    int size = src->rows * src->cols;
+    // Value check and clip illegal values to the respective min/max
+    if (z < 0)
+    {
+        z = 0;
+    }
+    else if (z > 1.0)
+    {
+        z = 1.0;
+    }
+    for (int i = 0; i < size; i++)
+    {
+        src->z[i] = z;
+    }
+};
