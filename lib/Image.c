@@ -33,7 +33,7 @@ Image *image_create(int rows, int cols)
 
     image_init(src);
 
-    if (rows <= 0 || cols <= 0) // If provided data invalid, return NULL
+    if (rows < 0 || cols < 0) // If provided data invalid, return NULL
     {
         return NULL;
     }
@@ -87,7 +87,7 @@ int image_alloc(Image *src, int rows, int cols)
         free(src->data[0]);
     }
     // Return error code if there was invalid input
-    if (rows <= 0 || cols <= 0)
+    if (rows < 0 || cols < 0)
     {
         fprintf(stderr, "invalid rows/cols input\n");
         return 1;
@@ -116,7 +116,7 @@ int image_alloc(Image *src, int rows, int cols)
     }
 
     // Set the row pointers to the appropriate row
-    for (int i = 1; i < rows - 1; i++)
+    for (int i = 1; i < rows; i++)
     {
         src->data[i] = &(src->data[0][i * cols]);
     }
@@ -141,7 +141,10 @@ int image_alloc(Image *src, int rows, int cols)
 void image_free(Image *src)
 {
     // Dealloc and free all of the internal data
-    image_dealloc(src);
+    if (src->data)
+    {
+        image_dealloc(src);
+    }
     // Free the struct
     free(src);
 };
@@ -154,13 +157,17 @@ void image_free(Image *src)
 void image_dealloc(Image *src)
 {
     // Free the pixel data
-    free(src->data[0]);
+    if (src->data[0])
+        free(src->data[0]);
     // Free the array of pointers
-    free(src->data);
+    if (src->data)
+        free(src->data);
 
     // Free the a and z channels
-    free(src->a);
-    free(src->z);
+    if (src->a)
+        free(src->a);
+    if (src->z)
+        free(src->z);
 
     // Reset the fields of the image
     image_init(src);
