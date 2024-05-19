@@ -216,7 +216,7 @@ int image_write(Image *src, char *filename)
         fprintf(fp, "P6\n");
         fprintf(fp, "%d %d\n%d\n", cols, rows, colors);
 
-        fwrite(src, sizeof(Image), rows * cols, fp);
+        fwrite(src->data[0], sizeof(FPixel), rows * cols, fp);
     }
     fclose(fp);
     return 0;
