@@ -443,7 +443,13 @@ void image_filla(Image *src, float a)
     {
         src->a[i] = a;
     }
-};
+}
+
+/**
+ * sets the z value of each pixel to the given value
+ * @param src the image to fill
+ * @param z the z value to set
+ */
 void image_fillz(Image *src, float z)
 {
     int size = src->rows * src->cols;
