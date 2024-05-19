@@ -83,6 +83,7 @@ Color color_from_pixel(Pixel pixel)
     color.c[0] = int_to_float(pixel.r);
     color.c[1] = int_to_float(pixel.g);
     color.c[2] = int_to_float(pixel.b);
+    return color;
 }
 
 Pixel pixel_from_color(Color color)

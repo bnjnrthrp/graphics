@@ -9,7 +9,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../include/Image.h"
+#include "Image.h"
+#include "Color.h"
 
 /**
  * Allocates an Image structure and initializes
@@ -182,7 +183,7 @@ Image *image_read(char *filename)
     return src;
 }
 /**
- * writes a PPM image to the given filename. Returns 0 on success.
+ * Writes a PPM image to the given filename. Returns 0 on success.
  * Optionally, you can look at the filename extension and write different
  * file types.
  * @param src the image to write
@@ -191,6 +192,25 @@ Image *image_read(char *filename)
  */
 int image_write(Image *src, char *filename)
 {
+    FILE *fp;
+    int rows, cols, colors;
+    rows = src->rows;
+    cols = src->cols;
+    colors = float_to_int(src->maxval);
+
+    if (filename != NULL && strlen(filename))
+        fp = fopen(filename, "w");
+    else
+        fp = stdout;
+
+    if (fp)
+    {
+        fprintf(fp, "P6\n");
+        fprintf(fp, "%d %d\n%d\n", cols, rows, colors);
+
+        fwrite(src, sizeof(Image), rows * cols, fp);
+    }
+    fclose(fp);
     return 0;
 };
 
