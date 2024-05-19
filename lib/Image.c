@@ -28,21 +28,22 @@ Image *image_create(int rows, int cols)
     if (src == NULL) // null check
     {
         fprintf(stderr, "Error creating the image\n");
-        return NULL;
+        exit(-1);
     }
 
     image_init(src);
 
     if (rows < 0 || cols < 0) // If provided data invalid, return NULL
     {
-        return NULL;
+        fprintf(stderr, "Invalid input rows/cols\n");
+        exit(-1);
     }
 
     int alloc = image_alloc(src, rows, cols);
     if (alloc != 0)
     {
         fprintf(stderr, "Something failed in the alloc\n");
-        return NULL;
+        exit(-1);
     }
 
     return src;
