@@ -28,7 +28,7 @@ DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 EXECUTABLES = ppmtest lab1 createMask composite imagetest
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o
+_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o FPixel.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -47,7 +47,8 @@ $(ODIR)/%.o: %.cpp $(DEPS)
 all:
 	for i in $(EXECUTABLES); do (make $$i) ; done
 
-TEST_FILE = tests.c
+TEST_FILE = tests.c FPixel.c Image.c
+C_FILES = $(LIBDIR)/FPixel.c $(LIBDIR)/Image.c
 IMAGE_FILE = imagetest.c
 OUTPUT = tests
  
@@ -71,13 +72,11 @@ imagetest: $(ODIR)/imagetest.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 
-all: $(TEST_FILE)
-	$(CC) $(CFLAGS) -O3 -o tests$(EXT) $(LIB_FILES) $^
+test: $(ODIR)/tests.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
  # this is the default target, it will run if you just type "make" in the terminal
 
-image-test: $(IMAGE_FILE)
-	$(CC) $(CFLAGS) -O3 -o imagetest$(EXT) $(LIB_FILES) $^
 
 
 clean: #this is a clean target, it removes all the .exe/.out files, called via "make clean"

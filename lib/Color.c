@@ -67,30 +67,30 @@ Color image_getColor(Image *src, int r, int c)
     return color;
 }
 
-float int_to_float(int val)
+float uc_to_float(unsigned char val)
 {
     return (float)(val / 255);
 }
 
-int float_to_int(float val)
+unsigned char float_to_uc(float val)
 {
-    return (int)val * 255;
+    return (unsigned char)val * 255;
 }
 
 Color color_from_pixel(Pixel pixel)
 {
     Color color;
-    color.c[0] = int_to_float(pixel.r);
-    color.c[1] = int_to_float(pixel.g);
-    color.c[2] = int_to_float(pixel.b);
+    color.c[0] = uc_to_float(pixel.r);
+    color.c[1] = uc_to_float(pixel.g);
+    color.c[2] = uc_to_float(pixel.b);
     return color;
 }
 
 Pixel pixel_from_color(Color color)
 {
     Pixel pixel;
-    pixel.r = float_to_int(color.c[0]);
-    pixel.g = float_to_int(color.c[1]);
-    pixel.b = float_to_int(color.c[2]);
+    pixel.r = float_to_uc(color.c[0]);
+    pixel.g = float_to_uc(color.c[1]);
+    pixel.b = float_to_uc(color.c[2]);
     return pixel;
 }

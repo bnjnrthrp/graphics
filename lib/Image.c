@@ -201,12 +201,7 @@ Image *image_read(char *filename)
     }
 
     src = image_create(rows, cols);
-    for (int i = 0; i < rows * cols; i++)
-    {
-        src->data[0][i].rgb[0] = int_to_float(temp[i].r);
-        src->data[0][i].rgb[1] = int_to_float(temp[i].g);
-        src->data[0][i].rgb[2] = int_to_float(temp[i].b);
-    }
+    convert_Pixel(temp, rows, cols, src->data[0]);
 
     free(temp);
     return src;
@@ -223,18 +218,13 @@ int image_write(Image *src, char *filename)
 {
     Pixel *temp;
     int rows, cols, colors;
-    int i;
-    colors = float_to_int(src->maxval);
+
+    colors = float_to_uc(src->maxval);
     rows = src->rows;
     cols = src->cols;
 
     temp = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
-    for (i = 0; i < rows * cols; i++)
-    {
-        temp[i].r = float_to_int(src->data[0][i].rgb[0]);
-        temp[i].g = float_to_int(src->data[0][i].rgb[1]);
-        temp[i].b = float_to_int(src->data[0][i].rgb[2]);
-    }
+    convert_FPixel(src->data[0], rows, cols, temp);
 
     writePPM(temp, rows, cols, colors, filename);
     free(temp);
@@ -527,9 +517,9 @@ Pixel *image_float_to_int(Image *src, int rows, int cols)
     Pixel *output = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
     for (int i = 0; i < rows * cols; i++)
     {
-        output[i].r = float_to_int(src->data[0][i].rgb[0]);
-        output[i].g = float_to_int(src->data[0][i].rgb[1]);
-        output[i].b = float_to_int(src->data[0][i].rgb[2]);
+        output[i].r = float_to_uc(src->data[0][i].rgb[0]);
+        output[i].g = float_to_uc(src->data[0][i].rgb[1]);
+        output[i].b = float_to_uc(src->data[0][i].rgb[2]);
     }
     return output;
 }
@@ -546,9 +536,9 @@ FPixel *image_int_to_float(Pixel *src, int rows, int cols)
     FPixel *output = (FPixel *)malloc(sizeof(FPixel) * rows * cols);
     for (int i = 0; i < rows * cols; i++)
     {
-        output[i].rgb[0] = int_to_float(src[i].r);
-        output[i].rgb[1] = int_to_float(src[i].g);
-        output[i].rgb[2] = int_to_float(src[i].b);
+        output[i].rgb[0] = uc_to_float(src[i].r);
+        output[i].rgb[1] = uc_to_float(src[i].g);
+        output[i].rgb[2] = uc_to_float(src[i].b);
     }
     return output;
 }
