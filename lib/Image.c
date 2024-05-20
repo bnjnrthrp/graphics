@@ -268,27 +268,20 @@ Image *image_read(char *filename)
 int image_write(Image *src, char *filename)
 {
     FILE *fp;
+    Pixel *temp;
     int rows, cols, colors;
     rows = src->rows;
     cols = src->cols;
     colors = float_to_int(src->maxval);
 
     // convert float pixel data from src and temp hold it in a Pixel array
-    Pixel *temp;
     temp = image_float_to_int(src, src->rows, src->cols);
-    if (filename != NULL && strlen(filename))
-        fp = fopen(filename, "w");
-    else
-        fp = stdout;
-
-    if (fp)
+    for (int i = 50; i < 100; i++)
     {
-        fprintf(fp, "P6\n");
-        fprintf(fp, "%d %d\n%d\n", cols, rows, colors);
 
-        fwrite(temp, sizeof(Pixel), rows * cols, fp);
+        printf("rgb data is %d %d %d\n", temp[i].r, temp[i].g, temp[i].b);
     }
-    fclose(fp);
+    writePPM(temp, rows, cols, colors, filename);
     free(temp);
     return 0;
 };
