@@ -128,6 +128,7 @@ bool test_setf_getf()
     passed &= ASSERT_EQUAL(actual.rgb[1], expected);
     passed &= ASSERT_EQUAL(actual.rgb[2], expected);
 
+    image_free(image);
     return passed;
 }
 
@@ -159,6 +160,7 @@ bool test_setc_getc()
     passed &= ASSERT_EQUAL(actualB, (float)1);
     PRINT_DEBUG("actual is %.1f, expected is: %.1f\n", actualB, (float)1);
 
+    image_free(image);
     return passed;
 }
 
@@ -190,6 +192,7 @@ bool test_setz_getz()
     passed &= ASSERT_EQUAL(actual, (float)1);
     PRINT_DEBUG("actual is %.1f, expected is: %.1f\n", actual, (float)1.0);
 
+    image_free(image);
     return passed;
 }
 
@@ -221,6 +224,7 @@ bool test_seta_geta()
     passed &= ASSERT_EQUAL(actual, (float)1);
     PRINT_DEBUG("actual is %.1f, expected is: %.1f\n", actual, (float)1.0);
 
+    image_free(image);
     return passed;
 }
 
@@ -280,6 +284,39 @@ bool test_utility()
         passed &= ASSERT_EQUAL(image->a[i], 1);
         passed &= ASSERT_EQUAL(image->z[i], 1);
     }
+    image_free(image);
+    return passed;
+}
+
+bool test_convert_file()
+{
+    bool passed = true;
+    PRINT_DEBUG("Creating new 3x3 image\n");
+    Image *image = image_create(3, 3);
+    int size = image->rows * image->cols;
+    FPixel color = {{.3, .5, .7}};
+    image_fill(image, color);
+
+    unsigned char expected[3] = {76, 127, 178};
+
+    Pixel *output = (Pixel *)malloc(sizeof(Pixel) * size);
+    convert_FPixel(image->data, image->rows, image->cols, output);
+    for (int i = 0; i < size; i++)
+    {
+        PRINT_DEBUG("Actual colors in image are: %.1f, %.1f, %.1f\n", image->data[0][i].rgb[0], image->data[0][i].rgb[1], image->data[0][i].rgb[2]);
+
+        passed &= ASSERT_EQUAL(output[i].r, expected[0]);
+        PRINT_DEBUG("Image is %.2f\n", image->data[0][i].rgb[0]);
+        PRINT_DEBUG("Output is %d, expected %d\n", output[i].r, expected[0]);
+        passed &= ASSERT_EQUAL(output[i].g, expected[1]);
+        PRINT_DEBUG("Image is %.2f\n", image->data[0][i].rgb[1]);
+        PRINT_DEBUG("Output is %d, expected %d\n", output[i].g, expected[1]);
+        passed &= ASSERT_EQUAL(output[i].b, expected[2]);
+        PRINT_DEBUG("Image is %.2f\n", image->data[0][i].rgb[2]);
+        PRINT_DEBUG("Output is %d, expected %d\n", output[i].b, expected[2]);
+    }
+    free(output);
+    image_free(image);
     return passed;
 }
 
@@ -301,6 +338,7 @@ init_testing_set()
     add_test(set, "testing setz_getz, setters and getters", test_setz_getz);
     add_test(set, "testing seta_geta, setters and getters", test_seta_geta);
     add_test(set, "testing test_utility, utility functions", test_utility);
+    add_test(set, "testint convert FPixel to Pixel", test_convert_file);
 
     return set;
 }

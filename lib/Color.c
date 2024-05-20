@@ -69,12 +69,14 @@ Color image_getColor(Image *src, int r, int c)
 
 float uc_to_float(unsigned char val)
 {
-    return (float)(val / 255);
+    float result = val / 255;
+    return result;
 }
 
 unsigned char float_to_uc(float val)
 {
-    return (unsigned char)val * 255;
+    unsigned char result = val * 255;
+    return result;
 }
 
 Color color_from_pixel(Pixel pixel)

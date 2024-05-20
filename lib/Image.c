@@ -83,12 +83,9 @@ void image_init(Image *src)
 int image_alloc(Image *src, int rows, int cols)
 {
     // Free the data if there is already something here.
-    if (src->rows > 0 && src->cols > 0)
-    {
-        free(src->data[0]);
-        free(src->a);
-        free(src->z);
-    }
+    if (src->rows > 0 || src->cols > 0)
+        image_dealloc(src);
+
     // Return error code if there was invalid input
     if (rows < 0 || cols < 0)
     {
@@ -103,7 +100,12 @@ int image_alloc(Image *src, int rows, int cols)
 
     // Allocate the row pointers, a channel, and z channel arrays
     src->data = (FPixel **)malloc(sizeof(FPixel *) * rows);
+
+    if (src->a)
+        free(src->a);
     src->a = (float *)malloc(sizeof(float) * rows * cols);
+    if (src->z)
+        free(src->z);
     src->z = (float *)malloc(sizeof(float) * rows * cols);
     if (src->data == NULL || src->a == NULL || src->z == NULL)
     {
@@ -143,13 +145,16 @@ int image_alloc(Image *src, int rows, int cols)
  */
 void image_free(Image *src)
 {
-    // Dealloc and free all of the internal data
-    if (src->data)
+    if (src)
     {
-        image_dealloc(src);
+        if (src->data)
+        {
+            // Dealloc and free all of the internal data
+            image_dealloc(src);
+        }
+        // Free the struct
+        free(src);
     }
-    // Free the struct
-    free(src);
 };
 
 /**
@@ -160,11 +165,14 @@ void image_free(Image *src)
 void image_dealloc(Image *src)
 {
     // Free the pixel data
-    if (src->data[0])
-        free(src->data[0]);
-    // Free the array of pointers
+
     if (src->data)
+    {
+        if (src->data[0])
+            free(src->data[0]);
+        // Free the array of pointers
         free(src->data);
+    }
 
     // Free the a and z channels
     if (src->a)
@@ -201,7 +209,7 @@ Image *image_read(char *filename)
     }
 
     src = image_create(rows, cols);
-    convert_Pixel(temp, rows, cols, src->data[0]);
+    convert_Pixel(temp, rows, cols, src->data);
 
     free(temp);
     return src;
@@ -224,7 +232,7 @@ int image_write(Image *src, char *filename)
     cols = src->cols;
 
     temp = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
-    convert_FPixel(src->data[0], rows, cols, temp);
+    convert_FPixel(src->data, rows, cols, temp);
 
     writePPM(temp, rows, cols, colors, filename);
     free(temp);
