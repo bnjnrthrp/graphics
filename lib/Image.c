@@ -187,7 +187,26 @@ void image_dealloc(Image *src)
  */
 Image *image_read(char *filename)
 {
-    Image *src = NULL;
+    Image *src;
+    Pixel *temp;
+    int rows, cols, colors;
+
+    temp = readPPM(&rows, &cols, &colors, filename);
+    if (!temp)
+    {
+        fprintf(stderr, "Failed to read the file\n");
+        exit(-1);
+    }
+
+    src = image_create(rows, cols);
+    for (int i = 0; i < rows * cols; i++)
+    {
+        src->data[0][i].rgb[0] = int_to_float(temp[i].r);
+        src->data[0][i].rgb[1] = int_to_float(temp[i].g);
+        src->data[0][i].rgb[2] = int_to_float(temp[i].b);
+    }
+
+    free(temp);
     return src;
 }
 /**
@@ -200,25 +219,24 @@ Image *image_read(char *filename)
  */
 int image_write(Image *src, char *filename)
 {
-    FILE *fp;
+    Pixel *temp;
     int rows, cols, colors;
+    int i;
+    colors = float_to_int(src->maxval);
     rows = src->rows;
     cols = src->cols;
-    colors = float_to_int(src->maxval);
 
-    if (filename != NULL && strlen(filename))
-        fp = fopen(filename, "w");
-    else
-        fp = stdout;
-
-    if (fp)
+    temp = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
+    for (i = 0; i < rows * cols; i++)
     {
-        fprintf(fp, "P6\n");
-        fprintf(fp, "%d %d\n%d\n", cols, rows, colors);
-
-        fwrite(src->data[0], sizeof(FPixel), rows * cols, fp);
+        temp[i].r = float_to_int(src->data[0][i].rgb[0]);
+        temp[i].g = float_to_int(src->data[0][i].rgb[1]);
+        temp[i].b = float_to_int(src->data[0][i].rgb[2]);
     }
-    fclose(fp);
+
+    writePPM(temp, rows, cols, colors, filename);
+    free(temp);
+
     return 0;
 };
 
