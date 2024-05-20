@@ -11,7 +11,7 @@
 int main(int argc, char *argv[])
 {
   Image *src;
-  FPixel p = {0.4, 0.6, 0.8};
+  FPixel p = {{0.4, 0.6, 0.8}};
   int rows = 300;
   int cols = 400;
   int i, j;

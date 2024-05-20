@@ -86,6 +86,8 @@ int image_alloc(Image *src, int rows, int cols)
     if (src->rows > 0 && src->cols > 0)
     {
         free(src->data[0]);
+        free(src->a);
+        free(src->z);
     }
     // Return error code if there was invalid input
     if (rows < 0 || cols < 0)
@@ -513,3 +515,40 @@ void image_fillz(Image *src, float z)
         src->z[i] = z;
     }
 };
+
+/**
+ * Creates a data array of the float pixels of a source and converts it to integer
+ *
+ * @param src the source image
+ * @return A pointer to the Pixels to print
+ */
+Pixel *image_float_to_int(Image *src, int rows, int cols)
+{
+    Pixel *output = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
+    for (int i = 0; i < rows * cols; i++)
+    {
+        output[i].r = float_to_int(src->data[0][i].rgb[0]);
+        output[i].g = float_to_int(src->data[0][i].rgb[1]);
+        output[i].b = float_to_int(src->data[0][i].rgb[2]);
+    }
+    return output;
+}
+
+/**
+ * Creates a data array of the int pixels of a source and converts it to float pixels
+ *
+ * @param src the source image (Pixel struct)
+ * @return A pointer to the FPixels
+ */
+FPixel *image_int_to_float(Pixel *src, int rows, int cols)
+{
+
+    FPixel *output = (FPixel *)malloc(sizeof(FPixel) * rows * cols);
+    for (int i = 0; i < rows * cols; i++)
+    {
+        output[i].rgb[0] = int_to_float(src[i].r);
+        output[i].rgb[1] = int_to_float(src[i].g);
+        output[i].rgb[2] = int_to_float(src[i].b);
+    }
+    return output;
+}
