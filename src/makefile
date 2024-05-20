@@ -22,20 +22,20 @@ LIBDIR =../lib
 BINDIR =../bin
 
 # libraries to include
-LIBS = -lm -limageIO
+LIBS = -limageIO -lm 
 LFLAGS = -L$(LIBDIR) -L/opt/local/lib
 
 # put all of the relevant include files here
-_DEPS = ppmIO.h alphaMask.h
+_DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Fractals.h Image.h
 
 # convert them to point to the right place
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = ppmtest lab1 createMask composite
+EXECUTABLES = ppmtest lab1 createMask composite mandeltest
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o
+_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o mandeltest.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -67,6 +67,9 @@ alphaMask: $(ODIR)/createMask.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 composite: $(ODIR)/compositeImage.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+mandeltest: $(ODIR)/mandeltest.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean
