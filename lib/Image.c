@@ -86,6 +86,8 @@ int image_alloc(Image *src, int rows, int cols)
     if (src->rows > 0 && src->cols > 0)
     {
         free(src->data[0]);
+        free(src->a);
+        free(src->z);
     }
     // Return error code if there was invalid input
     if (rows < 0 || cols < 0)
@@ -187,8 +189,73 @@ void image_dealloc(Image *src)
  */
 Image *image_read(char *filename)
 {
-    Image *src = NULL;
-    return src;
+    char tag[40];
+    Pixel *input;
+    Image *output;
+    FILE *fp;
+    int read, num[3], curchar, rows, cols, colors;
+
+    if (filename != NULL && strlen(filename))
+        fp = fopen(filename, "r");
+    else
+        fp = stdin;
+
+    if (fp)
+    {
+        fscanf(fp, "%s\n", tag);
+
+        // Read the "magic number" at the beginning of the ppm
+        if (strncmp(tag, "P6", 40) != 0)
+        {
+            fprintf(stderr, "not a ppm!\n");
+            exit(1);
+        }
+
+        // Read the rows, columns, and color depth output by cqcam
+        // need to read in three numbers and skip any lines that start with a #
+        read = 0;
+        while (read < 3)
+        {
+            curchar = fgetc(fp);
+            if ((char)curchar == '#')
+            { // skip this line
+                while (fgetc(fp) != '\n')
+                    /* do nothing */;
+            }
+            else
+            {
+                ungetc(curchar, fp);
+                fscanf(fp, "%d", &(num[read]));
+                read++;
+            }
+        }
+        while (fgetc(fp) != '\n')
+            /* pass the last newline character */;
+
+        cols = num[0];
+        rows = num[1];
+        colors = num[2];
+
+        if (cols > 0 && rows > 0)
+        {
+
+            input = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
+
+            if (input)
+            {
+                // Read the data
+                fread(input, sizeof(Pixel), rows * cols, fp);
+
+                if (fp != stdin)
+                    fclose(fp);
+                output = image_create(rows, cols);
+                output->data[0] = image_int_to_float(input, rows, cols);
+                return (output);
+            }
+        }
+    }
+
+    return (NULL);
 }
 /**
  * Writes a PPM image to the given filename. Returns 0 on success.
@@ -206,6 +273,9 @@ int image_write(Image *src, char *filename)
     cols = src->cols;
     colors = float_to_int(src->maxval);
 
+    // convert float pixel data from src and temp hold it in a Pixel array
+    Pixel *temp;
+    temp = image_float_to_int(src, src->rows, src->cols);
     if (filename != NULL && strlen(filename))
         fp = fopen(filename, "w");
     else
@@ -216,9 +286,10 @@ int image_write(Image *src, char *filename)
         fprintf(fp, "P6\n");
         fprintf(fp, "%d %d\n%d\n", cols, rows, colors);
 
-        fwrite(src->data[0], sizeof(FPixel), rows * cols, fp);
+        fwrite(temp, sizeof(Pixel), rows * cols, fp);
     }
     fclose(fp);
+    free(temp);
     return 0;
 };
 
@@ -495,3 +566,40 @@ void image_fillz(Image *src, float z)
         src->z[i] = z;
     }
 };
+
+/**
+ * Creates a data array of the float pixels of a source and converts it to integer
+ *
+ * @param src the source image
+ * @return A pointer to the Pixels to print
+ */
+Pixel *image_float_to_int(Image *src, int rows, int cols)
+{
+    Pixel *output = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
+    for (int i = 0; i < rows * cols; i++)
+    {
+        output[i].r = float_to_int(src->data[0][i].rgb[0]);
+        output[i].g = float_to_int(src->data[0][i].rgb[1]);
+        output[i].b = float_to_int(src->data[0][i].rgb[2]);
+    }
+    return output;
+}
+
+/**
+ * Creates a data array of the int pixels of a source and converts it to float pixels
+ *
+ * @param src the source image (Pixel struct)
+ * @return A pointer to the FPixels
+ */
+FPixel *image_int_to_float(Pixel *src, int rows, int cols)
+{
+
+    FPixel *output = (FPixel *)malloc(sizeof(FPixel) * rows * cols);
+    for (int i = 0; i < rows * cols; i++)
+    {
+        output[i].rgb[0] = int_to_float(src[i].r);
+        output[i].rgb[1] = int_to_float(src[i].g);
+        output[i].rgb[2] = int_to_float(src[i].b);
+    }
+    return output;
+}

@@ -2,6 +2,7 @@
 
 #define IMAGE_H
 #include "FPixel.h"
+#include "ppmIO.h"
 #define MAX_FILENAME_LENGTH 255
 
 typedef struct
@@ -42,5 +43,7 @@ void image_fill(Image *src, FPixel val);
 void image_fillrgb(Image *src, float r, float g, float b);
 void image_filla(Image *src, float a);
 void image_fillz(Image *src, float z);
+Pixel *image_float_to_int(Image *src, int rows, int cols);
+FPixel *image_int_to_float(Pixel *src, int rows, int cols);
 
 #endif // IMAGE_H
