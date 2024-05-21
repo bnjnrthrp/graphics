@@ -3,8 +3,9 @@
 
 void mandelbrot(Image *dst, float x0, float y0, float dx)
 {
-    float x, y, x1, y1, dy, zx, zy, sCols, sRows;
-    int cols, rows, i, j, setX, setY;
+    float cx, cy, x1, y1, dy, zx, zx2, zy, zy2, sCols, sRows, temp;
+    int cols, rows, i, j, n, maxIterations;
+    unsigned char r, g, b;
 
     cols = dst->cols;
     rows = dst->rows;
@@ -14,6 +15,7 @@ void mandelbrot(Image *dst, float x0, float y0, float dx)
     // calculate the number of columns cols = (x1 - x0) * rows / (y1 - y0)
     sCols = (x1 - x0) / cols;
     sRows = (y1 - y0) / rows;
+    maxIterations = 100;
 
     // allocate an image that is rows by cols -- done by the original
     // for each pixel in the image (i, j)
@@ -21,35 +23,45 @@ void mandelbrot(Image *dst, float x0, float y0, float dx)
     {
         for (j = 0; j < cols; j++)
         {
-            printf("Iterating through i, j: %d, %d\n", i, j);
             // calculate (x, y) given (i, j)
             // this corresponds to cx and cy in the Mandelbrot equation
-            x = (sCols * j) + x0;
-            y = (-1.0 * sRows * i) + y1;
+            cx = (sCols * j) + x0;
+            cy = (sRows * i) + y1;
             // set zx and zy to (0, 0)
             zx = zy = 0;
             // for some number of iterations up to N (e.g. 100)
-            for (int n = 0; n < 1000; n++)
+            n = 0;
+            while (n < maxIterations)
             {
-                printf("Iterating the mandelbrot equation\n");
+
                 // iterate the Mandelbrot equation
-                x = pow(x, 2) - pow(y, 2) - sCols;
-                y = 2 * x * y - sRows;
-                printf("Calculated x to %.5f, y to %.5f\n", x, y);
-                printf("n is %d\n", n);
+                zx2 = zx * zx - zy * zy - cx;
+                zy2 = 2 * zx * zy - cy;
+
+                zx = zx2;
+                zy = zy2;
                 // if the length of z is greater than 2.0,
-                if (sqrt(pow(x, 2) + pow(y, 2)) > 2.0)
+                if (zx * zx + zy * zy > 4.0)
                 {
-                    printf("Converting the numbers for pass\n");
                     // store the number of iterations and break
-                    setX = i;
-                    setY = j;
                     break;
                 }
+                n++;
             }
             // color pixel (i, j)
-            FPixel color = {{0, 0, 0}};
-            image_setf(dst, setX, setY, color);
+            if (n == maxIterations)
+            {
+                r = g = b = 0;
+            }
+
+            else
+            {
+                r = 255;
+                g = 255;
+                b = 255;
+            }
+            FPixel color = {{r, g, b}};
+            image_setf(dst, i, j, color);
         }
     }
     // return the image
