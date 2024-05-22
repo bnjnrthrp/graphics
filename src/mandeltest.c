@@ -21,9 +21,9 @@ int main(int argc, char *argv[])
 
   image_write(src, "mandelbrot.ppm");
 
-  // julia(src, -1.8, -1.8 * 0.75, 3.6);
+  julia(src, -1.8, -1.8 * 0.75, 3.6);
 
-  // image_write(src, "julia.ppm");
+  image_write(src, "julia.ppm");
 
   image_free(src);
 
