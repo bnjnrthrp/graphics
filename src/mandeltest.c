@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
   add_noise(src, 200);
 
-  image_write(src, "noise_200.ppm");
+  image_write(src, "perlin_noise_200.ppm");
 
   image_free(src);
 

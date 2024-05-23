@@ -54,14 +54,20 @@ void mandelJuliaSet(Image *dst, float x0, float y0, float dx, float a, float bi,
             // color pixel (i, j)
             if (n == maxIterations)
             {
+                // Black inside
                 r = g = b = 0;
+
+                // Green screen inside
+                // r = b = 0;
+                // g = .75;
             }
-            else if (n < 30)
-            {
-                r = ((float)n / (float)maxIterations);
-                g = .75;
-                b = ((float)n / (float)maxIterations);
-            }
+            // else if (n > 30)
+            // {
+            //     // Green background
+            //     r = 0;
+            //     g = .75;
+            //     b = 0;
+            // }
             else
             {
                 r = ((float)n / (float)maxIterations);

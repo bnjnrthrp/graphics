@@ -115,6 +115,12 @@ void add_noise(Image *dst, int noiseWidth)
             dy = (float)j / (float)dst->rows;
             value = perlin(dx * noiseWidth, dy * noiseWidth, dst->z[i * dst->cols + j]);
             value = (value + 1) / 2;
+            // Red Noise only
+            // pixel.rgb[0] = 1;
+            // pixel.rgb[1] = 220 * value / 255;
+            // pixel.rgb[2] = 0;
+
+            // Greyscale noise
             pixel.rgb[0] = value;
             pixel.rgb[1] = value;
             pixel.rgb[2] = value;

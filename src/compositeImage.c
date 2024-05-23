@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "../include/ppmIO.h"
 #include "../include/alphaMask.h"
 
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])
     Pixel *bgImage, *fgImage, *mask, *scaled, *scaledMask; // background image, foreground image, and mask
     int bgRows, bgCols, bgColors, fgRows, fgCols, fgColors, maskRows, maskCols, maskColors;
     long dx, dy;
+    bool scale = false;
 
     if (argc < 5)
     {
@@ -48,37 +50,64 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    // Scales the foreground image, making it 25% of the original
-    scaled = scaleImageHalf(fgImage, fgRows, fgCols);
-    long scaledRows = fgRows / 2;
-    long scaledCols = fgCols / 2;
-
-    scaledMask = scaleImageHalf(mask, fgRows, fgCols);
-
-    long j = 0; // index tracker for image 2
-    dx = 520;
-    dy = 80;
-    for (long r = 0; r < bgRows; r++)
+    if (scale)
     {
-        for (long c = 0; c < bgCols; c++)
-            // If the background image index is at the offset of the foreground image, start compositing images
-            // This allows for a smaller foreground dimension
-            if (c >= dx && c < scaledCols + dx && r >= dy && r < scaledRows + dy)
-            {
-                /// Blend each channel at i (the background), and j (foreground)
-                bgImage[r * bgCols + c].r = blendColors(scaled[j].r, bgImage[(r)*bgCols + c].r, scaledMask[j].r);
-                bgImage[r * bgCols + c].g = blendColors(scaled[j].g, bgImage[(r)*bgCols + c].g, scaledMask[j].g);
-                bgImage[r * bgCols + c].b = blendColors(scaled[j].b, bgImage[(r)*bgCols + c].b, scaledMask[j].b);
-                j++; // Increment the foreground
-            }
+        // Scales the foreground image, making it 25% of the original
+        scaled = scaleImageHalf(fgImage, fgRows, fgCols);
+        long scaledRows = fgRows / 2;
+        long scaledCols = fgCols / 2;
+
+        scaledMask = scaleImageHalf(mask, fgRows, fgCols);
+
+        long j = 0; // index tracker for image 2
+        dx = 520;
+        dy = 80;
+        for (long r = 0; r < bgRows; r++)
+        {
+            for (long c = 0; c < bgCols; c++)
+                // If the background image index is at the offset of the foreground image, start compositing images
+                // This allows for a smaller foreground dimension
+                if (c >= dx && c < scaledCols + dx && r >= dy && r < scaledRows + dy)
+                {
+                    /// Blend each channel at i (the background), and j (foreground)
+                    bgImage[r * bgCols + c].r = blendColors(scaled[j].r, bgImage[(r)*bgCols + c].r, scaledMask[j].r);
+                    bgImage[r * bgCols + c].g = blendColors(scaled[j].g, bgImage[(r)*bgCols + c].g, scaledMask[j].g);
+                    bgImage[r * bgCols + c].b = blendColors(scaled[j].b, bgImage[(r)*bgCols + c].b, scaledMask[j].b);
+                    j++; // Increment the foreground
+                }
+        }
+    }
+    else
+    {
+        long j = 0; // index tracker for image 2
+        dx = 0;
+        dy = 0;
+        for (long r = 0; r < bgRows; r++)
+        {
+            for (long c = 0; c < bgCols; c++)
+                // If the background image index is at the offset of the foreground image, start compositing images
+                // This allows for a smaller foreground dimension
+                if (c >= dx && c < fgCols + dx && r >= dy && r < fgRows + dy)
+                {
+                    /// Blend each channel at i (the background), and j (foreground)
+                    bgImage[r * bgCols + c].r = blendColors(fgImage[j].r, bgImage[(r)*bgCols + c].r, mask[j].r);
+                    bgImage[r * bgCols + c].g = blendColors(fgImage[j].g, bgImage[(r)*bgCols + c].g, mask[j].g);
+                    bgImage[r * bgCols + c].b = blendColors(fgImage[j].b, bgImage[(r)*bgCols + c].b, mask[j].b);
+                    j++; // Increment the foreground
+                }
+        }
     }
 
     /* write out the resulting image */
     writePPM(bgImage, bgRows, bgCols, bgColors /* s/b 255 */, argv[4]);
 
     /* free the image memory */
-    free(scaled);
-    free(scaledMask);
+    if (scaled)
+        free(scaled);
+
+    if (scaledMask)
+        free(scaledMask);
+
     free(bgImage);
     free(fgImage);
     free(mask);
