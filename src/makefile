@@ -26,7 +26,7 @@ LIBS = -limageIO -lm
 LFLAGS = -L$(LIBDIR) -L/opt/local/lib
 
 # put all of the relevant include files here
-_DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Fractals.h Image.h
+_DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Fractals.h Image.h Noise.h
 
 # convert them to point to the right place
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))

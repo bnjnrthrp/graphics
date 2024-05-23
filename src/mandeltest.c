@@ -6,6 +6,7 @@
 */
 #include "image.h"
 #include "Fractals.h"
+#include "Noise.h"
 #include <math.h>
 int main(int argc, char *argv[])
 {
@@ -24,6 +25,10 @@ int main(int argc, char *argv[])
   julia(src, -1.8, -1.8 * 0.75, 3.6);
 
   image_write(src, "julia.ppm");
+
+  add_noise(src, 200);
+
+  image_write(src, "noise_200.ppm");
 
   image_free(src);
 

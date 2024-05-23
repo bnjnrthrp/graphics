@@ -56,7 +56,12 @@ void mandelJuliaSet(Image *dst, float x0, float y0, float dx, float a, float bi,
             {
                 r = g = b = 0;
             }
-
+            else if (n < 30)
+            {
+                r = ((float)n / (float)maxIterations);
+                g = .75;
+                b = ((float)n / (float)maxIterations);
+            }
             else
             {
                 r = ((float)n / (float)maxIterations);
