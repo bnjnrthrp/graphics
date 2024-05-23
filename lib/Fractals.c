@@ -7,6 +7,7 @@
  */
 
 #include "Fractals.h"
+#include <math.h>
 
 /**
  * Creates a mandelbrot or julia set given the origin and scale of x.
@@ -89,8 +90,9 @@ void mandelJuliaSet(Image *dst, float x0, float y0, float dx, float a, float bi,
             // }
             else
             {
-                r = ((float)n / (float)maxIterations);
-                g = ((float)n / (float)maxIterations);
+                /// Color with sin/cos in red/green channels
+                r = ((float)sin(n) / (float)maxIterations);
+                g = ((float)cos(n) / (float)maxIterations);
                 b = ((float)n / (float)maxIterations);
             }
             FPixel color = {{r, g, b}};
