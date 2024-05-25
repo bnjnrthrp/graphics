@@ -4,6 +4,7 @@
  */
 
 #include "Point.h"
+#include <Math.h>
 
 /**
  * Set the 2D location (first two values) of the point to x and y. Sets z to 0.0 and h to 1.0.
@@ -99,8 +100,14 @@ void point_copy(Point *to, Point *from)
  */
 void point_draw(Point *p, Image *src, Color c)
 {
+    int x, y;
+
     if (p && src) // null check
+    {
+        x = (int)floor(p->val[0]);
+        y = (int)floor(p->val[1]);
         image_setColor(src, p->val[0], p->val[1], c);
+    }
 }
 
 /**
@@ -111,10 +118,12 @@ void point_draw(Point *p, Image *src, Color c)
  */
 void point_drawf(Point *p, Image *src, FPixel c)
 {
+    int x, y;
     if (p && src) // Null check
     {
-
-        image_setf(src, p->val[0], p->val[1], c);
+        x = (int)floor(p->val[0]);
+        y = (int)floor(p->val[1]);
+        image_setf(src, y, x, c);
     }
 }
 void point_print(Point *p, FILE *fp)
