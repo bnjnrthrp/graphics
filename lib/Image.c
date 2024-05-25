@@ -398,6 +398,35 @@ void image_setz(Image *src, int r, int c, float val)
     src->z[r * src->rows + c] = val;
 };
 
+/**
+ * Sets the color of a pixel in an image to a color.
+ * @param src The image
+ * @param r the row index
+ * @param c the column index
+ * @param val color value
+ */
+void image_setColor(Image *src, int r, int c, Color val)
+{
+    src->data[r][c].rgb[0] = val.c[0];
+    src->data[r][c].rgb[1] = val.c[1];
+    src->data[r][c].rgb[2] = val.c[2];
+}
+
+/**
+ * Gets the color from an image based off row/column index
+ * @param src The image
+ * @param r the row index
+ * @param c the column index
+ */
+Color image_getColor(Image *src, int r, int c)
+{
+    Color color;
+    color.c[0] = src->data[r][c].rgb[0];
+    color.c[1] = src->data[r][c].rgb[1];
+    color.c[2] = src->data[r][c].rgb[2];
+    return color;
+}
+
 // Utility
 /**
  * Resets every pixel to a default value (Black, alpha value
@@ -561,19 +590,4 @@ FPixel *image_int_to_float(Pixel *src, int rows, int cols)
         output[i].rgb[2] = uc_to_float(src[i].b);
     }
     return output;
-}
-
-void image_setColor(Image *src, int r, int c, Color val)
-{
-    src->data[r][c].rgb[0] = val.c[0];
-    src->data[r][c].rgb[1] = val.c[1];
-    src->data[r][c].rgb[2] = val.c[2];
-}
-Color image_getColor(Image *src, int r, int c)
-{
-    Color color;
-    color.c[0] = src->data[r][c].rgb[0];
-    color.c[1] = src->data[r][c].rgb[1];
-    color.c[2] = src->data[r][c].rgb[2];
-    return color;
 }

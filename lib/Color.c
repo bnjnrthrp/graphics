@@ -11,42 +11,39 @@
 
 void color_copy(Color *to, Color *from)
 {
-    // Iterate through each channel in the color array.
-    for (int i = 0; i < 3; i++)
-    {
-        to->c[i] = from->c[i];
-    }
+
+    to->c[0] = from->c[0];
+    to->c[1] = from->c[1];
+    to->c[2] = from->c[2];
 }
 void color_set(Color *to, float r, float g, float b)
 {
-    // Do one check to see if any parameters are outside limits, and skip rest of checks if its ok.
-    if (r < 0 || g < 0 || b < 0 || r > 1 || g > 1 || b > 1)
+    // check to see if any parameters are outside limits, and skip rest of checks if its ok.
+    if (r < 0)
     {
-        if (r < 0)
-        {
-            r = 0;
-        }
-        else if (r > 1)
-        {
-            r = 1;
-        }
-        if (g < 0)
-        {
-            g = 0;
-        }
-        else if (g > 1)
-        {
-            g = 1;
-        }
-        if (b < 0)
-        {
-            b = 0;
-        }
-        else if (b > 1)
-        {
-            b = 1;
-        }
+        r = 0;
     }
+    else if (r > 1)
+    {
+        r = 1;
+    }
+    if (g < 0)
+    {
+        g = 0;
+    }
+    else if (g > 1)
+    {
+        g = 1;
+    }
+    if (b < 0)
+    {
+        b = 0;
+    }
+    else if (b > 1)
+    {
+        b = 1;
+    }
+
     to->c[0] = r;
     to->c[1] = g;
     to->c[2] = b;
