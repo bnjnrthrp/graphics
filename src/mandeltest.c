@@ -26,6 +26,10 @@ int main(int argc, char *argv[])
 
   image_write(src, "julia.ppm");
 
+  add_noise(src, 10);
+
+  image_write(src, "perlin_noise_10.ppm");
+
   add_noise(src, 200);
 
   image_write(src, "perlin_noise_200.ppm");
