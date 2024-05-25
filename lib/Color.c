@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "Image.h"
 #include "Color.h"
 #include "ppmIO.h"
 
@@ -51,20 +50,6 @@ void color_set(Color *to, float r, float g, float b)
     to->c[0] = r;
     to->c[1] = g;
     to->c[2] = b;
-}
-void image_setColor(Image *src, int r, int c, Color val)
-{
-    src->data[r][c].rgb[0] = val.c[0];
-    src->data[r][c].rgb[1] = val.c[1];
-    src->data[r][c].rgb[2] = val.c[2];
-}
-Color image_getColor(Image *src, int r, int c)
-{
-    Color color;
-    color.c[0] = src->data[r][c].rgb[0];
-    color.c[1] = src->data[r][c].rgb[1];
-    color.c[2] = src->data[r][c].rgb[2];
-    return color;
 }
 
 float uc_to_float(unsigned char val)

@@ -22,7 +22,6 @@ void convert_Pixel(Pixel *pixel, int rows, int cols, FPixel **dest)
 {
     for (int i = 0; i < rows * cols; i++)
     {
-
         pixel[i].r = uc_to_float(dest[0][i].rgb[0]);
         pixel[i].g = uc_to_float(dest[0][i].rgb[1]);
         pixel[i].b = uc_to_float(dest[0][i].rgb[2]);

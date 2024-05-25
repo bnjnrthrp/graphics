@@ -208,7 +208,13 @@ Image *image_read(char *filename)
     }
 
     src = image_create(rows, cols);
-    convert_Pixel(temp, rows, cols, src->data);
+
+    for (int i = 0; i < rows * cols; i++)
+    {
+        src->data[0][i].rgb[0] = uc_to_float(temp[i].r);
+        src->data[0][i].rgb[1] = uc_to_float(temp[i].g);
+        src->data[0][i].rgb[2] = uc_to_float(temp[i].b);
+    }
 
     free(temp);
     return src;
@@ -232,6 +238,13 @@ int image_write(Image *src, char *filename)
 
     temp = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
     convert_FPixel(src->data, rows, cols, temp);
+
+    for (int i = 0; i < rows * cols; i++)
+    {
+        temp[i].r = float_to_uc(src->data[0][i].rgb[0]);
+        temp[i].g = float_to_uc(src->data[0][i].rgb[1]);
+        temp[i].b = float_to_uc(src->data[0][i].rgb[2]);
+    }
 
     writePPM(temp, rows, cols, colors, filename);
     free(temp);
@@ -548,4 +561,19 @@ FPixel *image_int_to_float(Pixel *src, int rows, int cols)
         output[i].rgb[2] = uc_to_float(src[i].b);
     }
     return output;
+}
+
+void image_setColor(Image *src, int r, int c, Color val)
+{
+    src->data[r][c].rgb[0] = val.c[0];
+    src->data[r][c].rgb[1] = val.c[1];
+    src->data[r][c].rgb[2] = val.c[2];
+}
+Color image_getColor(Image *src, int r, int c)
+{
+    Color color;
+    color.c[0] = src->data[r][c].rgb[0];
+    color.c[1] = src->data[r][c].rgb[1];
+    color.c[2] = src->data[r][c].rgb[2];
+    return color;
 }
