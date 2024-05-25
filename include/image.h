@@ -32,6 +32,8 @@ FPixel image_getf(Image *src, int r, int c);
 float image_getc(Image *src, int r, int c, int b);
 float image_geta(Image *src, int r, int c);
 float image_getz(Image *src, int r, int c);
+void image_setColor(Image *src, int r, int c, Color val);
+Color image_getColor(Image *src, int r, int c);
 void image_setf(Image *src, int r, int c, FPixel val);
 void image_setc(Image *src, int r, int c, int b, float val);
 void image_seta(Image *src, int r, int c, float val);

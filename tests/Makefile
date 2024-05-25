@@ -75,6 +75,9 @@ imagetest: $(ODIR)/imagetest.o
 test: $(ODIR)/tests.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
+testbench: $(ODIR)/testbench.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
  # this is the default target, it will run if you just type "make" in the terminal
 
 

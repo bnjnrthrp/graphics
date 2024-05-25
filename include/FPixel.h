@@ -2,6 +2,7 @@
 
 #define FPIXEL_H
 #include "ppmIO.h"
+#include "Color.h"
 typedef struct
 {
     float rgb[3];
