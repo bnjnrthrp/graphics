@@ -3,8 +3,9 @@
  * homogenous factor h.
  */
 
+#include <stdio.h>
 #include "Point.h"
-#include <Math.h>
+#include <math.h>
 
 /**
  * Set the 2D location (first two values) of the point to x and y. Sets z to 0.0 and h to 1.0.
@@ -106,7 +107,7 @@ void point_draw(Point *p, Image *src, Color c)
     {
         x = (int)floor(p->val[0]);
         y = (int)floor(p->val[1]);
-        image_setColor(src, p->val[0], p->val[1], c);
+        image_setColor(src, src->rows - 1 - y, x, c);
     }
 }
 
@@ -123,15 +124,13 @@ void point_drawf(Point *p, Image *src, FPixel c)
     {
         x = (int)floor(p->val[0]);
         y = (int)floor(p->val[1]);
-        image_setf(src, y, x, c);
+        image_setf(src, src->rows - 1 - y, x, c);
     }
 }
 void point_print(Point *p, FILE *fp)
 {
     if (fp)
     {
-        fprintf(fp, p->val);
+        fprintf(fp, "(%.1f, %.1f, %.1f, %.1f)\n", p->val[0], p->val[1], p->val[2], p->val[3]);
     }
-
-    fclose(fp);
 }

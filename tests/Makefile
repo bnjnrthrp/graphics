@@ -15,20 +15,20 @@ LIBDIR =../lib
 # path to the bin directory
 BINDIR =../bin
 
-LIBS = -lm -limageIO
+LIBS = -limageIO -lm
 LFLAGS = -L$(LIBDIR) -L/opt/local/lib
 
 # put all of the relevant include files here
-_DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Image.h
+_DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Image.h Fractals.h Line.h Point.h Noise.h 
 
 # convert them to point to the right place
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = ppmtest lab1 createMask composite imagetest
+EXECUTABLES = ppmtest lab1 createMask composite imagetest test3a
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o FPixel.o
+_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o FPixel.o test3a.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -78,6 +78,11 @@ test: $(ODIR)/tests.o
 testbench: $(ODIR)/testbench.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
+test3a: $(ODIR)/test3a.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+	
+test3d: $(ODIR)/test3d.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
  # this is the default target, it will run if you just type "make" in the terminal
 
 
