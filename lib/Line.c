@@ -48,10 +48,6 @@ void line_draw(Line *l, Image *src, Color c)
     int x, y, dx, dy, e, stepX, stepY, temp;
     double x0, x1, y0, y1;
 
-    printf("drawing line: ");
-    point_print(&(l->a), stdout);
-    point_print(&(l->b), stdout);
-
     // Null check
     if (l && src)
     {
@@ -88,7 +84,6 @@ void line_draw(Line *l, Image *src, Color c)
             for (int i = 0; i < dx; i++) // -1 to drop the final pixel
             {
                 image_setColor(src, y, x, c);
-                printf("Drawing at %d, %d\n", x, y);
                 x += stepX;
             }
         }
@@ -108,152 +103,149 @@ void line_draw(Line *l, Image *src, Color c)
             for (int i = 0; i < dy; i++)
             {
                 image_setColor(src, y, x, c);
-                printf("Drawing at %d, %d\n", x, y);
                 y += stepY;
             }
         }
+        else
+        {
+            /**
+             * Determine the octant:
+             * 1st- step by x to right, test y:         |dx| > |dy|, dx > 0 & dy < 0
+             * 2nd- step by y, test x                   |dx| < |dy|, dx > 0 & dy < 0
+             * 3rd- step by y, test x (x steps left)    |dx| < |dy|, dx < 0 & dy < 0
+             * 4th- step by x (to the left), test y     |dx| > |dy|, dx < 0 & dy < 0
+             *
+             */
+            // Determine the octant
+            // Octant 1, step right, positive slope, dx > dy
+            if (abs(dx) >= abs(dy)) // Octant, 1, 4, 5, or 8
+            {
+                // Octant 1 or 8
+                if (dx > 0)
+                {
+                    // X steps to the right
+                    stepX = 1;
+                    if (dy < 0) // Octant 1
+                    {
+                        dy = -dy;  // Make dy positive so the algorithm will work
+                        y = y - 1; // Start one higher than y0
+                        stepY = -1;
+                    }
+                    else // Octant 8
+                    {
+                        stepY = 1;
+                    }
+                }
+                // Octant 4 or 5
+                else
+                {
+                    x = x - 1;
+                    dx = -dx;
+                    // X steps to the left
+                    stepX = -1;
+                    if (dy < 0) // Octant 4
+                    {
+                        y = y - 1;
+                        dy = -dy;
+                        stepY = -1;
+                    }
+                    else // Octant 5
+                    {
+                        stepY = 1;
+                    }
+                }
+                // Step through the Bresenham algorithm for (int i = 0; i < dx; i++)
+                {
+                    // Set the initial error
+                    e = 3 * dy - 2 * dx;
 
-        /**
-         * Determine the octant:
-         * 1st- step by x to right, test y
-         * 2nd- step by y, test x
-         * 3rd- step by y, test x (x steps left)
-         * 4th- step by x (to the left), test y
-         * 5 mirrors 4
-         * 6 mirrors 3
-         * 7 mirrors 2
-         * 8 mirrors 1
-         *
-         * Horizontal and Vertical special cases:
-         * Hor left to right -> 1st quadrant
-         * Vertical down to up -> 2nd quadrant
-         * Horizontal right to left -> 3rd quadrant
-         * Vertical up to down -> 4th quadrant
-         * In the point of view of the line, draw to the left of the line.
-         */
-        // Determine the octant
-        // Octant 1, step right, positive slope, dx > dy
-        //     if (abs(dx) > abs(dy)) // Octant, 1, 4, 5, or 8
-        //     {
-        //         // Octant 1 or 8
-        //         if (dx > 0)
-        //         {
-        //             // X steps to the right
-        //             stepX = 1;
-        //             if (dy > 0) // Octant 1
-        //             {
-        //                 stepY = 1;
-        //             }
-        //             else // Octant 8
-        //             {
-        //                 dy = -dy; // Set dy to its positive value so the algorithm will work.
-        //                 stepY = -1;
-        //             }
-        //         }
-        //         // Octant 4 or 5
-        //         else
-        //         {
-        //             dx = -dx;
-        //             // X steps to the left
-        //             stepX = -1;
-        //             if (dy > 0) // Octant 4
-        //             {
-        //                 stepY = 1;
-        //             }
-        //             else // Octant 5
-        //             {
-        //                 dy = -dy;
-        //                 stepY = -1;
-        //             }
-        //         }
-        //         // Step through the Bresenham algorithm for (int i = 0; i < dx; i++)
-        //         {
-        //             // Set the initial error
-        //             e = 3 * dy - 2 * dx;
+                    // Step through all the x's
+                    for (int i = 0; i < dx; i++)
+                    {
+                        // Set the color of the current pixel
+                        image_setColor(src, y, x, c);
 
-        //             // Step through all the x's
-        //             for (int i = 0; i < dx; i++)
-        //             {
-        //                 // Set the color of the current pixel
-        //                 image_setColor(src, y, x, c);
-        //                 // While the error is positive, we need to step up
-        //                 while (e > 0)
-        //                 {
-        //                     // Step one y pixel
-        //                     y += stepY;
-        //                     // Subtract 1 from e to account for the step forward.
-        //                     // Becomes 2*dx for the integer math
-        //                     e = e - 2 * dx;
-        //                 }
-        //                 // Step one x pixel
-        //                 x = stepX;
-        //                 // Step forward with dy (3 dy to account for new slope of 3/2)
-        //                 e = e + 2 * dy;
-        //             }
-        //         }
-        //     }
-        //     else
-        //     {
-        //         // More rise than run, step through y as the primary.
-        //         if (abs(dx) < abs(dy)) // Octant, 2, 3, 6, or 7
-        //         {
-        //             // Octant 2 or 7
-        //             if (dx > 0)
-        //             {
-        //                 // X steps to the right
-        //                 stepX = 1;
-        //                 if (dy > 0) // Octant 2
-        //                 {
-        //                     stepY = 1;
-        //                 }
-        //                 else // Octant 7
-        //                 {
-        //                     dy = -dy;
-        //                     stepY = -1;
-        //                 }
-        //             }
-        //             // Octant 3 or 6
-        //             else
-        //             {
-        //                 dx = -dx;
-        //                 // X steps to the left
-        //                 stepX = -1;
-        //                 if (dy > 0) // Octant 3
-        //                 {
-        //                     stepY = 1;
-        //                 }
-        //                 else // Octant 6
-        //                 {
-        //                     dy = -dy;
-        //                     stepY = -1;
-        //                 }
-        //             }
-        //             // Step through the Bresenham algorithm for (int i = 0; i < dx; i++)
-        //             {
-        //                 // Set the initial error
-        //                 e = 3 * dy - 2 * dx;
-
-        //                 // Iterate through y
-        //                 for (int i = 0; i < dy; i++)
-        //                 {
-        //                     // Set the color of the current pixel
-        //                     image_setColor(src, y, x, c);
-        //                     // While the error is positive, we need to step up
-        //                     while (e > 0)
-        //                     {
-        //                         // Step one x pixel
-        //                         x += stepX;
-        //                         // Subtract 1 from e to account for the step left or right.
-        //                         // Becomes 2*dy for the integer math
-        //                         e = e - 2 * dy;
-        //                     }
-        //                     // Step one y pixel
-        //                     y = stepY;
-        //                     // Step forward with dx
-        //                     e = e + 2 * dx;
-        //                 }
-        //             }
-        //         }
-        //     }
+                        // if the error is positive, we need to step up
+                        if (e > 0)
+                        {
+                            // Step one y pixel
+                            y += stepY;
+                            // Subtract 1 from e to account for the step forward.
+                            // Becomes 2*dx for the integer math
+                            e = e - 2 * dx;
+                        }
+                        // Step one x pixel
+                        x += stepX;
+                        // Step forward with dy (3 dy to account for new slope of 3/2)
+                        e = e + 2 * dy;
+                    }
+                }
+            }
+            else // dx < dy
+            {
+                // More rise than run, step through y as the primary.
+                // Octant, 2, 3, 6, or 7
+                {
+                    // Octant 2 or 7
+                    if (dx > 0)
+                    {
+                        // X steps to the right
+                        stepX = 1;
+                        if (dy < 0) // Octant 2
+                        {
+                            dy = -dy;
+                            y = y - 1;
+                            stepY = -1;
+                        }
+                        else // Octant 7
+                        {
+                            stepY = 1;
+                        }
+                    }
+                    // Octant 3 or 6
+                    else
+                    {
+                        dx = -dx;
+                        // X steps to the left
+                        stepX = -1;
+                        if (dy < 0) // Octant 3
+                        {
+                            x = x - 1;
+                            dy = -dy;
+                            y = y - 1;
+                            stepY = -1;
+                        }
+                        else // Octant 6
+                        {
+                            stepY = 1;
+                        }
+                    }
+                    // Step through the Bresenham algorithm for (int i = 0; i < dx; i++)
+                    {
+                        // Set the initial error
+                        e = 3 * dx - 2 * dy;
+                        // Iterate through y
+                        for (int i = 0; i < dy; i++)
+                        {
+                            // Set the color of the current pixel
+                            image_setColor(src, y, x, c);
+                            // While the error is positive, we need to step up
+                            if (e > 0)
+                            {
+                                // Step one x pixel
+                                x += stepX;
+                                // Subtract 1 from e to account for the step left or right.
+                                // Becomes 2*dy for the integer math
+                                e = e - 2 * dy;
+                            }
+                            // Step one y pixel
+                            y += stepY;
+                            // Step forward with dx
+                            e = e + 2 * dx;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
