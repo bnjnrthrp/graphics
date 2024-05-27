@@ -10,6 +10,7 @@
 #include "../include/Line.h"
 #include "../include/Image.h"
 #include "../include/ppmIO.h"
+#include "../include/Circle.h"
 
 // draw a box
 static int box(Image *src, Color color, int x, int y, int dx, int dy);
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
   Color White;
   Color Red;
   Point p;
-  // Circle circ;
+  Circle circ;
   Line line;
 
   color_set(&White, 1.0, 1.0, 1.0);
@@ -54,8 +55,8 @@ int main(int argc, char *argv[])
   box(src, White, 160, 180, 10, 20);
 
   point_set2D(&p, 260, 160);
-  // circle_set(&circ, p, 60);
-  // circle_draw(&circ, src, White);
+  circle_set(&circ, p, 60);
+  circle_draw(&circ, src, White);
 
   line_set2D(&line, 290, 210, 470, 300);
   line_draw(&line, src, Red);

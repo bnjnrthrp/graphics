@@ -45,7 +45,7 @@ void line_copy(Line *to, Line *from)
 
 void line_draw(Line *l, Image *src, Color c)
 {
-    int x, y, dx, dy, e, stepX, stepY, temp;
+    int x, y, dx, dy, e, stepX, stepY;
     double x0, x1, y0, y1;
 
     // Null check
