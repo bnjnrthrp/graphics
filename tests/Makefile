@@ -81,6 +81,12 @@ testbench: $(ODIR)/testbench.o
 test3a: $(ODIR)/test3a.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 	
+test3b: $(ODIR)/test3b.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+test3c: $(ODIR)/test3c.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
 test3d: $(ODIR)/test3d.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
  # this is the default target, it will run if you just type "make" in the terminal
