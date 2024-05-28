@@ -6,8 +6,8 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include "Polyline.h"
-#include "Image.h"
+#include "../include/Polyline.h"
+#include "../include/Image.h"
 
 // draw some random lines, then two boxes
 int main(int argc, char *argv[])

@@ -1,11 +1,13 @@
+#include <stdlib.h>
 #include "Polyline.h"
+#include "Line.h"
 
 /**
  * Returns an allocated Polyline pointer
  * initialized so that numVertex is 0 and vertex is NULL.
  * @return an initialized polyline
  */
-Polyline *polyline_create()
+Polyline *polyline_create(void)
 {
     Polyline *p = (Polyline *)malloc(sizeof(Polyline));
     if (!p)
@@ -14,6 +16,7 @@ Polyline *polyline_create()
         exit(-1);
     }
     polyline_init(p);
+    return p;
 }
 
 /**
@@ -37,6 +40,9 @@ Polyline *polyline_createp(int numV, Point *vlist)
         p->numVertex = numV;
         return p;
     }
+    // Error if vlist is null
+    fprintf(stderr, "the vlist was empty\n");
+    exit(-1);
 }
 
 /**
@@ -60,10 +66,6 @@ void polyline_init(Polyline *p)
 {
     if (p) // Null check
     {
-        if (p->vertex) // Check if data in the vertex list
-        {
-            polyline_clear(p);
-        }
         p->zBuffer = 1;
         p->numVertex = 0;
         p->vertex = NULL;
@@ -100,10 +102,15 @@ void polyline_set(Polyline *p, int numV, Point *vlist)
  */
 void polyline_clear(Polyline *p)
 {
-    if (p->vertex)
-        free(p->vertex);
-    p->numVertex = 0;
-    p->zBuffer = 1;
+    // Null check
+    if (p)
+    {
+        if (p->vertex) // check there is already data before freeing
+            free(p->vertex);
+        p->vertex = NULL;
+        p->numVertex = 0;
+        p->zBuffer = 1;
+    }
 }
 
 // utility
@@ -140,14 +147,33 @@ void polyline_copy(Polyline *to, Polyline *from)
  * @param p the polyline to print
  * @param fp the output stream
  */
-void polyline_print(Polyline *p, FILE *fp);
+void polyline_print(Polyline *p, FILE *fp)
+{
+    // Null check for the polyline, file, and the vertex list
+    if (p && fp && p->vertex)
+    {
+        for (int i = 0; i < p->numVertex; i++)
+        {
+            point_print(&(p->vertex[i]), fp);
+        }
+    }
+}
 
 /**
  * Normalize the x and y values of each vertex by the homogeneous coordinate.
  *
  * @param p the Polyline
  */
-void polyline_normalize(Polyline *p);
+void polyline_normalize(Polyline *p)
+{
+    if (p && p->vertex)
+    {
+        for (int i = 0; i < p->numVertex; i++)
+        {
+            point_normalize(&(p->vertex[i]));
+        }
+    }
+}
 
 /**
  * Draw the polyline using color c and the z-buffer, if appropriate
@@ -156,4 +182,16 @@ void polyline_normalize(Polyline *p);
  * @param src the Image to draw it onto
  * @param c the color of the line
  */
-void polyline_draw(Polyline *p, Image *src, Color c);
+void polyline_draw(Polyline *p, Image *src, Color c)
+{
+    // Null checks for polyline, image, and vertex list
+    if (p && src && p->vertex)
+    {
+        Line line;
+        for (int i = 0; i < p->numVertex - 1; i++)
+        {
+            line_set(&line, p->vertex[i], p->vertex[i + 1]);
+            line_draw(&line, src, c);
+        }
+    }
+}

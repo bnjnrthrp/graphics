@@ -11,7 +11,7 @@ typedef struct Polyine
 } Polyline;
 
 // Constructors / Setters
-Polyline *polyline_create();
+Polyline *polyline_create(void);
 Polyline *polyline_createp(int numV, Point *vlist);
 void polyline_free(Polyline *p);
 void polyline_init(Polyline *p);
