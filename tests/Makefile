@@ -89,6 +89,10 @@ test3c: $(ODIR)/test3c.o
 
 test3d: $(ODIR)/test3d.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+	
+testCircles: $(ODIR)/testCircles.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
  # this is the default target, it will run if you just type "make" in the terminal
 
 

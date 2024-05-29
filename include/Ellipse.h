@@ -13,4 +13,6 @@ typedef struct Ellipse
 void ellipse_set(Ellipse *e, Point tc, double ta, double tb);
 void ellipse_draw(Ellipse *e, Image *src, Color p);
 void ellipse_drawFill(Ellipse *e, Image *src, Color p);
+void ellipse_draw_partial(Ellipse *e, Image *src, Color p, int *quadrants, int size);
+void ellipse_draw_helper(Image *src, int y, int cy, int x, int cx, Color p, int *quadrants, int size);
 #endif // ELLIPSE_H
