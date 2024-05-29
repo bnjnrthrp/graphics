@@ -13,57 +13,6 @@ void ellipse_draw(Ellipse *e, Image *src, Color p)
     int size = 4;
 
     ellipse_draw_partial(e, src, p, quadrants, size);
-    // cx = e->c.val[0]; // center point x value
-    // cy = e->c.val[1]; // center point y value
-    // Rx = e->ra;
-    // Ry = e->rb;
-    // x = -1;
-    // y = -Ry;
-    // px = 2 * Ry * Ry;
-    // py = 2 * Rx * Rx * -y;
-    // err = Ry * Ry - Rx * Rx * Ry + Rx * Rx / 4 + Ry * Ry + px;
-    // // Plot the initial value and its 4 reflections
-    // ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size);
-    // // image_setColor(src, y + cy, x + cx, p);
-    // // image_setColor(src, y + cy, -x + cx - 1, p);
-    // // image_setColor(src, -y + cy - 1, x + cx, p);
-    // // image_setColor(src, -y + cy - 1, -x + cx - 1, p);
-
-    // while (px < py)
-    // {
-    //     x--;
-    //     px = px + 2 * Ry * Ry;
-    //     if (err < 0)
-    //     {
-    //         err = err + Ry * Ry + px;
-    //     }
-    //     else
-    //     {
-    //         y++;
-    //         py = py - 2 * Rx * Rx;
-    //         err = err + Ry * Ry + px - py;
-    //     }
-    //     ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size);
-    // }
-
-    // err = Ry * Ry * (x * x + x) + Rx * Rx * (y * y - 2 * y + 1) - Rx * Rx * Ry * Ry + Rx * Rx - py;
-
-    // while (y < 0)
-    // {
-    //     y++;
-    //     py = py - 2 * Rx * Rx;
-    //     if (err > 0)
-    //     {
-    //         err = err + Rx * Rx - py;
-    //     }
-    //     else
-    //     {
-    //         x--;
-    //         px = px + 2 * Ry * Ry;
-    //         err = err + Rx * Rx - py + px;
-    //     }
-    //     ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size);
-    // }
 }
 
 void ellipse_draw_partial(Ellipse *e, Image *src, Color p, int *quadrants, int size)
@@ -80,10 +29,6 @@ void ellipse_draw_partial(Ellipse *e, Image *src, Color p, int *quadrants, int s
     err = Ry * Ry - Rx * Rx * Ry + Rx * Rx / 4 + Ry * Ry + px;
     // Plot the initial value and its 4 reflections
     ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size);
-    // image_setColor(src, y + cy, x + cx, p);
-    // image_setColor(src, y + cy, -x + cx - 1, p);
-    // image_setColor(src, -y + cy - 1, x + cx, p);
-    // image_setColor(src, -y + cy - 1, -x + cx - 1, p);
 
     while (px < py)
     {

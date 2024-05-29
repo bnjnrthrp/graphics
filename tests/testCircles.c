@@ -54,9 +54,12 @@ int main(int argc, char *argv[])
   ellipse_set(&ellipse, p, 10, 40);
   ellipse_draw(&ellipse, src, White);
 
-  point_set2D(&p, 260, 160);
+  point_set2D(&p, 340, 160);
   circle_set(&circ, p, 60);
-  circle_draw(&circ, src, Red);
+  circle_drawFill(&circ, src, Red);
+
+  circle_set(&circ, p, 60);
+  circle_draw(&circ, src, White);
 
   image_write(src, "testCircles.ppm");
 
