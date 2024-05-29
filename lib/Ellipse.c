@@ -1,4 +1,5 @@
 #include "Ellipse.h"
+#include "Line.h"
 
 void ellipse_set(Ellipse *e, Point tc, double ta, double tb)
 {
@@ -7,15 +8,8 @@ void ellipse_set(Ellipse *e, Point tc, double ta, double tb)
     e->c = tc;
     e->a = 0;
 }
-void ellipse_draw(Ellipse *e, Image *src, Color p)
-{
-    int quadrants[] = {1, 2, 3, 4};
-    int size = 4;
 
-    ellipse_draw_partial(e, src, p, quadrants, size);
-}
-
-void ellipse_draw_partial(Ellipse *e, Image *src, Color p, int *quadrants, int size)
+void ellipse_bresenham_algo(Ellipse *e, Image *src, Color p, int *quadrants, int size, int fill)
 {
     int x, y, Rx, Ry, err, px, py, cx, cy;
     cx = e->c.val[0]; // center point x value
@@ -28,7 +22,7 @@ void ellipse_draw_partial(Ellipse *e, Image *src, Color p, int *quadrants, int s
     py = 2 * Rx * Rx * -y;
     err = Ry * Ry - Rx * Rx * Ry + Rx * Rx / 4 + Ry * Ry + px;
     // Plot the initial value and its 4 reflections
-    ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size);
+    ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size, fill);
 
     while (px < py)
     {
@@ -44,7 +38,7 @@ void ellipse_draw_partial(Ellipse *e, Image *src, Color p, int *quadrants, int s
             py = py - 2 * Rx * Rx;
             err = err + Ry * Ry + px - py;
         }
-        ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size);
+        ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size, fill);
     }
 
     err = Ry * Ry * (x * x + x) + Rx * Rx * (y * y - 2 * y + 1) - Rx * Rx * Ry * Ry + Rx * Rx - py;
@@ -63,11 +57,11 @@ void ellipse_draw_partial(Ellipse *e, Image *src, Color p, int *quadrants, int s
             px = px + 2 * Ry * Ry;
             err = err + Rx * Rx - py + px;
         }
-        ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size);
+        ellipse_draw_helper(src, y, cy, x, cx, p, quadrants, size, fill);
     }
 }
 
-void ellipse_draw_helper(Image *src, int y, int cy, int x, int cx, Color p, int *quadrants, int size)
+void ellipse_draw_helper(Image *src, int y, int cy, int x, int cx, Color p, int *quadrants, int size, int fill)
 {
 
     if (size == 4)
@@ -76,6 +70,15 @@ void ellipse_draw_helper(Image *src, int y, int cy, int x, int cx, Color p, int 
         image_setColor(src, y + cy, -x + cx - 1, p);      // Quadrant 1
         image_setColor(src, -y + cy - 1, x + cx, p);      // Quadrant 3
         image_setColor(src, -y + cy - 1, -x + cx - 1, p); // Quadrant 4
+        if (fill)
+        {
+            Line fillRow;
+            line_set2D(&fillRow, x + cx, y + cy + 1, -x + cx - 1, y + cy + 1);
+            line_draw(&fillRow, src, p);
+
+            line_set2D(&fillRow, x + cx, -y + cy, -x + cx - 1, -y + cy);
+            line_draw(&fillRow, src, p);
+        }
     }
     else
     {
@@ -101,4 +104,24 @@ void ellipse_draw_helper(Image *src, int y, int cy, int x, int cx, Color p, int 
         }
     }
 }
-void ellipse_drawFill(Ellipse *e, Image *src, Color p);
+
+void ellipse_draw_partial(Ellipse *e, Image *src, Color p, int *quadrants, int size)
+{
+    ellipse_bresenham_algo(e, src, p, quadrants, size, 0);
+}
+
+void ellipse_draw(Ellipse *e, Image *src, Color p)
+{
+    int quadrants[] = {1, 2, 3, 4};
+    int size = 4;
+
+    ellipse_bresenham_algo(e, src, p, quadrants, size, 0);
+}
+
+void ellipse_drawFill(Ellipse *e, Image *src, Color p)
+{
+    int quadrants[] = {1, 2, 3, 4};
+    int size = 4;
+
+    ellipse_bresenham_algo(e, src, p, quadrants, size, 1);
+}
