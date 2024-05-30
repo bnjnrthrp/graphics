@@ -466,6 +466,22 @@ void image_fill(Image *src, FPixel val)
 };
 
 /**
+ * Sets every pixel in an image to the given color
+ * @param src the source image
+ * @param c the color to copy into every pixel
+ */
+void image_fillc(Image *src, Color c)
+{
+    int size = src->rows * src->cols;
+    for (int i = 0; i < size; i++)
+    {
+        src->data[0][i].rgb[0] = c.c[0];
+        src->data[0][i].rgb[1] = c.c[1];
+        src->data[0][i].rgb[2] = c.c[2];
+    }
+};
+
+/**
  * sets the (r, g, b) values of each pixel to the given color
  * @param src the image to fill
  * @param r the red channel value

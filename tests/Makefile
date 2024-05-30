@@ -25,10 +25,10 @@ _DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Image.h Fractals.h Line.h Point.h N
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = ppmtest lab1 createMask composite imagetest test3a
+EXECUTABLES = ppmtest lab1 createMask composite imagetest test3a train
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o FPixel.o test3a.o
+_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o FPixel.o train.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -92,6 +92,9 @@ test3d: $(ODIR)/test3d.o
 
 	
 testCircles: $(ODIR)/testCircles.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+train: $(ODIR)/train.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
  # this is the default target, it will run if you just type "make" in the terminal
 

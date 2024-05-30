@@ -42,6 +42,7 @@ void image_setz(Image *src, int r, int c, float val);
 // Utility
 void image_reset(Image *src);
 void image_fill(Image *src, FPixel val);
+void image_fillc(Image *src, Color c);
 void image_fillrgb(Image *src, float r, float g, float b);
 void image_filla(Image *src, float a);
 void image_fillz(Image *src, float z);
