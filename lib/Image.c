@@ -62,11 +62,7 @@ void image_init(Image *src)
     src->a = NULL;
     src->z = NULL;
     src->maxval = 1;
-
-    for (int i = 0; i < MAX_FILENAME_LENGTH; i++)
-    {
-        src->filename[i] = 0;
-    };
+    src->filename[0] = 0;
 };
 
 /**
@@ -83,7 +79,7 @@ void image_init(Image *src)
 int image_alloc(Image *src, int rows, int cols)
 {
     // Free the data if there is already something here.
-    if (src->rows > 0 || src->cols > 0)
+    if (src->rows > 0 && src->cols > 0)
         image_dealloc(src);
 
     // Return error code if there was invalid input
@@ -101,6 +97,7 @@ int image_alloc(Image *src, int rows, int cols)
     // Allocate the row pointers, a channel, and z channel arrays
     src->data = (FPixel **)malloc(sizeof(FPixel *) * rows);
 
+    // Check for old data, free and reinitialize if applicable
     if (src->a)
         free(src->a);
     src->a = (float *)malloc(sizeof(float) * rows * cols);
@@ -165,21 +162,21 @@ void image_free(Image *src)
 void image_dealloc(Image *src)
 {
     // Free the pixel data
-
-    if (src->data)
+    if (src)
     {
-        if (src->data[0])
-            free(src->data[0]);
-        // Free the array of pointers
-        free(src->data);
+        if (src->data)
+        {
+            if (src->data[0])
+                free(src->data[0]);
+            // Free the array of pointers
+            free(src->data);
+        }
+        // Free the a and z channels
+        if (src->a)
+            free(src->a);
+        if (src->z)
+            free(src->z);
     }
-
-    // Free the a and z channels
-    if (src->a)
-        free(src->a);
-    if (src->z)
-        free(src->z);
-
     // Reset the fields of the image
     image_init(src);
     return;
@@ -237,7 +234,6 @@ int image_write(Image *src, char *filename)
     cols = src->cols;
 
     temp = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
-    convert_FPixel(src->data, rows, cols, temp);
 
     for (int i = 0; i < rows * cols; i++)
     {
@@ -351,9 +347,9 @@ void image_setc(Image *src, int r, int c, int b, float val)
     {
         val = 0;
     }
-    else if (val > src->maxval)
+    else if (val > 1)
     {
-        val = src->maxval;
+        val = 1;
     }
     src->data[r][c].rgb[b] = val;
 };
@@ -387,6 +383,11 @@ void image_seta(Image *src, int r, int c, float val)
  */
 void image_setz(Image *src, int r, int c, float val)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Null pointer provided to image_reset()\n");
+        exit(-1);
+    }
     if (val < 0)
     {
         val = 0;
@@ -570,40 +571,3 @@ void image_fillz(Image *src, float z)
         src->z[i] = z;
     }
 };
-
-/**
- * Creates a data array of the float pixels of a source and converts it to integer
- *
- * @param src the source image
- * @return A pointer to the Pixels to print
- */
-Pixel *image_float_to_int(Image *src, int rows, int cols)
-{
-    Pixel *output = (Pixel *)malloc(sizeof(Pixel) * rows * cols);
-    for (int i = 0; i < rows * cols; i++)
-    {
-        output[i].r = float_to_uc(src->data[0][i].rgb[0]);
-        output[i].g = float_to_uc(src->data[0][i].rgb[1]);
-        output[i].b = float_to_uc(src->data[0][i].rgb[2]);
-    }
-    return output;
-}
-
-/**
- * Creates a data array of the int pixels of a source and converts it to float pixels
- *
- * @param src the source image (Pixel struct)
- * @return A pointer to the FPixels
- */
-FPixel *image_int_to_float(Pixel *src, int rows, int cols)
-{
-
-    FPixel *output = (FPixel *)malloc(sizeof(FPixel) * rows * cols);
-    for (int i = 0; i < rows * cols; i++)
-    {
-        output[i].rgb[0] = uc_to_float(src[i].r);
-        output[i].rgb[1] = uc_to_float(src[i].g);
-        output[i].rgb[2] = uc_to_float(src[i].b);
-    }
-    return output;
-}

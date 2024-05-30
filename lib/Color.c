@@ -51,14 +51,36 @@ void color_set(Color *to, float r, float g, float b)
 
 float uc_to_float(unsigned char val)
 {
-    float result = val / 255;
+    // Bounds check that value between 0 and 255
+    float result;
+    if (val < 0)
+    {
+        val = 0;
+    }
+    else if (val > 255)
+    {
+        val = 255;
+    }
+    result = (float)val / 255;
+
     return result;
 }
 
 unsigned char float_to_uc(float val)
 {
-    unsigned char result = val * 255;
-    return result;
+    // Bounds check to ensure the val is [0, 1]
+    unsigned char result;
+    if (val < 0)
+    {
+        val = 0;
+    }
+    else if (val > 1)
+    {
+        val = 1;
+    }
+
+    result = val * 255 + .5;
+    return (unsigned char)result;
 }
 
 Color color_from_pixel(Pixel pixel)
