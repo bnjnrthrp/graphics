@@ -14,6 +14,7 @@
 #include "../include/ppmIO.h"
 #include "../include/Image.h"
 #include "../include/Line.h"
+#include "../include/Point.h"
 
 typedef struct
 {

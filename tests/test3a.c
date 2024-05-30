@@ -43,7 +43,6 @@ int main(int argc, char *argv[])
   Point p;
   Circle circ;
   Line line;
-  Ellipse ellipse;
 
   color_set(&White, 1.0, 1.0, 1.0);
   color_set(&Red, 0.9, 0.05, 0.05);

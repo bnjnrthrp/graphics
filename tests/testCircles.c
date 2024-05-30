@@ -54,18 +54,18 @@ int main(int argc, char *argv[])
   ellipse_set(&ellipse, p, 10, 40);
   ellipse_draw(&ellipse, src, White);
 
-  point_set2D(&p, 340, 160);
+  point_set2D(&p, 340, 60);
   circle_set(&circ, p, 60);
   circle_drawFill(&circ, src, Red);
 
   circle_set(&circ, p, 60);
   circle_draw(&circ, src, White);
 
-  point_set2D(&p, 340, 330);
+  point_set2D(&p, 360, 330);
   ellipse_set(&ellipse, p, 60, 30);
   ellipse_drawFill(&ellipse, src, Red);
 
-  point_set2D(&p, 345, 330);
+  point_set2D(&p, 365, 330);
   ellipse_set(&ellipse, p, 60, 30);
   ellipse_drawFill(&ellipse, src, White);
 
