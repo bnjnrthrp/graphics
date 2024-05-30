@@ -18,10 +18,26 @@ void circle_set(Circle *c, Point tc, double tr)
 }
 
 /**
+ * Helper function that will draw either the full circle or a partial circle
  *
+ * @param src the image to draw to
+ * @param y the y value
+ * @param cy the y value of the center of the circle
+ * @param x the x value
+ * @param cx the x value of the center of the circle
+ * @param p the color to draw
+ * @param octants an array that contains the desired octants to draw
+ * @param size the size of the octants array (how many octants to fill)
+ * @param fill 1 to fill the circle, 0 to not fill
  */
 void circle_draw_helper(Image *src, int y, int cy, int x, int cx, Color p, int *octants, int size, int fill)
 {
+    // Null check
+    if (!src || !octants)
+    {
+        fprintf(stderr, "One of the pointers provided was null\n");
+        exit(-1);
+    }
     // If drawing the whole circle, shortcut
     if (size == 8)
     {
@@ -85,8 +101,24 @@ void circle_draw_helper(Image *src, int y, int cy, int x, int cx, Color p, int *
     }
 }
 
+/**
+ * Bresenham's algorithm to draw a circle
+ *
+ * @param c the circle to draw
+ * @param src the Image to draw it to
+ * @param p the color of the circle
+ * @param octants the octants to draw (for partial drawings)
+ * @param size the size of the array of octants
+ * @param fill 1 to fill the circle, 0 to not fill the circle
+ */
 void circle_bresenham_algo(Circle *c, Image *src, Color p, int *octants, int size, int fill)
 {
+    // Null check
+    if (!c || !src || !octants)
+    {
+        fprintf(stderr, "One of the pointers provided was null\n");
+        exit(-1);
+    }
     int x, y, e, cx, cy;
     // set x to -1
     x = -1;
@@ -124,6 +156,13 @@ void circle_bresenham_algo(Circle *c, Image *src, Color p, int *octants, int siz
  */
 void circle_draw(Circle *c, Image *src, Color p)
 {
+    // Null check
+    if (!c || !src)
+    {
+        fprintf(stderr, "One of the pointers provided was null\n");
+        exit(-1);
+    }
+
     int octants[] = {1, 2, 3, 4, 5, 6, 7, 8};
     int size = 8;
 
@@ -131,8 +170,22 @@ void circle_draw(Circle *c, Image *src, Color p)
     circle_bresenham_algo(c, src, p, octants, size, 0);
 }
 
+/**
+ * Draws a partial circle by octant
+ * @param c the circle to draw
+ * @param src the image to draw onto
+ * @param p the color to draw
+ * @param octants the octants to draw
+ * @param size the size of the array of octants to draw
+ */
 void circle_draw_partial(Circle *c, Image *src, Color p, int *octants, int size)
 {
+    // Null check
+    if (!c || !src || !octants)
+    {
+        fprintf(stderr, "One of the pointers provided was null\n");
+        exit(-1);
+    }
     // Call the helper function and do not fill
     circle_bresenham_algo(c, src, p, octants, size, 0);
 }
@@ -145,6 +198,12 @@ void circle_draw_partial(Circle *c, Image *src, Color p, int *octants, int size)
  */
 void circle_drawFill(Circle *c, Image *src, Color p)
 {
+    // Null check
+    if (!c || !src)
+    {
+        fprintf(stderr, "One of the pointers provided was null\n");
+        exit(-1);
+    }
     int octants[] = {1, 2, 3, 4, 5, 6, 7, 8};
     int size = 8;
 

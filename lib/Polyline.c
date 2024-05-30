@@ -29,20 +29,20 @@ Polyline *polyline_create(void)
  */
 Polyline *polyline_createp(int numV, Point *vlist)
 {
-    if (vlist)
+    if (!vlist)
     {
-        Polyline *p = polyline_create();
-        p->vertex = (Point *)malloc(sizeof(Point) * numV);
-        for (int i = 0; i < numV; i++)
-        {
-            p->vertex[i] = vlist[i];
-        }
-        p->numVertex = numV;
-        return p;
+        fprintf(stderr, "the vlist was empty\n");
+        exit(-1);
     }
+    Polyline *p = polyline_create();
+    p->vertex = (Point *)malloc(sizeof(Point) * numV);
+    for (int i = 0; i < numV; i++)
+    {
+        p->vertex[i] = vlist[i];
+    }
+    p->numVertex = numV;
+    return p;
     // Error if vlist is null
-    fprintf(stderr, "the vlist was empty\n");
-    exit(-1);
 }
 
 /**
@@ -82,6 +82,12 @@ void polyline_init(Polyline *p)
  */
 void polyline_set(Polyline *p, int numV, Point *vlist)
 {
+    if (!p || !vlist)
+    {
+        fprintf(stderr, "A null pointer was provided\n");
+        exit(-1);
+    }
+
     if (p->vertex && vlist)
     {
         polyline_clear(p);
@@ -119,7 +125,12 @@ void polyline_clear(Polyline *p)
  */
 void polyline_zBuffer(Polyline *p, int flag)
 {
-    if (p && (flag == 0 || flag == 1))
+    if (!p)
+    {
+        fprintf(stderr, "A null pointer was provided\n");
+        exit(-1);
+    }
+    if (flag == 0 || flag == 1)
         p->zBuffer = flag;
 }
 
@@ -133,12 +144,14 @@ void polyline_zBuffer(Polyline *p, int flag)
  */
 void polyline_copy(Polyline *to, Polyline *from)
 {
-    if (to && from) // Null checks
+    if (!to || !from) // Null checks
     {
-        if (to->vertex) // Check if destination has memory, free if its there
-            polyline_clear(to);
-        polyline_set(to, from->numVertex, from->vertex);
+        fprintf(stderr, "A null pointer was provided\n");
+        exit(-1);
     }
+    if (to->vertex) // Check if destination has memory, free if its there
+        polyline_clear(to);
+    polyline_set(to, from->numVertex, from->vertex);
 }
 
 /**
@@ -166,6 +179,7 @@ void polyline_print(Polyline *p, FILE *fp)
  */
 void polyline_normalize(Polyline *p)
 {
+    // Null check
     if (p && p->vertex)
     {
         for (int i = 0; i < p->numVertex; i++)
