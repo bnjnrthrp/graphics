@@ -13,7 +13,18 @@
  * initialized to its default values
  * @return Polygon pointer
  */
-Polygon *polygon_create(void);
+Polygon *polygon_create(void)
+{
+    Polygon *p = (Polygon *)malloc(sizeof(Polygon));
+    if (!p)
+    {
+        fprintf(stderr, "Memory allocation failed in polygon_create\n");
+        exit(-1);
+    }
+    // Initialize the polygon to default values
+    polygon_init(p);
+    return p;
+}
 
 /**
  * Returns an allocated Polygon pointer with the vertex
@@ -31,6 +42,18 @@ Polygon *polygon_createp(int numV, Point *vlist)
         fprintf(stderr, "A null pointer was provided to polygon_createp\n");
         exit(-1);
     }
+
+    if (numV < 0)
+    {
+        fprintf(stderr, "Negative number provided to polygon_createp for numV\n");
+        exit(-1);
+    }
+    // Create the polygon pointer
+    Polygon *p = polygon_create();
+    // Set up the vertex list
+    polygon_set(p, numV, vlist);
+
+    return p;
 }
 
 /**
@@ -44,6 +67,12 @@ void polygon_free(Polygon *p)
         fprintf(stderr, "A null pointer was provided to polygon_free\n");
         exit(-1);
     }
+    // Check for vertex data, free if found
+    if (p->vertex)
+        free(p->vertex);
+
+    // free the Polygon
+    free(p);
 }
 
 // Initialize, set, free
@@ -60,6 +89,14 @@ void polygon_init(Polygon *p)
         fprintf(stderr, "A null pointer was provided to polygon_init\n");
         exit(-1);
     }
+
+    // Check for internal data, free if required
+    if (p->vertex)
+        free(p->vertex);
+
+    p->oneSided = 1;
+    p->nVertex = 0;
+    p->vertex = NULL;
 }
 
 /**
@@ -77,12 +114,36 @@ void polygon_set(Polygon *p, int numV, Point *vlist)
         fprintf(stderr, "A null pointer was provided to polygon_set\n");
         exit(-1);
     }
+
+    // Check to ensure number of vertices is non-negative
+    if (numV < 0)
+    {
+        fprintf(stderr, "Number of vertices provided was < 0 (polygon_set())\n");
+        exit(-1);
+    }
+
+    // Allocate the memory for the vertex list in the polygon struct
+    p->vertex = (Point *)malloc(sizeof(Point) * numV);
+
+    // Null check incase the malloc failed
+    if (!p->vertex)
+    {
+        fprintf(stderr, "polygon vertex memory allocation failed\n");
+        exit(-1);
+    }
+
+    // Copy data over from vlist to p->vertex. Avoids aliasing.
+    for (int i = 0; i < numV; i++)
+    {
+        p->vertex[i] = vlist[i];
+    }
+    p->nVertex = numV;
 }
 
 /**
  * Frees the internal data and resets the fields of a polygon
  *
- * @param p the polygon to initialize
+ * @param p the polygon to clear and reset
  */
 void polygon_clear(Polygon *p)
 {
@@ -92,6 +153,14 @@ void polygon_clear(Polygon *p)
         fprintf(stderr, "A null pointer was provided to polygon_clear\n");
         exit(-1);
     }
+
+    // Check for vertex data, free if found and reset to null
+    if (p->vertex)
+        free(p->vertex);
+    p->vertex = NULL;
+
+    // Reinitialize the polygon to default values
+    polygon_init(p);
 }
 
 // setters/getters
@@ -99,7 +168,7 @@ void polygon_clear(Polygon *p)
  * Sets the oneSided value of the polygon
  *
  * @param p the polygon to initialize
- * @param oneSided 1 for true, 0 for false (two-sided)
+ * @param oneSided 1 for one sided, 0 for two-sided
  */
 void polygon_setSided(Polygon *p, int oneSided)
 {
@@ -108,6 +177,12 @@ void polygon_setSided(Polygon *p, int oneSided)
     {
         fprintf(stderr, "A null pointer was provided to polygon_setSided\n");
         exit(-1);
+    }
+
+    // Check bounds of oneSided. Do nothing if outside range
+    if (oneSided == 0 || oneSided == 1)
+    {
+        p->oneSided = oneSided;
     }
 }
 
@@ -126,6 +201,21 @@ void polygon_copy(Polygon *to, Polygon *from)
         fprintf(stderr, "A null pointer was provided to polygon_copy\n");
         exit(-1);
     }
+
+    // Check if destination has vertices to free. Set to 0.
+    if (to->vertex)
+    {
+        free(to->vertex);
+        to->nVertex = 0;
+        to->vertex = NULL;
+    }
+
+    // Check the source has vertices to copy,
+    // then copy that data over with polygon_set
+    if (from->vertex)
+    {
+        polygon_set(to, from->nVertex, from->vertex);
+    }
 }
 
 /**
@@ -141,6 +231,25 @@ void polygon_print(Polygon *p, FILE *fp)
     {
         fprintf(stderr, "A null pointer was provided to polygon_print\n");
         exit(-1);
+    }
+
+    // Print the basic struct info
+    printf("Sides (1 for 1 sided, 0 for 2-sided): %d\n", p->oneSided);
+    printf("Num Vertices: %d\n", p->nVertex);
+
+    // Check there are vertices to print
+    if (!p->vertex)
+    {
+        printf("Vertices: None\n");
+    }
+    else
+    {
+        printf("Vertices:\n");
+        // If there is data, iterate through list and print each point.
+        for (int i = 0; i < p->nVertex; i++)
+        {
+            point_print(&(p->vertex[i]), fp);
+        }
     }
 }
 

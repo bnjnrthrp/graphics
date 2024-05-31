@@ -29,6 +29,7 @@ Polyline *polyline_create(void)
  */
 Polyline *polyline_createp(int numV, Point *vlist)
 {
+    // Error if vlist is null
     if (!vlist)
     {
         fprintf(stderr, "the vlist was empty\n");
@@ -36,13 +37,17 @@ Polyline *polyline_createp(int numV, Point *vlist)
     }
     Polyline *p = polyline_create();
     p->vertex = (Point *)malloc(sizeof(Point) * numV);
+    if (!p->vertex)
+    {
+        fprintf(stderr, "polyline memory allocation failed\n");
+        exit(-1);
+    }
     for (int i = 0; i < numV; i++)
     {
         p->vertex[i] = vlist[i];
     }
     p->numVertex = numV;
     return p;
-    // Error if vlist is null
 }
 
 /**
