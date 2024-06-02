@@ -89,11 +89,6 @@ void polygon_init(Polygon *p)
         fprintf(stderr, "A null pointer was provided to polygon_init\n");
         exit(-1);
     }
-
-    // Check for internal data, free if required
-    if (p->vertex)
-        free(p->vertex);
-
     p->oneSided = 1;
     p->nVertex = 0;
     p->vertex = NULL;
@@ -265,6 +260,18 @@ void polygon_normalize(Polygon *p)
     {
         fprintf(stderr, "A null pointer was provided to polygon_normalize\n");
         exit(-1);
+    }
+
+    // Null check the vertex list
+    if (!p->vertex)
+    {
+        fprintf(stderr, "No vertices to normalize\n");
+        exit(-1);
+    }
+
+    for (int i = 0; i < p->nVertex; i++)
+    {
+        point_normalize(&(p->vertex[i]));
     }
 }
 

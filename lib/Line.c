@@ -123,8 +123,8 @@ void line_draw(Line *l, Image *src, Color c)
     y1 = l->b.val[1];
     dx = x1 - x0;
     dy = y1 - y0;
-    x = floor(x0);
-    y = floor(y0);
+    x = x0;
+    y = y0;
 
     /**
      * Special cases: determine if horizontal or vertical line. Horizontal will draw left to right on top, right to left on pixel row beneath it
