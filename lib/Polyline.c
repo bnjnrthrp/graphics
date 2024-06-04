@@ -44,7 +44,7 @@ Polyline *polyline_createp(int numV, Point *vlist)
     }
     for (int i = 0; i < numV; i++)
     {
-        p->vertex[i] = vlist[i];
+        point_copy(&(p->vertex[i]), &(vlist[i]));
     }
     p->numVertex = numV;
     return p;
@@ -100,7 +100,7 @@ void polyline_set(Polyline *p, int numV, Point *vlist)
     p->vertex = (Point *)malloc(sizeof(Point) * numV);
     for (int i = 0; i < numV; i++)
     {
-        p->vertex[i] = vlist[i];
+        point_copy(&(p->vertex[i]), &(vlist[i]));
     }
     p->numVertex = numV;
 }

@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "polygon.h"
-#include "list.h"
+#include "Polygon.h"
+#include "List.h"
 
 /********************
 Scanline Fill Algorithm
@@ -82,18 +82,9 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src)
 	}
 	// Check if the starting row is below the image or the end row is
 	// above the image and skip the edge if either is true
-
-	// Sort the two points to ensure start is actually below the end
-	if (compYStart(&start, &end) > 0)
+	if (start.val[1] > src->rows || end.val[1] < 0)
 	{
-		Point temp = start;
-		start = end;
-		end = temp;
-	}
-
-	if (start.val[1] >= src->rows || end.val[1] < 0)
-	{
-		return (-1);
+		return NULL;
 	}
 
 	// allocate an edge structure and set the x0, y0, x1, y1 values
@@ -107,28 +98,60 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src)
 	// start y value to the nearest integer and assign it to
 	// edge->yStart.
 
+	edge->yStart = (int)(edge->y0 + .5);
+
 	// Turn off the edge if it starts in the lower half or the top half
 	// of the next pixel.  In other words, round the end y value to the
 	// nearest integer and subtract 1, assigning the result to
 	// edge->yEnd.
 
+	edge->yEnd = (int)(edge->y1 + .5) - 1;
+
 	// Clip yEnd to the number of rows-1.
 
-	// Calculate the slope, dxPerScan
+	if (edge->yEnd >= src->rows)
+	{
+		edge->yEnd = src->rows - 1;
+	}
 
+	// Calculate the slope, dxPerScan == dx / dy
+	edge->dxPerScan = (edge->x1 - edge->x0) / (edge->y1 - edge->y0);
 	// Calculate xIntersect, adjusting for the fraction of the point in the pixel.
 	// Scanlines go through the middle of pixels
 	// Move the edge to the first scanline it crosses
 
+	if (edge->y0 - (int)(edge->y0) <= .5)
+	{
+		// xIntersect = x0 + (.5 - (y0 - floor(y0)) * dx/dy
+		edge->xIntersect = edge->x0 + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dxPerScan;
+	}
+	else
+	{
+		// xIntersect = x0 + (1.0 - y0 - floor(y0) + .5) * dx/dy
+		edge->xIntersect = edge->x0 + (1 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dxPerScan;
+	}
+
 	// adjust if the edge starts above the image
 	// move the intersections down to scanline zero
 	// if edge->y0 < 0
-	//   update xIntersect
-	//   update y0
-	//   update x0
-	//   update yStart
+	if (edge->y0 < 0)
+	{
+		//   update xIntersect
+		// xIntersect would be the new x when sloping from the negative y to 0. xI1 = xI0 + dx/dy * (0 - y0)
+		edge->xIntersect = edge->xIntersect + (edge->dxPerScan) * (0 - edge->y0);
+		//   update y0
+		edge->y0 = 0;
+		//   update x0
+		edge->x0 = edge->xIntersect; // since using Lower left index, x0 would be actually be at the xIntersect
+		//   update yStart
+		edge->yStart = (int)(edge->y0 + .5);
+	}
 
 	// check for really bad cases with steep slopes where xIntersect has gone beyond the end of the edge
+	if ((edge->xIntersect > edge->x1 && edge->dxPerScan > 0) || (edge->xIntersect < edge->x1 && edge->dxPerScan < 0))
+	{
+		edge->xIntersect = edge->x1;
+	}
 
 	// return the newly created edge data structure
 	return (edge);
@@ -191,7 +214,7 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 static void fillScan(int scan, LinkedList *active, Image *src, Color c)
 {
 	Edge *p1, *p2;
-	int i, f;
+	int i, f, start, end;
 
 	// loop over the list
 	p1 = ll_head(active);
@@ -215,11 +238,24 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c)
 
 		/**** Your code goes here ****/
 		// identify the starting column
+		start = (int)(p1->xIntersect + .5);
 		// clip to the left side of the image
+		if (start < 0)
+		{
+			start = 0;
+		}
 		// identify the ending column
+		end = (int)(p2->xIntersect + .5);
 		// clip to the right side of the image
+		if (end > src->cols)
+		{
+			end = src->cols;
+		}
 		// loop from start to end and color in the pixels
-
+		for (int i = start; i < end; i++)
+		{
+			image_setColor(src, scan, i, c);
+		}
 		// move ahead to the next pair of edges
 		p1 = ll_next(active);
 	}

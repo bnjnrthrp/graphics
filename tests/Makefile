@@ -19,16 +19,17 @@ LIBS = -limageIO -lm
 LFLAGS = -L$(LIBDIR) -L/opt/local/lib
 
 # put all of the relevant include files here
-_DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Image.h Fractals.h Line.h Point.h Noise.h 
+# _DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Image.h Fractals.h Line.h Point.h Noise.h 
+_DEPS = Graphics.h
 
 # convert them to point to the right place
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = ppmtest lab1 createMask composite imagetest test3a train
+EXECUTABLES = ppmtest lab1 createMask composite test4a
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o FPixel.o train.o
+_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o FPixel.o train.o test4a.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -68,33 +69,36 @@ endif
 # gcc -Wall -O3 -o tests.out tests.c Image.c 
 
 # put the specific executable rules here
-imagetest: $(ODIR)/imagetest.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# imagetest: $(ODIR)/imagetest.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
+# test: $(ODIR)/tests.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-test: $(ODIR)/tests.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# testbench: $(ODIR)/testbench.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-testbench: $(ODIR)/testbench.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-test3a: $(ODIR)/test3a.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# test3a: $(ODIR)/test3a.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 	
 test3b: $(ODIR)/test3b.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-test3c: $(ODIR)/test3c.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# test3c: $(ODIR)/test3c.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-test3d: $(ODIR)/test3d.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# test3d: $(ODIR)/test3d.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 	
-testCircles: $(ODIR)/testCircles.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# testCircles: $(ODIR)/testCircles.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-train: $(ODIR)/train.o
+# train: $(ODIR)/train.o
+#	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+
+test4a: $(ODIR)/test4a.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
  # this is the default target, it will run if you just type "make" in the terminal
 

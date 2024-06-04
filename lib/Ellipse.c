@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "Ellipse.h"
 #include "Line.h"
 

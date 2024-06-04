@@ -1,6 +1,7 @@
 #include "Circle.h"
 #include "Line.h"
 #include <math.h>
+#include <stdlib.h>
 /**
  * Initialize a circle to center tc and radius tr.
  * @param c the Circle pointer

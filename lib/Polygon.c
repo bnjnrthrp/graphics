@@ -6,6 +6,8 @@
 
 #include <stdlib.h>
 #include "Polygon.h"
+#include "list.h"
+#include "Line.h"
 
 // Constructors
 /**
@@ -285,23 +287,19 @@ void polygon_normalize(Polygon *p)
 void polygon_draw(Polygon *p, Image *src, Color c)
 {
     // Null check
-    if (!p || !src)
+    if (!p || !src || !p->vertex)
     {
         fprintf(stderr, "A null pointer was provided to polygon_draw\n");
         exit(-1);
     }
-}
 
-/**
- * Draw a filled polygon on an image using the color c.
- * Uses a scanline z-buffer rendering algorithm
- */
-void polygon_drawFill(Polygon *p, Image *src, Color c)
-{
-    // Null check
-    if (!p || !src)
+    Line line;
+    for (int i = 0; i < p->nVertex - 1; i++)
     {
-        fprintf(stderr, "A null pointer was provided to polygon_drawFill\n");
-        exit(-1);
+        line_set(&line, p->vertex[i], p->vertex[i + 1]);
+        line_draw(&line, src, c);
     }
+    // Connect the last point and first point
+    line_set(&line, p->vertex[p->nVertex - 1], p->vertex[0]);
+    line_draw(&line, src, c);
 }

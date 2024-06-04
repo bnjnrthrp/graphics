@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "line.h": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "stdlib.h": "c"
     }
 }
