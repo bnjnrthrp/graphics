@@ -6,12 +6,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "graphics.h"
+#include "../include/Graphics.h"
 
 /*
   Program to stress test the polygon API
 */
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   Image *src;
   const int rows = 300;
   const int cols = 400;
@@ -20,7 +21,7 @@ int main(int argc, char *argv[]) {
   Color Red;
   Color Blue;
   Point pt[5];
-  
+
   color_set(&Red, 8.0, 0.1, 0.2);
   color_set(&Blue, 0.2, 0.1, 0.8);
 
@@ -71,13 +72,13 @@ int main(int argc, char *argv[]) {
 
   printf("polygon_set(): overwriting vertices in pstat\n");
   polygon_set(&pstat, 4, pt);
-  
+
   printf("pstat:\n");
   polygon_print(&pstat, stdout);
 
   printf("polygon_copy(): copying from pstat to pdyn\n");
   polygon_copy(pdyn, &pstat);
-  
+
   printf("pdyn:\n");
   polygon_print(pdyn, stdout);
 
@@ -104,5 +105,5 @@ int main(int argc, char *argv[]) {
 
   image_free(src);
 
-  return(0);
+  return (0);
 }

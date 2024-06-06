@@ -26,5 +26,6 @@ void polygon_print(Polygon *p, FILE *fp);
 void polygon_normalize(Polygon *p);
 void polygon_draw(Polygon *p, Image *src, Color c);
 void polygon_drawFill(Polygon *p, Image *src, Color c);
+void polygon_drawFillB(Polygon *p, Image *src, Color c);
 
 #endif // POLYGON_H

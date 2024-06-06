@@ -6,12 +6,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "graphics.h"
+#include "../include/graphics.h"
 
 /*
   Program to test polygon functionality using barycentric coordinates
 */
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   Image *src;
   const int rows = 100;
   const int cols = 100;
@@ -21,10 +22,10 @@ int main(int argc, char *argv[]) {
   Color Blue;
   Point pt[100];
 
-  color_set(&Red, 0.9, 0.2, 0.1 );
-  color_set(&White, 1.0, 1.0, 1.0 );
-  color_set(&Blue, 0.2, 0.1, 0.95 );
-  
+  color_set(&Red, 0.9, 0.2, 0.1);
+  color_set(&White, 1.0, 1.0, 1.0);
+  color_set(&Blue, 0.2, 0.1, 0.95);
+
   src = image_create(rows, cols);
 
   // make a simple square to test proper areas and locations
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
   printf("drawing polygon 1\n");
   polygon_drawFillB(p, src, Blue);
 
-  polygon_set(p, 3, &(pt[2]) );
+  polygon_set(p, 3, &(pt[2]));
 
   printf("drawing polygon 2\n");
   polygon_drawFillB(p, src, Red);
@@ -59,7 +60,7 @@ int main(int argc, char *argv[]) {
   point_set2D(&(pt[11]), 5, 25);
   point_set2D(&(pt[12]), 5, 5);
 
-  polygon_set(p, 3, &(pt[10]) );
+  polygon_set(p, 3, &(pt[10]));
 
   printf("drawing polygon 4\n");
   polygon_drawFillB(p, src, Red);
@@ -69,11 +70,10 @@ int main(int argc, char *argv[]) {
   printf("drawing polygon 5\n");
   polygon_drawFillB(p, src, Blue);
 
-
   printf("writing output\n");
   image_write(src, "test4b.ppm");
 
   image_free(src);
 
-  return(0);
+  return (0);
 }

@@ -26,10 +26,10 @@ _DEPS = Graphics.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = ppmtest lab1 createMask composite test4a
+EXECUTABLES = ppmtest lab1 createMask composite test4a test4b test4c test4c-loop polyspeed
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o FPixel.o train.o test4a.o
+_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o imagetest.o FPixel.o train.o test4a.o polyspeed.o test4b.o test4c.o test4c-loop.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -99,6 +99,18 @@ test3b: $(ODIR)/test3b.o
 
 
 test4a: $(ODIR)/test4a.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+test4b: $(ODIR)/test4b.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+	
+polyspeed: $(ODIR)/polyspeed.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+test4c: $(ODIR)/test4c.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+test4c-loop: $(ODIR)/test4c-loop.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
  # this is the default target, it will run if you just type "make" in the terminal
 

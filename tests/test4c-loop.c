@@ -6,12 +6,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "graphics.h"
+#include "../include/Graphics.h"
 
 /*
   Program to stress test the polygon API
 */
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   Image *src;
   const int rows = 300;
   const int cols = 400;
@@ -20,7 +21,7 @@ int main(int argc, char *argv[]) {
   Color Red;
   Color Blue;
   Point pt[5];
-  
+
   color_set(&Red, 8.0, 0.1, 0.2);
   color_set(&Blue, 0.2, 0.1, 0.8);
 
@@ -33,7 +34,8 @@ int main(int argc, char *argv[]) {
   point_set2D(&(pt[3]), 150, 130);
   point_set2D(&(pt[4]), 60, 180);
 
-  for(;;) {
+  for (;;)
+  {
     pdyn = polygon_createp(5, pt);
 
     polygon_init(&pstat);
@@ -47,9 +49,9 @@ int main(int argc, char *argv[]) {
     polygon_clear(pdyn);
 
     polygon_set(&pstat, 4, pt);
-  
+
     polygon_copy(pdyn, &pstat);
-  
+
     polygon_set(pdyn, 5, pt);
 
     polygon_drawFill(pdyn, src, Blue);
@@ -65,5 +67,5 @@ int main(int argc, char *argv[]) {
 
   image_free(src);
 
-  return(0);
+  return (0);
 }

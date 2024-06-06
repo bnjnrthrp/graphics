@@ -2,6 +2,7 @@
     "files.associations": {
         "line.h": "c",
         "cmath": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "polygon.h": "c"
     }
 }
