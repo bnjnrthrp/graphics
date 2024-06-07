@@ -6,17 +6,12 @@
 #include <stdlib.h>
 #include "Graphics.h"
 
-/*
-Program to build out the starfox starship
-*/
-
-int main(int argc, char *argv[])
+static void draw_starfox(Image *src)
 {
+    if (!src)
+        return;
     Point pt[100];
     Polygon *p;
-    Image *src;
-    int rows = 1000;
-    int cols = 2000;
 
     // Initialize all the colors. Each color is mapped to the corresponding index in the rgbValues arrays. Need to move this to hashmap
     Color colors[16];
@@ -35,12 +30,11 @@ int main(int argc, char *argv[])
     int yValue[] = {590, 901, 600, 623, 644, 590, 481, 550, 525, 481, 525, 230, 531, 543, 520, 538, 509, 528, 455, 590, 464, 600, 572, 464, 572, 557, 546, 464, 459, 585, 465, 594, 597, 566, 470, 553, 543, 618, 850, 552, 600, 619, 901, 635, 901, 674, 755, 552, 850, 304, 685, 620, 644, 626, 660, 675, 643, 652, 635, 643, 626, 579, 598, 570, 592, 555, 579, 526, 533, 575, 600, 463, 618, 486};
     int ptSize = 74;
 
+    // Assign the points array
     for (int i = 0; i < ptSize; i++)
     {
         point_set2D(&(pt[i]), xValue[i], yValue[i]);
     }
-    // Initialize the points array
-    src = image_create(rows, cols);
 
     p = polygon_createp(3, pt);
 
@@ -152,8 +146,143 @@ int main(int argc, char *argv[])
     polygon_drawFillB(p, src, colors[14]);
 
     image_write(src, "starfox.ppm");
-
     polygon_free(p);
+}
+
+/**
+ * A program that will draw the pokemon Porygon
+ */
+static void draw_porygon(Image *src)
+{
+    if (!src)
+        return;
+
+    Point pt[100];
+    Polygon *p;
+    Circle circ;
+
+    // Initialize all the colors. Each color is mapped to the corresponding index in the rgbValues arrays. Need to move this to hashmap
+    Color colors[19];
+    int colorSize = 19;
+    float rValues[] = {0.81, 0.65, 1, 0.88, 0.91, 0.58, 0.65, 0.34, 0.26, 0.3, 0.32, 0.27, 0.35, 0.97, 0.94, 0.94, 0.89, 0.69, .05};
+    float gValues[] = {0.91, 0.29, 0.35, 0.35, 0.53, 0.27, 0.84, 0.7, 0.45, 0.6, 0.67, 0.46, 0.71, 0.81, 0.65, 0.89, 0.85, 0.65, .05};
+    float bValues[] = {0.91, 0.31, 0.4, 0.4, 0.55, 0.28, 0.89, 0.78, 0.49, 0.64, 0.72, 0.48, 0.79, 0.83, 0.69, 0.89, 0.85, 0.64, .05};
+
+    for (int i = 0; i < colorSize; i++)
+    {
+        color_set(&(colors[i]), rValues[i], gValues[i], bValues[i]);
+    }
+
+    // Define all the X and Y points
+    int xValue[] = {84, 118, 251, 162, 283, 306, 396, 513, 540, 453, 430, 345, 283, 252, 310, 330, 402, 236, 118, 236, 350, 451, 402, 453, 540, 330, 310, 402, 453, 345, 430, 245, 320, 274, 312, 305, 226, 274, 320, 508, 458, 449, 395, 274, 447, 559, 508, 545, 458, 650, 711, 508, 458, 449, 480, 650, 650, 626, 721, 738, 678, 711, 716, 731, 754, 508, 559, 600, 632, 711, 722, 734, 852, 774, 632, 585, 709, 728, 602, 852, 849, 728, 709, 774, 379};
+    int yValue[] = {494, 348, 380, 522, 404, 471, 436, 314, 204, 241, 323, 338, 400, 379, 299, 209, 191, 156, 348, 156, 86, 103, 191, 241, 204, 209, 299, 191, 241, 338, 323, 497, 466, 590, 618, 667, 626, 590, 466, 634, 386, 384, 435, 590, 695, 732, 634, 491, 386, 337, 390, 634, 386, 384, 352, 337, 337, 335, 25, 29, 358, 390, 422, 419, 60, 634, 732, 670, 487, 390, 455, 456, 503, 559, 488, 762, 804, 837, 791, 503, 574, 837, 804, 559, 268};
+    int ptSize = 85;
+
+    // Assign the points array
+    for (int i = 0; i < ptSize; i++)
+    {
+        point_set2D(&(pt[i]), xValue[i], yValue[i]);
+    }
+
+    p = polygon_createp(4, pt);
+
+    printf("Drawing the nose\n");
+    polygon_drawFill(p, src, colors[6]);
+    polygon_set(p, 3, &(pt[2]));
+    polygon_drawFill(p, src, colors[7]);
+    polygon_set(p, 3, &(pt[3]));
+    polygon_drawFill(p, src, colors[8]);
+
+    printf("Drawing the cheeks\n");
+    polygon_set(p, 8, &(pt[5]));
+    polygon_drawFill(p, src, colors[1]);
+    polygon_set(p, 4, &(pt[11]));
+    polygon_drawFill(p, src, colors[2]);
+    polygon_set(p, 6, &(pt[13]));
+    polygon_drawFill(p, src, colors[13]);
+
+    printf("Drawing the top of the head\n");
+    polygon_set(p, 4, &(pt[19]));
+    polygon_drawFill(p, src, colors[14]);
+    polygon_set(p, 4, &(pt[21]));
+    polygon_drawFill(p, src, colors[3]);
+
+    printf("Drawing the eye\n");
+    polygon_set(p, 3, &(pt[25]));
+    polygon_drawFill(p, src, colors[15]);
+    polygon_set(p, 4, &(pt[26]));
+    polygon_drawFill(p, src, colors[16]);
+    polygon_set(p, 3, &(pt[28]));
+    polygon_drawFill(p, src, colors[17]);
+    circle_set(&circ, pt[84], 15);
+    circle_drawFill(&circ, src, colors[18]);
+
+    printf("Drawing the left leg\n");
+    polygon_set(p, 6, &(pt[31]));
+    polygon_drawFill(p, src, colors[9]);
+
+    printf("Drawing the chest\n");
+    polygon_set(p, 3, &(pt[37]));
+    polygon_drawFill(p, src, colors[0]);
+    polygon_set(p, 5, &(pt[38]));
+    polygon_drawFill(p, src, colors[10]);
+    polygon_set(p, 4, &(pt[43]));
+    polygon_drawFill(p, src, colors[11]);
+
+    printf("Drawing the shoulder and body\n");
+    polygon_set(p, 3, &(pt[46]));
+    polygon_drawFill(p, src, colors[10]);
+    polygon_set(p, 6, &(pt[46]));
+    polygon_drawFill(p, src, colors[3]);
+    polygon_set(p, 4, &(pt[52]));
+    polygon_drawFill(p, src, colors[4]);
+
+    printf("Drawing the tail\n");
+    polygon_set(p, 5, &(pt[56]));
+    polygon_drawFill(p, src, colors[0]);
+    polygon_set(p, 6, &(pt[59]));
+    polygon_drawFill(p, src, colors[11]);
+
+    printf("Drawing the lower body\n");
+    polygon_set(p, 4, &(pt[65]));
+    polygon_drawFill(p, src, colors[5]);
+    polygon_set(p, 3, &(pt[68]));
+    polygon_drawFill(p, src, colors[5]);
+    polygon_set(p, 4, &(pt[71]));
+    polygon_drawFill(p, src, colors[12]);
+    polygon_set(p, 4, &(pt[73]));
+    polygon_drawFill(p, src, colors[0]);
+    polygon_set(p, 4, &(pt[75]));
+    polygon_drawFill(p, src, colors[11]);
+    polygon_set(p, 5, &(pt[79]));
+    polygon_drawFill(p, src, colors[12]);
+
+    image_write(src, "porygon.ppm");
+    polygon_free(p);
+}
+
+/*
+Program to build out the starfox starship
+*/
+int main(int argc, char *argv[])
+{
+    Image *src;
+    int rows = 1000;
+    int cols = 2000;
+    src = image_create(rows, cols);
+
+    printf("Drawing Starfox's ship\n");
+    draw_starfox(src);
+
+    image_free(src);
+
+    rows = 900;
+    cols = 950;
+    src = image_create(rows, cols);
+
+    printf("Drawing Porygon\n");
+    draw_porygon(src);
+
     image_free(src);
 
     return (0);

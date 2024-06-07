@@ -3,6 +3,8 @@
   Fall 2014
 
 	Skeleton scanline fill algorithm
+
+	Implementation completed by Benji Northrop
 */
 
 #include <stdio.h>
