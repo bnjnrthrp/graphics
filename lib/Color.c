@@ -49,17 +49,6 @@ void color_set(Color *to, float r, float g, float b)
     to->c[2] = b;
 }
 
-Color color_interpolate(Color c1, Color c2, double a)
-{
-    Color result;
-    float r, g, b;
-    r = a * c1.c[0] + (1 - a) * (c2.c[0]);
-    g = a * c1.c[1] + (1 - a) * (c2.c[1]);
-    b = a * c1.c[2] + (1 - a) * (c2.c[2]);
-    color_set(&result, r, g, b);
-    return result;
-}
-
 float uc_to_float(unsigned char val)
 {
     // Bounds check that value between 0 and 255
