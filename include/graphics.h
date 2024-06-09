@@ -12,3 +12,4 @@
 #include "Polygon.h"
 #include "Polyline.h"
 #include "ppmIO.h"
+#include "Vector.h"

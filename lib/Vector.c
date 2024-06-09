@@ -36,7 +36,7 @@ void vector_print(Vector *v, FILE *fp)
         fprintf(stderr, "Invalid pointer was provided to vector_point\n");
         exit(-1);
     }
-    fprintf(fp, "(%d, %d, %d)\n", v->val[0], v->val[1], v->val[2]);
+    fprintf(fp, "(%f, %f, %f)\n", v->val[0], v->val[1], v->val[2]);
 }
 
 /**
