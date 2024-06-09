@@ -81,8 +81,8 @@ endif
 # test3a: $(ODIR)/test3a.o
 # 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 	
-test3b: $(ODIR)/test3b.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# test3b: $(ODIR)/test3b.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 # test3c: $(ODIR)/test3c.o
 # 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
@@ -90,28 +90,26 @@ test3b: $(ODIR)/test3b.o
 # test3d: $(ODIR)/test3d.o
 # 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-	
 # testCircles: $(ODIR)/testCircles.o
 # 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 # train: $(ODIR)/train.o
 #	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
+# test4a: $(ODIR)/test4a.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-test4a: $(ODIR)/test4a.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-test4b: $(ODIR)/test4b.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# test4b: $(ODIR)/test4b.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 	
-polyspeed: $(ODIR)/polyspeed.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# polyspeed: $(ODIR)/polyspeed.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-test4c: $(ODIR)/test4c.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# test4c: $(ODIR)/test4c.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-test4c-loop: $(ODIR)/test4c-loop.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+# test4c-loop: $(ODIR)/test4c-loop.o
+# 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
  # this is the default target, it will run if you just type "make" in the terminal
 
 
