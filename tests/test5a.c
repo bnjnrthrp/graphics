@@ -1,6 +1,6 @@
 /*
-	Bruce A. Maxwell
-	Fall 2014
+  Bruce A. Maxwell
+  Fall 2014
   Assignment 5, matrix test program
 
   C version
@@ -8,12 +8,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "graphics.h"
+#include "../include/Graphics.h"
+#define M_PI 3.14159265358979323846
 
 /*
   Program to test matrix library functionality
 */
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   Image *src;
   const int rows = 600;
   const int cols = 800;
@@ -34,17 +36,19 @@ int main(int argc, char *argv[]) {
   double phaserAngle = 0.0;
   int firePhase = 0;
 
-	color_set(&Grey, 180/255.0, 180/255.0, 183/255.0);
-	color_set(&dkGrey, 140/255.0, 140/255.0, 143/255.0);
-	color_set(&Red, 250/255.0, 40/255.0, 40/255.0);
-	color_set(&Blue, 30/255.0, 20/255.0, 250/255.0);
+  color_set(&Grey, 180 / 255.0, 180 / 255.0, 183 / 255.0);
+  color_set(&dkGrey, 140 / 255.0, 140 / 255.0, 143 / 255.0);
+  color_set(&Red, 250 / 255.0, 40 / 255.0, 40 / 255.0);
+  color_set(&Blue, 30 / 255.0, 20 / 255.0, 250 / 255.0);
 
-  if(argc > 1) {
+  if (argc > 1)
+  {
     theta = atoi(argv[1]);
   }
   printf("Drawing ship with orientation %.2f degrees\n", theta);
 
-  if(argc > 2) {
+  if (argc > 2)
+  {
     phaserAngle = atoi(argv[2]);
     firePhase = 1;
 
@@ -60,14 +64,14 @@ int main(int argc, char *argv[]) {
   matrix_identity(&GTM);
   matrix_identity(&LTM);
 
-  // Fix world coordinates as normal (x, y) 
+  // Fix world coordinates as normal (x, y)
 
   // give the view window an origin at -180m, -150m
   // size is a 4x3 ratio
   // VTM = T(0, rows-1)S(cols/vx, rows/vy)T(180, 150)
   matrix_translate2D(&VTM, 120, 100);
-  matrix_scale2D(&VTM, cols/(4*60), -rows/(3*60));
-  matrix_translate2D(&VTM, 0, rows-1);
+  matrix_scale2D(&VTM, cols / (4 * 60), -rows / (3 * 60));
+  matrix_translate2D(&VTM, 0, rows - 1);
   printf("VTM\n");
   matrix_print(&VTM, stdout);
 
@@ -77,10 +81,11 @@ int main(int argc, char *argv[]) {
   // use the VTM to change the view
 
   // make a list of points that form the unit circle
-  for(i=0;i<Resolution;i++) {
-    point_set2D(&(unitCircle[i]), 
-		cos( i * 2.0 * M_PI / (float)Resolution), 
-		sin( i * 2.0 * M_PI / (float)Resolution));
+  for (i = 0; i < Resolution; i++)
+  {
+    point_set2D(&(unitCircle[i]),
+                cos(i * 2.0 * M_PI / (float)Resolution),
+                sin(i * 2.0 * M_PI / (float)Resolution));
   }
   // set up the unit square
   point_set2D(&(unitSquare[0]), 0, 0);
@@ -97,7 +102,8 @@ int main(int argc, char *argv[]) {
   // move it 20m along the X-axis
   matrix_translate2D(&LTM, 60, 0);
   // transform the circle points using LTM
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(unitCircle[i]), &(pt[i]));
   }
 
@@ -115,7 +121,8 @@ int main(int argc, char *argv[]) {
   // move it 20m along the X-axis
   matrix_translate2D(&LTM, 60, 0);
   // transform the circle points using LTM
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(unitCircle[i]), &(pt[i]));
   }
 
@@ -130,7 +137,8 @@ int main(int argc, char *argv[]) {
   // move it 20m along the X-axis
   matrix_translate2D(&LTM, 60, 0);
   // transform the circle points using LTM
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(unitCircle[i]), &(pt[i]));
   }
 
@@ -145,7 +153,8 @@ int main(int argc, char *argv[]) {
   matrix_translate2D(&LTM, 2.5, 0);
 
   // transform the circle points using LTM
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(unitCircle[i]), &(pt[i]));
   }
 
@@ -153,14 +162,15 @@ int main(int argc, char *argv[]) {
   matrix_print(&LTM, stdout);
   ship[index] = polygon_createp(Resolution, pt);
   shipColor[index++] = Grey;
-  
+
   // make a trapezoidal strut out of the unit square
   matrix_identity(&LTM);
   matrix_translate2D(&LTM, -0.5, 0.0);
   matrix_scale2D(&LTM, 10, 10);
   matrix_shear2D(&LTM, .2, 0.0);
 
-  for(i=0;i<4;i++) {
+  for (i = 0; i < 4; i++)
+  {
     matrix_xformPoint(&LTM, &(unitSquare[i]), &(pt[i]));
   }
 
@@ -168,7 +178,8 @@ int main(int argc, char *argv[]) {
   matrix_identity(&LTM);
   matrix_translate2D(&LTM, 0, 12);
 
-  for(i=0;i<4;i++) {
+  for (i = 0; i < 4; i++)
+  {
     matrix_xformPoint(&LTM, &(pt[i]), &(ptt[i]));
   }
 
@@ -182,7 +193,8 @@ int main(int argc, char *argv[]) {
   matrix_scale2D(&LTM, 1, -1);
   matrix_translate2D(&LTM, 0, -12);
 
-  for(i=0;i<4;i++) {
+  for (i = 0; i < 4; i++)
+  {
     matrix_xformPoint(&LTM, &(pt[i]), &(ptt[i]));
   }
 
@@ -195,7 +207,8 @@ int main(int argc, char *argv[]) {
   matrix_scale2D(&LTM, 31, 6);
 
   // make the engine
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(unitCircle[i]), &(pt[i]));
   }
 
@@ -204,7 +217,8 @@ int main(int argc, char *argv[]) {
   matrix_translate2D(&LTM, -5, 27);
 
   // move the engine
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(pt[i]), &(ptt[i]));
   }
 
@@ -217,7 +231,8 @@ int main(int argc, char *argv[]) {
   matrix_translate2D(&LTM, -5, -27);
 
   // move the engine
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(pt[i]), &(ptt[i]));
   }
 
@@ -230,7 +245,8 @@ int main(int argc, char *argv[]) {
   matrix_scale2D(&LTM, 30, 5);
 
   // make the engine
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(unitCircle[i]), &(pt[i]));
   }
 
@@ -239,7 +255,8 @@ int main(int argc, char *argv[]) {
   matrix_translate2D(&LTM, -5, 27);
 
   // move the engine
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(pt[i]), &(ptt[i]));
   }
 
@@ -252,7 +269,8 @@ int main(int argc, char *argv[]) {
   matrix_translate2D(&LTM, -5, -27);
 
   // move the engine
-  for(i=0;i<Resolution;i++) {
+  for (i = 0; i < Resolution; i++)
+  {
     matrix_xformPoint(&LTM, &(pt[i]), &(ptt[i]));
   }
 
@@ -261,30 +279,32 @@ int main(int argc, char *argv[]) {
   shipColor[index++] = Grey;
 
   // set up the phaser
-  if(firePhase) {
+  if (firePhase)
+  {
     matrix_identity(&LTM);
 
     matrix_scale2D(&LTM, 100, 2);
 
     // orient the phaser
-    matrix_rotateZ(&LTM, cos(phaserAngle*M_PI/180.0), sin(phaserAngle*M_PI/180.0));
-    
+    matrix_rotateZ(&LTM, cos(phaserAngle * M_PI / 180.0), sin(phaserAngle * M_PI / 180.0));
+
     // translate it to the center of the disk and out
-    matrix_translate2D(&LTM, 
-		       60 + 30 * cos(phaserAngle*M_PI/180.0), 
-		       30 * sin(phaserAngle*M_PI/180.0) );
+    matrix_translate2D(&LTM,
+                       60 + 30 * cos(phaserAngle * M_PI / 180.0),
+                       30 * sin(phaserAngle * M_PI / 180.0));
 
     // use the unit square
-    for(i=0;i<4;i++) {
+    for (i = 0; i < 4; i++)
+    {
       matrix_xformPoint(&LTM, &(unitSquare[i]), &(pt[i]));
     }
-    
+
     // add the polygon
     ship[index] = polygon_createp(4, pt);
     shipColor[index++] = Red;
   }
 
-  matrix_rotateZ(&GTM, cos(theta*M_PI/180.0), sin(theta*M_PI/180.0));
+  matrix_rotateZ(&GTM, cos(theta * M_PI / 180.0), sin(theta * M_PI / 180.0));
 
   printf("GTM:\n");
   matrix_print(&GTM, stdout);
@@ -292,11 +312,13 @@ int main(int argc, char *argv[]) {
   printf("Pre-GTM/VTM\n");
   polygon_print(ship[0], stdout);
 
-  for(i=0;i<index;i++) {
+  for (i = 0; i < index; i++)
+  {
 
     // multiply the polygon by the global transform matrix
     matrix_xformPolygon(&GTM, ship[i]);
-    if(i==0) {
+    if (i == 0)
+    {
       printf("Pre-VTM\n");
       polygon_print(ship[i], stdout);
     }
@@ -304,7 +326,8 @@ int main(int argc, char *argv[]) {
     // multiply the polygon by the view transformation matrix
     matrix_xformPolygon(&VTM, ship[i]);
 
-    if(i==0) {
+    if (i == 0)
+    {
       printf("Pre-draw\n");
       polygon_print(ship[i], stdout);
     }
@@ -315,8 +338,7 @@ int main(int argc, char *argv[]) {
 
   image_write(src, "test5a.ppm");
 
-
   image_free(src);
 
-  return(0);
+  return (0);
 }

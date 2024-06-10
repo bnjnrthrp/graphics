@@ -3,6 +3,7 @@
         "line.h": "c",
         "cmath": "c",
         "stdlib.h": "c",
-        "polygon.h": "c"
+        "polygon.h": "c",
+        "graphics.h": "c"
     }
 }

@@ -8,10 +8,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "graphics.h"
+#include "../include/Graphics.h"
+#define M_PI 3.14159265358979323846
 
-
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 	Point p;
 	Point q;
 	Vector u;
@@ -32,11 +33,11 @@ int main(int argc, char *argv[]) {
 	vector_set(&x, 1.0, 0.0, 0.0);
 	vector_set(&y, 0.0, 1.0, 0.0);
 	vector_set(&z, 0.0, 0.0, 1.0);
-	
+
 	vector_print(&v, stdout);
 	printf("vector_length: %.3f (should be 1.732)\n", vector_length(&v));
-	
-	vector_normalize( &v );
+
+	vector_normalize(&v);
 	printf("vector_normalize: should be (0.577, 0.577, 0.577, 0.0)\n");
 	vector_print(&v, stdout);
 
@@ -51,7 +52,7 @@ int main(int argc, char *argv[]) {
 	vector_cross(&w, &v, &u);
 	printf("vector_cross: should be (-11.0, 7.0, 1.0, 0.0)\n");
 	vector_print(&u, stdout);
-	
+
 	printf("\n---------------\nThis should/could be garbage\n");
 	matrix_print(&m, stdout);
 
@@ -63,8 +64,10 @@ int main(int argc, char *argv[]) {
 	printf("matrix_identity: identity matrix w/ones on the diagonals\n");
 	matrix_print(&m, stdout);
 
-	for(i=0,k=0;i<4;i++) {
-		for(j=0;j<4;j++,k++) {
+	for (i = 0, k = 0; i < 4; i++)
+	{
+		for (j = 0; j < 4; j++, k++)
+		{
 			matrix_set(&m, i, j, (double)k);
 		}
 	}
@@ -72,15 +75,17 @@ int main(int argc, char *argv[]) {
 	matrix_print(&m, stdout);
 
 	printf("matrix_get: should print out 0-15\n");
-	for(i=0;i<4;i++) {
-		for(j=0;j<4;j++) {
+	for (i = 0; i < 4; i++)
+	{
+		for (j = 0; j < 4; j++)
+		{
 			printf("%.2f ", matrix_get(&m, i, j));
 		}
 	}
 	printf("\n");
 
 	matrix_copy(&n, &m);
-	
+
 	matrix_transpose(&m);
 	printf("matrix_transpose: should transpose the prior matrix so numbers are column major\n");
 	matrix_print(&m, stdout);
@@ -111,7 +116,7 @@ int main(int argc, char *argv[]) {
 	matrix_multiply(&m, &m, &m);
 	printf("matrix_multiply: result should not change from above\n");
 	matrix_print(&m, stdout);
-	
+
 	matrix_identity(&m);
 	matrix_identity(&n);
 	matrix_identity(&o);
@@ -121,7 +126,7 @@ int main(int argc, char *argv[]) {
 	printf("matrix_scale2D/xformPoint: result should be (2.0, 3.0, 1.0, 1.0)\n");
 	point_print(&q, stdout);
 
-	matrix_rotateZ(&n, cos(M_PI/6.0), sin(M_PI/6.0) );
+	matrix_rotateZ(&n, cos(M_PI / 6.0), sin(M_PI / 6.0));
 	matrix_xformPoint(&n, &p, &q);
 	printf("matrix_rotateZ/xformPoint: result should be ( 0.366, 1.366, 1.000, 1.000 )\n");
 	point_print(&q, stdout);
@@ -150,13 +155,13 @@ int main(int argc, char *argv[]) {
 	point_print(&q, stdout);
 
 	matrix_identity(&m);
-	matrix_rotateX(&m, cos(M_PI/6.0), sin(M_PI/6.0) );
+	matrix_rotateX(&m, cos(M_PI / 6.0), sin(M_PI / 6.0));
 	matrix_xformPoint(&m, &p, &q);
 	printf("matrix_rotateX/xformPoint: result should be (1.000, 0.366, 1.366, 1.000)\n");
 	point_print(&q, stdout);
 
 	matrix_identity(&m);
-	matrix_rotateY(&m, cos(M_PI/6.0), sin(M_PI/6.0) );
+	matrix_rotateY(&m, cos(M_PI / 6.0), sin(M_PI / 6.0));
 	matrix_xformPoint(&m, &p, &q);
 	printf("matrix_rotateY/xformPoint: result should be (1.366, 1.000, 0.366, 1.000)\n");
 	point_print(&q, stdout);
@@ -175,5 +180,5 @@ int main(int argc, char *argv[]) {
 	printf("matrix_rotateXYZ: result should be (1.697, 0.049, -0.343, 1.000)\n");
 	point_print(&q, stdout);
 
-	return(0);
+	return (0);
 }

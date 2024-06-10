@@ -131,6 +131,6 @@ void point_print(Point *p, FILE *fp)
 {
     if (fp)
     {
-        fprintf(fp, "(%.1f, %.1f, %.1f, %.1f)\n", p->val[0], p->val[1], p->val[2], p->val[3]);
+        fprintf(fp, "(%.3f, %.3f, %.3f, %.3f)\n", p->val[0], p->val[1], p->val[2], p->val[3]);
     }
 }

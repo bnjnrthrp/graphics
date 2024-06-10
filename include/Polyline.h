@@ -3,7 +3,7 @@
 #define POLYLINE_H
 #include "Point.h"
 
-typedef struct Polyine
+typedef struct Polyline
 {
     int zBuffer;   // default true (1), determine if use zBuffer
     int numVertex; // Num of vertices

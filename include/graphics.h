@@ -7,6 +7,7 @@
 #include "Image.h"
 #include "Line.h"
 #include "list.h"
+#include "Matrix.h"
 #include "Noise.h"
 #include "Point.h"
 #include "Polygon.h"
