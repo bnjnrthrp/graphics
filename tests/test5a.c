@@ -101,12 +101,12 @@ int main(int argc, char *argv[])
   matrix_scale2D(&LTM, 31, 31);
   // move it 20m along the X-axis
   matrix_translate2D(&LTM, 60, 0);
+
   // transform the circle points using LTM
   for (i = 0; i < Resolution; i++)
   {
     matrix_xformPoint(&LTM, &(unitCircle[i]), &(pt[i]));
   }
-
   // add the polygon
   matrix_print(&LTM, stdout);
   ship[index] = polygon_createp(Resolution, pt);

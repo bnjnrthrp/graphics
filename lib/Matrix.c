@@ -253,7 +253,7 @@ void matrix_xformPoint(Matrix *m, Point *p, Point *q)
         for (int j = 0; j < 4; j++)
         {
             // Sums the products of each column in the row of the matrix corresponding to the single column in the point.
-            result += m->m[i][j] * p->val[i];
+            result += m->m[i][j] * p->val[j];
         }
         q->val[i] = result;
     }
