@@ -29,7 +29,7 @@ DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 EXECUTABLES = test5a
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = test5a.o
+_OBJ = test5a.o debugTest5b.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -120,7 +120,8 @@ test5c: $(ODIR)/test5c.o
 test5d: $(ODIR)/test5d.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
-
+debugtest5b:
+	$(CC) -g test5b.c -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
  # this is the default target, it will run if you just type "make" in the terminal
 

@@ -14,3 +14,4 @@
 #include "Polyline.h"
 #include "ppmIO.h"
 #include "Vector.h"
+#include "View2D.h"

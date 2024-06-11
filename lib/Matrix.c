@@ -23,6 +23,7 @@ void matrix_print(Matrix *m, FILE *fp)
     }
     for (int i = 0; i < 4; i++)
     {
+        fprintf(fp, "| ");
         for (int j = 0; j < 4; j++)
         {
             if (j != 3)
@@ -31,7 +32,7 @@ void matrix_print(Matrix *m, FILE *fp)
             }
             else
             {
-                fprintf(fp, "%.3f\n", m->m[i][j]);
+                fprintf(fp, "%.3f |\n", m->m[i][j]);
             }
         }
     }
@@ -368,15 +369,11 @@ void matrix_xformLine(Matrix *m, Line *line)
         fprintf(stderr, "Invalid pointer to matrix_xformLine\n");
         exit(-1);
     }
-    Point tmp;
-    // 1. Transform a and put the results into tmp
-    matrix_xformPoint(m, &(line->a), &tmp);
-    // 2. copy the results from tmp back to a
-    point_copy(&(line->a), &tmp);
-
-    // Repeat 1 and 2 for b
-    matrix_xformPoint(m, &(line->b), &tmp);
-    point_copy(&(line->b), &tmp);
+    Line tmp;
+    // 1. Transform each point and put the results into tmp
+    matrix_xformPoint(m, &(line->a), &(tmp.a));
+    matrix_xformPoint(m, &(line->b), &(tmp.b));
+    line_copy(line, &tmp);
 }
 
 /**

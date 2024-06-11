@@ -132,7 +132,8 @@ void line_draw(Line *l, Image *src, Color c)
      * Vertical lines will draw to the left when drawing down to up, and to the right when drawing up to down.
      */
     if (dy == 0)
-    {               // Horizontal Line
+    { // Horizontal Line
+        printf("horizontal line\n");
         stepX = 1;  // Set the step to go to the right.
         if (dx < 0) // if dx < 0, line goes left, so step left and draw in 3rd quadrant
         {
@@ -153,7 +154,8 @@ void line_draw(Line *l, Image *src, Color c)
         }
     }
     else if (dx == 0)
-    {               // Vertical Line
+    { // Vertical Line
+        printf("Vertical line\n");
         stepY = -1; // Set the step to go up (0, 0) in top left corner
         if (dy > 0) // Positive dy means drawing down, so draw in 4th quadrant
         {
@@ -192,12 +194,14 @@ void line_draw(Line *l, Image *src, Color c)
                 stepX = 1;
                 if (dy < 0) // Octant 1
                 {
+                    printf("Octant 1\n");
                     dy = -dy;  // Make dy positive so the algorithm will work
                     y = y - 1; // Start one higher than y0
                     stepY = -1;
                 }
                 else // Octant 8
                 {
+                    printf("Octant 8\n");
                     stepY = 1;
                 }
             }
@@ -210,12 +214,14 @@ void line_draw(Line *l, Image *src, Color c)
                 stepX = -1;
                 if (dy < 0) // Octant 4
                 {
+                    printf("Octant 4\n");
                     y = y - 1;
                     dy = -dy;
                     stepY = -1;
                 }
                 else // Octant 5
                 {
+                    printf("Octant 5\n");
                     stepY = 1;
                 }
             }
@@ -250,65 +256,70 @@ void line_draw(Line *l, Image *src, Color c)
         {
             // More rise than run, step through y as the primary.
             // Octant, 2, 3, 6, or 7
+
+            // Octant 2 or 7
+            if (dx > 0)
             {
-                // Octant 2 or 7
-                if (dx > 0)
+                // X steps to the right
+                stepX = 1;
+                if (dy < 0) // Octant 2
                 {
-                    // X steps to the right
-                    stepX = 1;
-                    if (dy < 0) // Octant 2
-                    {
-                        dy = -dy;
-                        y = y - 1;
-                        stepY = -1;
-                    }
-                    else // Octant 7
-                    {
-                        stepY = 1;
-                    }
+                    printf("Octant 2\n");
+                    dy = -dy;
+                    y = y - 1;
+                    stepY = -1;
                 }
-                // Octant 3 or 6
-                else
+                else // Octant 7
                 {
-                    dx = -dx;
-                    // X steps to the left
-                    stepX = -1;
-                    if (dy < 0) // Octant 3
-                    {
-                        x = x - 1;
-                        dy = -dy;
-                        y = y - 1;
-                        stepY = -1;
-                    }
-                    else // Octant 6
-                    {
-                        stepY = 1;
-                    }
+                    printf("Octant 7\n");
+                    stepY = 1;
                 }
-                // Step through the Bresenham algorithm for (int i = 0; i < dx; i++)
+            }
+            // Octant 3 or 6
+            else
+            {
+                dx = -dx;
+                // X steps to the left
+                stepX = -1;
+                if (dy < 0) // Octant 3
                 {
-                    // Set the initial error
-                    e = 3 * dx - 2 * dy;
-                    // Iterate through y
-                    for (int i = 0; i < dy; i++)
-                    {
-                        // Set the color of the current pixel
-                        image_setColor(src, y, x, c);
-                        // While the error is positive, we need to step up
-                        if (e > 0)
-                        {
-                            // Step one x pixel
-                            x += stepX;
-                            // Subtract 1 from e to account for the step left or right.
-                            // Becomes 2*dy for the integer math
-                            e = e - 2 * dy;
-                        }
-                        // Step one y pixel
-                        y += stepY;
-                        // Step forward with dx
-                        e = e + 2 * dx;
-                    }
+                    printf("Octant 3\n");
+                    x = x - 1;
+                    dy = -dy;
+                    y = y - 1;
+                    stepY = -1;
+                    printf("Stats: x: %d, dy: %d, y: %d, stepY: %d, dx: %d\n", x, dy, y, stepY, dx);
                 }
+                else // Octant 6
+                {
+                    printf("Octant 6\n");
+                    stepY = 1;
+                }
+            }
+            // Step through the Bresenham algorithm for (int i = 0; i < dy; i++)
+
+            printf("Maybe running out of dy? %d", dy);
+            // Set the initial error
+            e = 3 * dx - 2 * dy;
+            // Iterate through y
+            for (int i = 0; i < dy; i++)
+            {
+                printf("Maybe running out of dy 2? %d", dy);
+                // Set the color of the current pixel
+                image_setColor(src, y, x, c);
+                // While the error is positive, we need to step up
+                if (e > 0)
+                {
+                    // Step one x pixel
+                    x += stepX;
+                    // Subtract 1 from e to account for the step left or right.
+                    // Becomes 2*dy for the integer math
+                    e = e - 2 * dy;
+                }
+                // Step one y pixel
+                y += stepY;
+                // Step forward with dx
+                e = e + 2 * dx;
             }
         }
     }
