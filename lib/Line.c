@@ -132,8 +132,7 @@ void line_draw(Line *l, Image *src, Color c)
      * Vertical lines will draw to the left when drawing down to up, and to the right when drawing up to down.
      */
     if (dy == 0)
-    { // Horizontal Line
-        printf("horizontal line\n");
+    {               // Horizontal Line
         stepX = 1;  // Set the step to go to the right.
         if (dx < 0) // if dx < 0, line goes left, so step left and draw in 3rd quadrant
         {
@@ -154,8 +153,7 @@ void line_draw(Line *l, Image *src, Color c)
         }
     }
     else if (dx == 0)
-    { // Vertical Line
-        printf("Vertical line\n");
+    {               // Vertical Line
         stepY = -1; // Set the step to go up (0, 0) in top left corner
         if (dy > 0) // Positive dy means drawing down, so draw in 4th quadrant
         {
@@ -194,14 +192,12 @@ void line_draw(Line *l, Image *src, Color c)
                 stepX = 1;
                 if (dy < 0) // Octant 1
                 {
-                    printf("Octant 1\n");
                     dy = -dy;  // Make dy positive so the algorithm will work
                     y = y - 1; // Start one higher than y0
                     stepY = -1;
                 }
                 else // Octant 8
                 {
-                    printf("Octant 8\n");
                     stepY = 1;
                 }
             }
@@ -214,14 +210,12 @@ void line_draw(Line *l, Image *src, Color c)
                 stepX = -1;
                 if (dy < 0) // Octant 4
                 {
-                    printf("Octant 4\n");
                     y = y - 1;
                     dy = -dy;
                     stepY = -1;
                 }
                 else // Octant 5
                 {
-                    printf("Octant 5\n");
                     stepY = 1;
                 }
             }
@@ -264,14 +258,12 @@ void line_draw(Line *l, Image *src, Color c)
                 stepX = 1;
                 if (dy < 0) // Octant 2
                 {
-                    printf("Octant 2\n");
                     dy = -dy;
                     y = y - 1;
                     stepY = -1;
                 }
                 else // Octant 7
                 {
-                    printf("Octant 7\n");
                     stepY = 1;
                 }
             }
@@ -283,28 +275,24 @@ void line_draw(Line *l, Image *src, Color c)
                 stepX = -1;
                 if (dy < 0) // Octant 3
                 {
-                    printf("Octant 3\n");
                     x = x - 1;
                     dy = -dy;
                     y = y - 1;
                     stepY = -1;
-                    printf("Stats: x: %d, dy: %d, y: %d, stepY: %d, dx: %d\n", x, dy, y, stepY, dx);
                 }
                 else // Octant 6
                 {
-                    printf("Octant 6\n");
+
                     stepY = 1;
                 }
             }
             // Step through the Bresenham algorithm for (int i = 0; i < dy; i++)
 
-            printf("Maybe running out of dy? %d", dy);
             // Set the initial error
             e = 3 * dx - 2 * dy;
             // Iterate through y
             for (int i = 0; i < dy; i++)
             {
-                printf("Maybe running out of dy 2? %d", dy);
                 // Set the color of the current pixel
                 image_setColor(src, y, x, c);
                 // While the error is positive, we need to step up

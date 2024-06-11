@@ -56,6 +56,11 @@ Image *image_create(int rows, int cols)
  */
 void image_init(Image *src)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
     src->data = NULL;
     src->rows = 0;
     src->cols = 0;
@@ -78,6 +83,11 @@ void image_init(Image *src)
  */
 int image_alloc(Image *src, int rows, int cols)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
     // Free the data if there is already something here.
     if (src->rows > 0 && src->cols > 0)
         image_dealloc(src);
@@ -193,6 +203,11 @@ void image_dealloc(Image *src)
  */
 Image *image_read(char *filename)
 {
+    if (!filename)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
     Image *src;
     Pixel *temp;
     int rows, cols, colors;
@@ -226,6 +241,12 @@ Image *image_read(char *filename)
  */
 int image_write(Image *src, char *filename)
 {
+    if (!src || !filename)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
+
     Pixel *temp;
     int rows, cols, colors;
 
@@ -258,6 +279,15 @@ int image_write(Image *src, char *filename)
  */
 FPixel image_getf(Image *src, int r, int c)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
+    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    {
+        return; // If the image set is out of the image, early return
+    }
     return src->data[r][c];
 };
 
@@ -271,6 +301,15 @@ FPixel image_getf(Image *src, int r, int c)
  */
 float image_getc(Image *src, int r, int c, int b)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
+    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    {
+        return; // If the image set is out of the image, early return
+    }
     return src->data[r][c].rgb[b];
 };
 
@@ -283,6 +322,11 @@ float image_getc(Image *src, int r, int c, int b)
  */
 float image_geta(Image *src, int r, int c)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
     return src->a[r * src->rows + c];
 };
 /**
@@ -294,6 +338,11 @@ float image_geta(Image *src, int r, int c)
  */
 float image_getz(Image *src, int r, int c)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
     return src->z[r * src->rows + c];
 };
 
@@ -309,6 +358,15 @@ float image_getz(Image *src, int r, int c)
  */
 void image_setf(Image *src, int r, int c, FPixel val)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
+    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    {
+        return; // If the image set is out of the image, early return
+    }
     for (int i = 0; i < 3; i++)
     {
         if (val.rgb[i] < 0)
@@ -343,6 +401,11 @@ void image_setc(Image *src, int r, int c, int b, float val)
         return;
     }
 
+    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    {
+        return; // If the image set is out of the image, early return
+    }
+
     if (val < 0)
     {
         val = 0;
@@ -363,6 +426,17 @@ void image_setc(Image *src, int r, int c, int b, float val)
  */
 void image_seta(Image *src, int r, int c, float val)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Invalid pointer provided\n");
+        exit(-1);
+    }
+
+    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    {
+        return; // If the image set is out of the image, early return
+    }
+
     if (val < 0)
     {
         val = 0;
@@ -385,9 +459,15 @@ void image_setz(Image *src, int r, int c, float val)
 {
     if (!src)
     {
-        fprintf(stderr, "Null pointer provided to image_reset()\n");
+        fprintf(stderr, "Null pointer provided\n");
         exit(-1);
     }
+
+    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    {
+        return; // If the image set is out of the image, early return
+    }
+
     if (val < 0)
     {
         val = 0;
@@ -408,6 +488,17 @@ void image_setz(Image *src, int r, int c, float val)
  */
 void image_setColor(Image *src, int r, int c, Color val)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Null pointer provided\n");
+        exit(-1);
+    }
+
+    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    {
+        return; // If the image set is out of the image, early return
+    }
+
     src->data[r][c].rgb[0] = val.c[0];
     src->data[r][c].rgb[1] = val.c[1];
     src->data[r][c].rgb[2] = val.c[2];
@@ -421,6 +512,17 @@ void image_setColor(Image *src, int r, int c, Color val)
  */
 Color image_getColor(Image *src, int r, int c)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Null pointer provided\n");
+        exit(-1);
+    }
+
+    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    {
+        return; // If the image set is out of the image, early return
+    }
+
     Color color;
     color.c[0] = src->data[r][c].rgb[0];
     color.c[1] = src->data[r][c].rgb[1];
@@ -436,6 +538,11 @@ Color image_getColor(Image *src, int r, int c)
  */
 void image_reset(Image *src)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Null pointer provided\n");
+        exit(-1);
+    }
     int size = src->rows * src->cols;
     // Iterate every every pixel in the image
     for (int i = 0; i < size; i++)
@@ -457,6 +564,11 @@ void image_reset(Image *src)
  */
 void image_fill(Image *src, FPixel val)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Null pointer provided\n");
+        exit(-1);
+    }
     int size = src->rows * src->cols;
     for (int i = 0; i < size; i++)
     {
@@ -473,6 +585,11 @@ void image_fill(Image *src, FPixel val)
  */
 void image_fillc(Image *src, Color c)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Null pointer provided\n");
+        exit(-1);
+    }
     int size = src->rows * src->cols;
     for (int i = 0; i < size; i++)
     {
@@ -491,6 +608,11 @@ void image_fillc(Image *src, Color c)
  */
 void image_fillrgb(Image *src, float r, float g, float b)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Null pointer provided\n");
+        exit(-1);
+    }
     int size = src->rows * src->cols;
     // Check values and ensure within min/max
     if (r < 0)
@@ -533,6 +655,11 @@ void image_fillrgb(Image *src, float r, float g, float b)
  */
 void image_filla(Image *src, float a)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Null pointer provided\n");
+        exit(-1);
+    }
     int size = src->rows * src->cols;
     // Value check and clip illegal values to the respective min/max
     if (a < 0)
@@ -556,6 +683,11 @@ void image_filla(Image *src, float a)
  */
 void image_fillz(Image *src, float z)
 {
+    if (!src)
+    {
+        fprintf(stderr, "Null pointer provided\n");
+        exit(-1);
+    }
     int size = src->rows * src->cols;
     // Value check and clip illegal values to the respective min/max
     if (z < 0)
