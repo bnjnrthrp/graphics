@@ -68,13 +68,13 @@ void point_normalize(Point *p)
 {
     if (p)
     {
-
-        double x, y, h;
-        x = p->val[0];
-        y = p->val[1];
-        h = p->val[3];
-        x = x / h;
-        y = y / h;
+        if (p->val[3] == 0)
+        {
+            fprintf(stderr, "Uh oh, you tried to divide by 0 in point_normalize\n");
+            exit(-1);
+        }
+        p->val[0] = p->val[0] / p->val[3];
+        p->val[1] = p->val[1] / p->val[3];
     }
 }
 /**

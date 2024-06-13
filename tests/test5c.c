@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     // normalize by homogeneous coordinate before drawing
     polygon_normalize(&tpoly);
 
-    polygon_drawFrame(&tpoly, src, color[i]);
+    polygon_draw(&tpoly, src, color[i]);
     polygon_print(&tpoly, stdout);
   }
 

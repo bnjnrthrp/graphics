@@ -282,11 +282,11 @@ void matrix_xformVector(Matrix *m, Vector *p, Vector *q)
     double result;
     for (int i = 0; i < 4; i++)
     {
-        result = 0;
+        result = 0.0;
         for (int j = 0; j < 4; j++)
         {
             // Sums the products of each column in the row of the matrix corresponding to the single column in the vector.
-            result += m->m[i][j] * p->val[i];
+            result += m->m[i][j] * p->val[j];
         }
         q->val[i] = result;
     }

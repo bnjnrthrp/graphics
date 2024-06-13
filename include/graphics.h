@@ -15,3 +15,4 @@
 #include "ppmIO.h"
 #include "Vector.h"
 #include "View2D.h"
+#include "View3D.h"

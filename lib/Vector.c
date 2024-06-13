@@ -119,9 +119,10 @@ void vector_cross(Vector *a, Vector *b, Vector *c)
         fprintf(stderr, "Invalid pointer was provided to vector_cross\n");
         exit(-1);
     }
-
-    c->val[0] = a->val[1] * b->val[2] - a->val[2] * b->val[1]; // Cx = Ay * Bz - Az * By
-    c->val[1] = a->val[2] * b->val[0] - a->val[0] * b->val[2]; // Cy = Az * Bx - Ax * Bz
-    c->val[2] = a->val[0] * b->val[1] - a->val[1] * b->val[0]; // Cz = Ax * By - Ay * Bx
-    c->val[3] = 0;                                             // Confirm c is 0.0
+    Vector tmp;
+    tmp.val[0] = a->val[1] * b->val[2] - a->val[2] * b->val[1]; // Cx = Ay * Bz - Az * By
+    tmp.val[1] = a->val[2] * b->val[0] - a->val[0] * b->val[2]; // Cy = Az * Bx - Ax * Bz
+    tmp.val[2] = a->val[0] * b->val[1] - a->val[1] * b->val[0]; // Cz = Ax * By - Ay * Bx
+    tmp.val[3] = 0;                                             // Confirm c is 0.0
+    vector_copy(c, &tmp);
 }
