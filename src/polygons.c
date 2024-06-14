@@ -270,20 +270,22 @@ int main(int argc, char *argv[])
     int rows = 1000;
     int cols = 2000;
     src = image_create(rows, cols);
+    // For green screen
+    image_fillrgb(src, 0, 1, 0);
 
     printf("Drawing Starfox's ship\n");
     draw_starfox(src);
 
     image_free(src);
 
-    rows = 900;
-    cols = 950;
-    src = image_create(rows, cols);
+    // rows = 900;
+    // cols = 950;
+    // src = image_create(rows, cols);
 
-    printf("Drawing Porygon\n");
-    draw_porygon(src);
+    // printf("Drawing Porygon\n");
+    // draw_porygon(src);
 
-    image_free(src);
+    // image_free(src);
 
     return (0);
 }
