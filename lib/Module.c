@@ -65,14 +65,16 @@ Element *element_init(ObjectType type, void *obj)
             matrix_copy(&(e->obj.matrix), (Matrix *)obj);
             break;
         case ObjColor:
+        case ObjBodyColor:
+        case ObjSurfaceColor:
             color_copy(&(e->obj.color), (Color *)obj);
             break;
+        case ObjIdentity:
+            matrix_identity(&e->obj.matrix);
+            break;
         // For the rest of these, nothing made yet so do nothing
-        case ObjBodyColor:
-            break;
-        case ObjSurfaceColor:
-            break;
         case ObjSurfaceCoeff:
+            e->obj.coeff = *(float *)obj;
             break;
         case ObjLight:
             break;
@@ -80,6 +82,7 @@ Element *element_init(ObjectType type, void *obj)
 
     e->next = NULL; // Ensure next pointer is set to NULL
     e->type = type; // Set the type to align with the data
+    return e;
 }
 
 /**
@@ -126,8 +129,8 @@ Module *module_create()
         fprintf(stderr, "Module malloc failed in module_create\n");
         exit(-1);
     }
-    m->head == NULL;
-    m->tail == NULL;
+    m->head = NULL;
+    m->tail = NULL;
     return m;
 }
 
@@ -185,7 +188,25 @@ void module_delete(Module *md)
  * @param md Pointer to the Module.
  * @param e Pointer to the Element to insert.
  */
-void module_insert(Module *md, Element *e);
+void module_insert(Module *md, Element *e)
+{
+    if (!md || !e) // Null check
+    {
+        fprintf(stderr, "Null pointer provided to module_insert\n");
+        exit(-1);
+    }
+    // check if this is the first module, then add
+    if (md->head == NULL && md->tail == NULL)
+    {
+        md->head = e;
+        md->tail = e;
+    }
+    else // Not the first of the list
+    {
+        md->tail->next = e;
+        md->tail = e;
+    }
+}
 
 /**
  * Adds a pointer to the Module sub to the tail of the module’s list.
@@ -193,7 +214,17 @@ void module_insert(Module *md, Element *e);
  * @param md Pointer to the parent Module.
  * @param sub Pointer to the sub Module to add.
  */
-void module_module(Module *md, Module *sub);
+void module_module(Module *md, Module *sub)
+{
+    if (!md || !sub) // Null check
+    {
+        fprintf(stderr, "Null pointer provided to module_module\n");
+        exit(-1);
+    }
+
+    Element *e = element_init(ObjModule, sub);
+    module_insert(md, e);
+}
 
 /**
  * Adds p to the tail of the module’s list.
@@ -201,7 +232,17 @@ void module_module(Module *md, Module *sub);
  * @param md Pointer to the Module.
  * @param p Pointer to the Point to add.
  */
-void module_point(Module *md, Point *p);
+void module_point(Module *md, Point *p)
+{
+    if (!md || !p) // Null check
+    {
+        fprintf(stderr, "Null pointer provided to module_point\n");
+        exit(-1);
+    }
+
+    Element *e = element_init(ObjPoint, p);
+    module_insert(md, e);
+}
 
 /**
  * Adds p to the tail of the module’s list.
@@ -209,7 +250,17 @@ void module_point(Module *md, Point *p);
  * @param md Pointer to the Module.
  * @param p Pointer to the Line to add.
  */
-void module_line(Module *md, Line *p);
+void module_line(Module *md, Line *p)
+{
+    if (!md || !p) // Null check
+    {
+        fprintf(stderr, "Null pointer provided to module_line\n");
+        exit(-1);
+    }
+
+    Element *e = element_init(ObjLine, p);
+    module_insert(md, e);
+}
 
 /**
  * Adds p to the tail of the module’s list.
@@ -217,7 +268,17 @@ void module_line(Module *md, Line *p);
  * @param md Pointer to the Module.
  * @param p Pointer to the Polyline to add.
  */
-void module_polyline(Module *md, Polyline *p);
+void module_polyline(Module *md, Polyline *p)
+{
+    if (!md || !p) // Null check
+    {
+        fprintf(stderr, "Null pointer provided to module_polyline\n");
+        exit(-1);
+    }
+
+    Element *e = element_init(ObjPolyline, p);
+    module_insert(md, e);
+}
 
 /**
  * Adds p to the tail of the module’s list.
@@ -225,14 +286,35 @@ void module_polyline(Module *md, Polyline *p);
  * @param md Pointer to the Module.
  * @param p Pointer to the Polygon to add.
  */
-void module_polygon(Module *md, Polygon *p);
+void module_polygon(Module *md, Polygon *p)
+{
+    if (!md || !p) // Null check
+    {
+        fprintf(stderr, "Null pointer provided to module_polygon\n");
+        exit(-1);
+    }
+
+    Element *e = element_init(ObjPolygon, p);
+    module_insert(md, e);
+}
 
 /**
  * Object that sets the current transform to the identity, placed at the tail of the module’s list.
  *
  * @param md Pointer to the Module.
  */
-void module_identity(Module *md);
+void module_identity(Module *md)
+{
+    if (!md) // Null check
+    {
+        fprintf(stderr, "Null pointer provided to module_identity\n");
+        exit(-1);
+    }
+    Matrix m;
+    matrix_identity(&m);
+    Element *e = element_init(ObjIdentity, &m);
+    module_insert(md, e);
+}
 
 /**
  * Add a translation matrix to the tail of the module’s list.
@@ -252,7 +334,8 @@ void module_translate2D(Module *md, double tx, double ty)
     matrix_identity(&tMatrix);            // Initialize the matrix and set to identity
     matrix_translate2D(&tMatrix, tx, ty); // Add the translation
 
-    Element *e = element_init(ObjMatrix, &tMatrix);
+    Element *e = element_init(ObjMatrix, &tMatrix); // Initialize the Element
+    module_insert(md, e);                           // Add to the module
 }
 
 /**
@@ -262,7 +345,20 @@ void module_translate2D(Module *md, double tx, double ty)
  * @param sx Scaling factor along the x-axis.
  * @param sy Scaling factor along the y-axis.
  */
-void module_scale2D(Module *md, double sx, double sy);
+void module_scale2D(Module *md, double sx, double sy)
+{
+    if (!md) // Null check
+    {
+        fprintf(stderr, "Null pointer provided to module_scale2D\n");
+        exit(-1);
+    }
+    Matrix sMatrix;
+    matrix_identity(&sMatrix);
+    matrix_scale2D(&sMatrix, sx, sy);
+
+    Element *e = element_init(ObjMatrix, &sMatrix); // Initialize the Element
+    module_insert(md, e);                           // Add to the module
+}
 
 /**
  * Matrix operand to add a rotation about the Z axis to the tail of the module’s list.
@@ -271,7 +367,20 @@ void module_scale2D(Module *md, double sx, double sy);
  * @param cth Cosine of the rotation angle.
  * @param sth Sine of the rotation angle.
  */
-void module_rotateZ(Module *md, double cth, double sth);
+void module_rotateZ(Module *md, double cth, double sth)
+{
+    if (!md)
+    {
+        fprintf(stderr, "Null pointer provided to module_rotateZ\n");
+        exit(-1);
+    }
+    Matrix m;
+    matrix_identity(&m);
+    matrix_rotateZ(&m, cth, sth);
+
+    Element *e = element_init(ObjMatrix, &m);
+    module_insert(md, e);
+}
 
 /**
  * Matrix operand to add a 2D shear matrix to the tail of the module’s list.
@@ -280,7 +389,20 @@ void module_rotateZ(Module *md, double cth, double sth);
  * @param shx Shear factor along the x-axis.
  * @param shy Shear factor along the y-axis.
  */
-void module_shear2D(Module *md, double shx, double shy);
+void module_shear2D(Module *md, double shx, double shy)
+{
+    if (!md)
+    {
+        fprintf(stderr, "Null pointer provided to module_shear2D\n");
+        exit(-1);
+    }
+    Matrix m;
+    matrix_identity(&m);
+    matrix_shear2D(&m, shx, shy);
+
+    Element *e = element_init(ObjMatrix, &m);
+    module_insert(md, e);
+}
 
 /**
  * Draw the module into the image using the given view transformation matrix [VTM], Lighting, and DrawState.
@@ -292,7 +414,79 @@ void module_shear2D(Module *md, double shx, double shy);
  * @param lighting Pointer to the Lighting structure.
  * @param src Pointer to the Image.
  */
-void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *lighting, Image *src);
+void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *lighting, Image *src)
+{
+    if (!md || !VTM || !GTM || !ds || !src)
+    {
+        fprintf(stderr, "Null pointer provided to module_draw\n");
+        exit(-1);
+    }
+    Matrix LTM;
+    matrix_identity(&LTM);
+
+    Element *e = md->head;
+    while (e != NULL)
+    {
+        switch (e->type)
+        {
+        case ObjColor:
+            drawstate_setColor(ds, e->obj.color);
+            break;
+        case ObjPoint:
+            Point p, pt;
+            point_copy(&p, &(e->obj.point));
+            // Transform the point by each matrix, but alternate the destination to avoid
+            // using the same point for p and q
+            matrix_xformPoint(&LTM, &p, &pt);
+            matrix_xformPoint(GTM, &pt, &p);
+            matrix_xformPoint(VTM, &p, &pt);
+            point_normalize(&pt);
+            point_draw(&pt, src, ds->color);
+            break;
+        case ObjLine:
+            Line line;
+            line_copy(&line, &(e->obj.line));
+            matrix_xformLine(&LTM, &line);
+            matrix_xformLine(GTM, &line);
+            matrix_xformLine(VTM, &line);
+            line_normalize(&line);
+            line_draw(&line, src, ds->color);
+            break;
+        case ObjPolygon:
+            Polygon plygn;
+            polygon_copy(&plygn, &(e->obj.polygon));
+            matrix_xformPolygon(&LTM, &plygn);
+            matrix_xformPolygon(GTM, &plygn);
+            matrix_xformPolygon(VTM, &plygn);
+            polygon_normalize(&plygn);
+            if (ds->shade == ShadeFrame)
+            {
+                polygon_draw(&plygn, src, ds->color);
+            }
+            else if (ds->shade == ShadeConstant)
+            {
+                polygon_drawFill(&plygn, src, ds->color);
+            }
+            break;
+        case ObjMatrix:
+            matrix_multiply(&(e->obj.matrix), &LTM, &LTM);
+            break;
+        case ObjIdentity:
+            matrix_identity(&LTM);
+            break;
+        case ObjModule:
+            Matrix TM;
+            DrawState *tempDS;
+            matrix_multiply(GTM, &LTM, &TM);
+            drawstate_copy(tempDS, ds);
+            module_draw(e->obj.module, VTM, &TM, tempDS, NULL, src);
+            break;
+        case ObjNone:
+            return;
+        }
+        e = e->next;
+    }
+}
 
 /**
  * Matrix operand to add a 3D translation to the Module.
@@ -302,7 +496,20 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
  * @param ty Translation along the y-axis.
  * @param tz Translation along the z-axis.
  */
-void module_translate(Module *md, double tx, double ty, double tz);
+void module_translate(Module *md, double tx, double ty, double tz)
+{
+    if (!md) // Null check
+    {
+        fprintf(stderr, "Null pointer provided to module_translate\n");
+        exit(-1);
+    }
+    Matrix tMatrix;
+    matrix_identity(&tMatrix);              // Initialize the matrix and set to identity
+    matrix_translate(&tMatrix, tx, ty, tz); // Add the translation
+
+    Element *e = element_init(ObjMatrix, &tMatrix); // Initialize the Element
+    module_insert(md, e);                           // Add to the module
+}
 
 /**
  * Matrix operand to add a 3D scale to the Module.
@@ -312,7 +519,22 @@ void module_translate(Module *md, double tx, double ty, double tz);
  * @param sy Scaling factor along the y-axis.
  * @param sz Scaling factor along the z-axis.
  */
-void module_scale(Module *md, double sx, double sy, double sz);
+void module_scale(Module *md, double sx, double sy, double sz)
+{
+    {
+        if (!md) // Null check
+        {
+            fprintf(stderr, "Null pointer provided to module_scale\n");
+            exit(-1);
+        }
+        Matrix sMatrix;
+        matrix_identity(&sMatrix);
+        matrix_scale(&sMatrix, sx, sy, sz);
+
+        Element *e = element_init(ObjMatrix, &sMatrix); // Initialize the Element
+        module_insert(md, e);                           // Add to the module
+    }
+}
 
 /**
  * Matrix operand to add a rotation about the X-axis to the Module.
@@ -321,7 +543,20 @@ void module_scale(Module *md, double sx, double sy, double sz);
  * @param cth Cosine of the rotation angle.
  * @param sth Sine of the rotation angle.
  */
-void module_rotateX(Module *md, double cth, double sth);
+void module_rotateX(Module *md, double cth, double sth)
+{
+    if (!md)
+    {
+        fprintf(stderr, "Null pointer provided to module_rotateX\n");
+        exit(-1);
+    }
+    Matrix m;
+    matrix_identity(&m);
+    matrix_rotateX(&m, cth, sth);
+
+    Element *e = element_init(ObjMatrix, &m);
+    module_insert(md, e);
+}
 
 /**
  * Matrix operand to add a rotation about the Y-axis to the Module.
@@ -330,7 +565,20 @@ void module_rotateX(Module *md, double cth, double sth);
  * @param cth Cosine of the rotation angle.
  * @param sth Sine of the rotation angle.
  */
-void module_rotateY(Module *md, double cth, double sth);
+void module_rotateY(Module *md, double cth, double sth)
+{
+    if (!md)
+    {
+        fprintf(stderr, "Null pointer provided to module_rotateY\n");
+        exit(-1);
+    }
+    Matrix m;
+    matrix_identity(&m);
+    matrix_rotateY(&m, cth, sth);
+
+    Element *e = element_init(ObjMatrix, &m);
+    module_insert(md, e);
+}
 
 /**
  * Matrix operand to add a rotation that orients to the orthonormal axes ~u, ~v, ~w.
@@ -340,7 +588,20 @@ void module_rotateY(Module *md, double cth, double sth);
  * @param v Pointer to the second orthonormal vector.
  * @param w Pointer to the third orthonormal vector.
  */
-void module_rotateXYZ(Module *md, Vector *u, Vector *v, Vector *w);
+void module_rotateXYZ(Module *md, Vector *u, Vector *v, Vector *w)
+{
+    if (!md || !u || !v || !w)
+    {
+        fprintf(stderr, "Null pointer provided to module_rotateXYZ\n");
+        exit(-1);
+    }
+    Matrix m;
+    matrix_identity(&m);
+    matrix_rotateXYZ(&m, u, v, w);
+
+    Element *e = element_init(ObjMatrix, &m);
+    module_insert(md, e);
+}
 
 /**
  * Adds a unit cube, axis-aligned and centered on zero to the Module. If solid is zero, add only lines.
@@ -357,7 +618,16 @@ void module_cube(Module *md, int solid);
  * @param md Pointer to the Module.
  * @param c Pointer to the Color.
  */
-void module_color(Module *md, Color *c);
+void module_color(Module *md, Color *c)
+{
+    if (!md || !c)
+    {
+        fprintf(stderr, "Invalid pointer to module_color\n");
+        exit(-1);
+    }
+    Element *e = element_init(ObjColor, c);
+    module_insert(md, e);
+}
 
 /**
  * Adds the body color value to the tail of the module’s list.
@@ -365,7 +635,16 @@ void module_color(Module *md, Color *c);
  * @param md Pointer to the Module.
  * @param c Pointer to the Color.
  */
-void module_bodyColor(Module *md, Color *c);
+void module_bodyColor(Module *md, Color *c)
+{
+    if (!md || !c)
+    {
+        fprintf(stderr, "Invalid pointer to module_bodyColor\n");
+        exit(-1);
+    }
+    Element *e = element_init(ObjBodyColor, c);
+    module_insert(md, e);
+}
 
 /**
  * Adds the surface color value to the tail of the module’s list.
@@ -373,7 +652,16 @@ void module_bodyColor(Module *md, Color *c);
  * @param md Pointer to the Module.
  * @param c Pointer to the Color.
  */
-void module_surfaceColor(Module *md, Color *c);
+void module_surfaceColor(Module *md, Color *c)
+{
+    if (!md || !c)
+    {
+        fprintf(stderr, "Invalid pointer to module_surfaceColor\n");
+        exit(-1);
+    }
+    Element *e = element_init(ObjSurfaceColor, c);
+    module_insert(md, e);
+}
 
 /**
  * Adds the specular coefficient to the tail of the module’s list.
@@ -381,4 +669,15 @@ void module_surfaceColor(Module *md, Color *c);
  * @param md Pointer to the Module.
  * @param coeff Specular coefficient.
  */
-void module_surfaceCoeff(Module *md, float coeff);
+void module_surfaceCoeff(Module *md, float coeff)
+{
+    {
+        if (!md)
+        {
+            fprintf(stderr, "Invalid pointer to module_surfaceCoeff\n");
+            exit(-1);
+        }
+        Element *e = element_init(ObjSurfaceCoeff, &coeff);
+        module_insert(md, e);
+    }
+}

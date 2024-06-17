@@ -68,10 +68,10 @@ typedef struct Module
     Element *tail; // keep around a pointer to the last object
 } Module;
 
-Element *element_create();
+Element *element_create(void);
 Element *element_init(ObjectType type, void *obj);
 void element_delete(Element *e);
-Module *module_create();
+Module *module_create(void);
 void module_clear(Module *md);
 void module_delete(Module *md);
 void module_insert(Module *md, Element *e);

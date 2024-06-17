@@ -4,6 +4,6 @@
 
 typedef struct Lighting
 {
-    null;
+    int nLights;
 } Lighting;
 #endif // LIGHTING_H
