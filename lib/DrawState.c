@@ -19,10 +19,10 @@ DrawState *drawstate_create(void)
 
     color_set(&White, 1, 1, 1);
     point_set(&p, 0, 0, 0, 1);
-    ds->body = White;
-    ds->color = White;
-    ds->flatColor = White;
-    ds->surface = White;
+    color_copy(&(ds->body), &White);
+    color_copy(&(ds->color), &White);
+    color_copy(&(ds->flatColor), &White);
+    color_copy(&(ds->surface), &White);
     ds->surfaceCoeff = 0.0;
     ds->shade = ShadeFrame;
     ds->zBufferFlag = 0;
@@ -44,7 +44,7 @@ void drawstate_setColor(DrawState *s, Color c)
         fprintf(stderr, "Invalid pointer to drawstate_setColor\n");
         exit(-1);
     }
-    s->color = c;
+    color_copy(&(s->color), &c);
 }
 
 /**
@@ -53,7 +53,15 @@ void drawstate_setColor(DrawState *s, Color c)
  * @param s: Pointer to the DrawState structure.
  * @param c: The Color value to set.
  */
-void drawstate_setBody(DrawState *s, Color c);
+void drawstate_setBody(DrawState *s, Color c)
+{
+    if (!s)
+    {
+        fprintf(stderr, "Invalid pointer to drawstate_setBody\n");
+        exit(-1);
+    }
+    color_copy(&(s->body), &c);
+}
 
 /**
  * Sets the surface field of the DrawState structure.
@@ -61,7 +69,15 @@ void drawstate_setBody(DrawState *s, Color c);
  * @param s: Pointer to the DrawState structure.
  * @param c: The Color value to set.
  */
-void drawstate_setSurface(DrawState *s, Color c);
+void drawstate_setSurface(DrawState *s, Color c)
+{
+    if (!s)
+    {
+        fprintf(stderr, "Invalid pointer to drawstate_setSurface\n");
+        exit(-1);
+    }
+    color_copy(&(s->surface), &c);
+}
 
 /**
  * Sets the surfaceCoeff field of the DrawState structure.
@@ -69,7 +85,15 @@ void drawstate_setSurface(DrawState *s, Color c);
  * @param s: Pointer to the DrawState structure.
  * @param f: The float value to set.
  */
-void drawstate_setSurfaceCoeff(DrawState *s, float f);
+void drawstate_setSurfaceCoeff(DrawState *s, float f)
+{
+    if (!s)
+    {
+        fprintf(stderr, "Invalid pointer to drawstate_setSurfaceCoeff\n");
+        exit(-1);
+    }
+    s->surfaceCoeff = f;
+}
 
 /**
  * Copies the data from one DrawState structure to another.

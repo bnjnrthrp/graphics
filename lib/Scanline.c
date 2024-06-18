@@ -358,7 +358,7 @@ void polygon_drawFill(Polygon *p, Image *src, Color c)
 
 	// process the edge list (should be able to take an arbitrary edge list)
 	processEdgeList(edges, src, c);
-
+	printf("Completed processEdgeList\n");
 	// clean up
 	ll_delete(edges, (void (*)(const void *))free);
 

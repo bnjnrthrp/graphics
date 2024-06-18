@@ -309,6 +309,7 @@ void matrix_xformPolygon(Matrix *m, Polygon *p)
     if (!p->vertex || p->nVertex < 1)
     {
         fprintf(stderr, "Empty polygon provided to matrix_xformPolygon\n");
+        polygon_print(p, stdout);
         exit(-1);
     }
     // Create a temp pointlist to hold the transformed list

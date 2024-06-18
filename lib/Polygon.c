@@ -71,8 +71,9 @@ void polygon_free(Polygon *p)
     }
     // Check for vertex data, free if found
     if (p->vertex)
+    {
         free(p->vertex);
-
+    }
     // free the Polygon
     free(p);
 }
@@ -138,7 +139,7 @@ void polygon_set(Polygon *p, int numV, Point *vlist)
     // Copy data over from vlist to p->vertex. Avoids aliasing.
     for (int i = 0; i < numV; i++)
     {
-        p->vertex[i] = vlist[i];
+        point_copy(&(p->vertex[i]), &(vlist[i]));
     }
     p->nVertex = numV;
 }

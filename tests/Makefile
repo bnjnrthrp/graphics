@@ -4,7 +4,7 @@ CC = gcc   # This variable is which compiler to use, we will use the variable la
 # set the path to the include directory
 INCDIR =../include
 
-CFLAGS = -Wall  # this variable is command line arguments
+CFLAGS = -ggdb3 -Wall  # this variable is command line arguments
 
 # path to the object file directory
 ODIR = ../src/obj

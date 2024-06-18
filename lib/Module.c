@@ -56,9 +56,11 @@ Element *element_init(ObjectType type, void *obj)
             point_copy(&(e->obj.point), (Point *)obj);
             break;
         case ObjPolyline:
-            polyline_copy(&(e->obj.polyline), (Polyline *)obj);
+            polyline_init(&(e->obj.polyline));
+            polyline_copy(&(e->obj.polyline), obj);
             break;
         case ObjPolygon:
+            polygon_init(&(e->obj.polygon));
             polygon_copy(&(e->obj.polygon), (Polygon *)obj);
             break;
         case ObjMatrix:
@@ -102,10 +104,12 @@ void element_delete(Element *e)
     switch (e->type)
     {
     case ObjPolyline:
-        polyline_free(&(e->obj.polyline));
+        if (&(e->obj.polyline))
+            polyline_clear(&(e->obj.polyline));
         break;
     case ObjPolygon:
-        polygon_free(&(e->obj.polygon));
+        if (&(e->obj.polygon))
+            polygon_clear(&(e->obj.polygon));
         break;
     default:
         // For the rest, do nothing, as no mallocs occurred for these types
@@ -425,13 +429,21 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
     matrix_identity(&LTM);
 
     Element *e = md->head;
-    while (e != NULL)
+    while (e) // Iterate through the list until you get to NULL (end of list)
     {
         switch (e->type)
         {
         case ObjColor:
             drawstate_setColor(ds, e->obj.color);
             break;
+        case ObjBodyColor:
+            drawstate_setBody(ds, e->obj.color);
+            break;
+        case ObjSurfaceColor:
+            drawstate_setSurface(ds, e->obj.color);
+            break;
+        case ObjSurfaceCoeff:
+            drawstate_setSurfaceCoeff(ds, e->obj.coeff);
         case ObjPoint:
             Point p, pt;
             point_copy(&p, &(e->obj.point));
@@ -453,7 +465,9 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             line_draw(&line, src, ds->color);
             break;
         case ObjPolygon:
+        {
             Polygon plygn;
+            polygon_init(&plygn);
             polygon_copy(&plygn, &(e->obj.polygon));
             matrix_xformPolygon(&LTM, &plygn);
             matrix_xformPolygon(GTM, &plygn);
@@ -467,7 +481,26 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             {
                 polygon_drawFill(&plygn, src, ds->color);
             }
+            else
+            {
+                printf("Found something not shadeframe or constant\n");
+            }
+            polygon_clear(&plygn);
             break;
+        }
+        case ObjPolyline:
+        {
+            Polyline plyln;
+            polyline_init(&plyln);
+            polyline_copy(&plyln, &(e->obj.polyline));
+            matrix_xformPolyline(&LTM, &plyln);
+            matrix_xformPolyline(GTM, &plyln);
+            matrix_xformPolyline(VTM, &plyln);
+            polyline_normalize(&plyln);
+            polyline_draw(&plyln, src, ds->color);
+            polyline_clear(&plyln);
+            break;
+        }
         case ObjMatrix:
             matrix_multiply(&(e->obj.matrix), &LTM, &LTM);
             break;
@@ -475,16 +508,18 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             matrix_identity(&LTM);
             break;
         case ObjModule:
+        {
             Matrix TM;
-            DrawState *tempDS;
+            DrawState tempDS;
+            drawstate_copy(&tempDS, ds);
             matrix_multiply(GTM, &LTM, &TM);
-            drawstate_copy(tempDS, ds);
-            module_draw(e->obj.module, VTM, &TM, tempDS, NULL, src);
+            module_draw(e->obj.module, VTM, &TM, &tempDS, NULL, src);
             break;
-        case ObjNone:
-            return;
         }
-        e = e->next;
+        case ObjNone:
+            break;
+        }
+        e = e->next; // Forward sequence to next element
     }
 }
 
@@ -610,7 +645,111 @@ void module_rotateXYZ(Module *md, Vector *u, Vector *v, Vector *w)
  * @param md Pointer to the Module.
  * @param solid Integer indicating whether the cube is solid.
  */
-void module_cube(Module *md, int solid);
+void module_cube(Module *md, int solid)
+{
+    if (!md)
+    {
+        fprintf(stderr, "Invalid pointer provided to module_cube\n");
+        exit(-1);
+    }
+
+    Point p[8];
+    Point pt[4];
+    Polygon side[6];
+    Line line[12];
+    Polygon tpoly;
+    Color White;
+    int i;
+
+    Module *cube;
+
+    // Initialize the points
+    point_set(&p[0], -0.5, -0.5, -0.5, 1);
+    point_set(&p[1], 0.5, -0.5, -0.5, 1);
+    point_set(&p[2], 0.5, -0.5, 0.5, 1);
+    point_set(&p[3], -0.5, -0.5, 0.5, 1);
+    point_set(&p[4], -0.5, 0.5, -0.5, 1);
+    point_set(&p[5], 0.5, 0.5, -0.5, 1);
+    point_set(&p[6], 0.5, 0.5, 0.5, 1);
+    point_set(&p[7], -0.5, 0.5, 0.5, 1);
+
+    cube = module_create();
+    if (solid == 0) // If solid, then make using polygons
+    {
+        for (i = 0; i < 6; i++)
+        {
+            polygon_init(&side[i]);
+        }
+
+        // Bottom
+        polygon_set(&side[0], 4, &(p[0]));
+
+        // Top
+        polygon_set(&side[1], 4, &(p[4]));
+
+        // Front
+        point_copy(&pt[0], &p[0]);
+        point_copy(&pt[1], &p[1]);
+        point_copy(&pt[2], &p[4]);
+        point_copy(&pt[3], &p[5]);
+
+        polygon_set(&side[2], 4, pt);
+
+        // Left side
+        point_copy(&pt[0], &p[0]);
+        point_copy(&pt[1], &p[3]);
+        point_copy(&pt[2], &p[4]);
+        point_copy(&pt[3], &p[7]);
+
+        polygon_set(&side[3], 4, pt);
+
+        // Right side
+        point_copy(&pt[0], &p[1]);
+        point_copy(&pt[1], &p[2]);
+        point_copy(&pt[2], &p[5]);
+        point_copy(&pt[3], &p[6]);
+
+        polygon_set(&side[4], 4, pt);
+
+        // Back side
+        point_copy(&pt[0], &p[2]);
+        point_copy(&pt[1], &p[3]);
+        point_copy(&pt[2], &p[6]);
+        point_copy(&pt[3], &p[7]);
+
+        polygon_set(&side[5], 4, pt);
+
+        for (i = 0; i < 6; i++)
+        {
+            module_polygon(cube, &side[i]);
+        }
+    }
+    else
+    {
+        // Bottom square
+        line_set(&(line[0]), p[0], p[1]);
+        line_set(&(line[1]), p[1], p[2]);
+        line_set(&(line[2]), p[2], p[3]);
+        line_set(&(line[3]), p[3], p[0]);
+
+        // Top square
+        line_set(&(line[4]), p[4], p[5]);
+        line_set(&(line[5]), p[5], p[6]);
+        line_set(&(line[6]), p[6], p[7]);
+        line_set(&(line[7]), p[7], p[4]);
+
+        // Vertical edges
+        line_set(&(line[8]), p[0], p[4]);
+        line_set(&(line[9]), p[1], p[5]);
+        line_set(&(line[10]), p[2], p[6]);
+        line_set(&(line[11]), p[3], p[7]);
+
+        for (i = 0; i < 12; i++)
+        {
+            module_line(cube, &line[i]);
+        }
+    }
+}
 
 /**
  * Adds the foreground color value to the tail of the module’s list.

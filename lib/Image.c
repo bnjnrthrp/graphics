@@ -401,7 +401,7 @@ void image_setc(Image *src, int r, int c, int b, float val)
         return;
     }
 
-    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    if (r < 0 || c < 0 || r > src->rows - 1 || c > src->cols - 1)
     {
         return; // If the image set is out of the image, early return
     }
@@ -490,11 +490,11 @@ void image_setColor(Image *src, int r, int c, Color val)
 {
     if (!src)
     {
-        fprintf(stderr, "Null pointer provided\n");
+        fprintf(stderr, "Null pointer provided to image_setColor\n");
         exit(-1);
     }
 
-    if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
+    if (r < 0 || c < 0 || r > src->rows - 1 || c > src->cols - 1)
     {
         return; // If the image set is out of the image, early return
     }
@@ -611,6 +611,11 @@ void image_fillrgb(Image *src, float r, float g, float b)
     if (!src)
     {
         fprintf(stderr, "Null pointer provided\n");
+        exit(-1);
+    }
+    if (!src->data)
+    {
+        fprintf(stderr, "No data in the image\n");
         exit(-1);
     }
     int size = src->rows * src->cols;
