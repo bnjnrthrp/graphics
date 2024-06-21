@@ -643,7 +643,7 @@ void module_rotateXYZ(Module *md, Vector *u, Vector *v, Vector *w)
  * If solid is non-zero, use polygons with surface normals defined.
  *
  * @param md Pointer to the Module.
- * @param solid Integer indicating whether the cube is solid.
+ * @param solid Integer indicating whether the cube is solid. 0 = edges only, anything else is a solid fill
  */
 void module_cube(Module *md, int solid)
 {
@@ -652,102 +652,121 @@ void module_cube(Module *md, int solid)
         fprintf(stderr, "Invalid pointer provided to module_cube\n");
         exit(-1);
     }
+    Point pt[5];
 
-    Point p[8];
-    Point pt[4];
-    Polygon side[6];
-    Line line[12];
-    Polygon tpoly;
-    Color White;
-    int i;
+    // Bottom of cube
+    point_set3D(&pt[0], -0.5, -0.5, -0.5);
+    point_set3D(&pt[1], 0.5, -0.5, -0.5);
+    point_set3D(&pt[2], 0.5, -0.5, 0.5);
+    point_set3D(&pt[3], -0.5, -0.5, 0.5);
+    point_set3D(&pt[4], -0.5, -0.5, -0.5);
 
-    Module *cube;
-
-    // Initialize the points
-    point_set(&p[0], -0.5, -0.5, -0.5, 1);
-    point_set(&p[1], 0.5, -0.5, -0.5, 1);
-    point_set(&p[2], 0.5, -0.5, 0.5, 1);
-    point_set(&p[3], -0.5, -0.5, 0.5, 1);
-    point_set(&p[4], -0.5, 0.5, -0.5, 1);
-    point_set(&p[5], 0.5, 0.5, -0.5, 1);
-    point_set(&p[6], 0.5, 0.5, 0.5, 1);
-    point_set(&p[7], -0.5, 0.5, 0.5, 1);
-
-    cube = module_create();
-    if (solid == 0) // If solid, then make using polygons
+    if (solid == 0)
     {
-        for (i = 0; i < 6; i++)
-        {
-            polygon_init(&side[i]);
-        }
+        Polyline p;
+        polyline_init(&p);
 
-        // Bottom
-        polygon_set(&side[0], 4, &(p[0]));
+        // Bottom of cube
+        polyline_set(&p, 5, pt);
+        module_polyline(md, &p);
 
-        // Top
-        polygon_set(&side[1], 4, &(p[4]));
+        // Top of cube
+        point_set3D(&pt[0], -0.5, 0.5, -0.5);
+        point_set3D(&pt[1], 0.5, 0.5, -0.5);
+        point_set3D(&pt[2], 0.5, 0.5, 0.5);
+        point_set3D(&pt[3], -0.5, 0.5, 0.5);
+        point_set3D(&pt[4], -0.5, 0.5, -0.5);
+        polyline_set(&p, 5, pt);
+        module_polyline(md, &p);
 
-        // Front
-        point_copy(&pt[0], &p[0]);
-        point_copy(&pt[1], &p[1]);
-        point_copy(&pt[2], &p[4]);
-        point_copy(&pt[3], &p[5]);
+        // back of cube
+        point_set3D(&pt[0], -0.5, -0.5, -0.5);
+        point_set3D(&pt[1], 0.5, -0.5, -0.5);
+        point_set3D(&pt[2], 0.5, 0.5, -0.5);
+        point_set3D(&pt[3], -0.5, 0.5, -0.5);
+        point_set3D(&pt[4], -0.5, -0.5, -0.5);
+        polyline_set(&p, 5, pt);
+        module_polyline(md, &p);
 
-        polygon_set(&side[2], 4, pt);
+        // Front of cube
+        point_set3D(&pt[0], -0.5, -0.5, 0.5);
+        point_set3D(&pt[1], 0.5, -0.5, 0.5);
+        point_set3D(&pt[2], 0.5, 0.5, 0.5);
+        point_set3D(&pt[3], -0.5, 0.5, 0.5);
+        point_set3D(&pt[4], -0.5, -0.5, 0.5);
+        polyline_set(&p, 5, pt);
+        module_polyline(md, &p);
 
-        // Left side
-        point_copy(&pt[0], &p[0]);
-        point_copy(&pt[1], &p[3]);
-        point_copy(&pt[2], &p[4]);
-        point_copy(&pt[3], &p[7]);
+        // right face of cube
+        point_set3D(&pt[0], 0.5, -0.5, -0.5);
+        point_set3D(&pt[1], 0.5, -0.5, 0.5);
+        point_set3D(&pt[2], 0.5, 0.5, 0.5);
+        point_set3D(&pt[3], 0.5, 0.5, -0.5);
+        point_set3D(&pt[4], 0.5, -0.5, -0.5);
+        polyline_set(&p, 5, pt);
+        module_polyline(md, &p);
 
-        polygon_set(&side[3], 4, pt);
+        // // left face of cube
+        point_set3D(&pt[0], -0.5, -0.5, -0.5);
+        point_set3D(&pt[1], -0.5, -0.5, 0.5);
+        point_set3D(&pt[2], -0.5, 0.5, 0.5);
+        point_set3D(&pt[3], -0.5, 0.5, -0.5);
+        point_set3D(&pt[4], -0.5, -0.5, -0.5);
+        polyline_set(&p, 5, pt);
+        module_polyline(md, &p);
 
-        // Right side
-        point_copy(&pt[0], &p[1]);
-        point_copy(&pt[1], &p[2]);
-        point_copy(&pt[2], &p[5]);
-        point_copy(&pt[3], &p[6]);
-
-        polygon_set(&side[4], 4, pt);
-
-        // Back side
-        point_copy(&pt[0], &p[2]);
-        point_copy(&pt[1], &p[3]);
-        point_copy(&pt[2], &p[6]);
-        point_copy(&pt[3], &p[7]);
-
-        polygon_set(&side[5], 4, pt);
-
-        for (i = 0; i < 6; i++)
-        {
-            module_polygon(cube, &side[i]);
-        }
+        polyline_clear(&p);
     }
     else
     {
-        // Bottom square
-        line_set(&(line[0]), p[0], p[1]);
-        line_set(&(line[1]), p[1], p[2]);
-        line_set(&(line[2]), p[2], p[3]);
-        line_set(&(line[3]), p[3], p[0]);
+        Polygon p;
+        polygon_init(&p);
 
-        // Top square
-        line_set(&(line[4]), p[4], p[5]);
-        line_set(&(line[5]), p[5], p[6]);
-        line_set(&(line[6]), p[6], p[7]);
-        line_set(&(line[7]), p[7], p[4]);
+        // Bottom of cube
+        polygon_set(&p, 4, pt);
+        module_polygon(md, &p);
 
-        // Vertical edges
-        line_set(&(line[8]), p[0], p[4]);
-        line_set(&(line[9]), p[1], p[5]);
-        line_set(&(line[10]), p[2], p[6]);
-        line_set(&(line[11]), p[3], p[7]);
+        // Top of cube
+        point_set3D(&pt[0], -0.5, 0.5, -0.5);
+        point_set3D(&pt[1], 0.5, 0.5, -0.5);
+        point_set3D(&pt[2], 0.5, 0.5, 0.5);
+        point_set3D(&pt[3], -0.5, 0.5, 0.5);
+        polygon_set(&p, 4, pt);
+        module_polygon(md, &p);
 
-        for (i = 0; i < 12; i++)
-        {
-            module_line(cube, &line[i]);
-        }
+        // back of cube
+        point_set3D(&pt[0], -0.5, -0.5, -0.5);
+        point_set3D(&pt[1], 0.5, -0.5, -0.5);
+        point_set3D(&pt[2], 0.5, 0.5, -0.5);
+        point_set3D(&pt[3], -0.5, 0.5, -0.5);
+        polygon_set(&p, 4, pt);
+        module_polygon(md, &p);
+
+        // Front of cube
+        point_set3D(&pt[0], -0.5, -0.5, 0.5);
+        point_set3D(&pt[1], 0.5, -0.5, 0.5);
+        point_set3D(&pt[2], 0.5, 0.5, 0.5);
+        point_set3D(&pt[3], -0.5, 0.5, 0.5);
+        polygon_set(&p, 4, pt);
+        module_polygon(md, &p);
+
+        // right face of cube
+        point_set3D(&pt[0], 0.5, -0.5, -0.5);
+        point_set3D(&pt[1], 0.5, -0.5, 0.5);
+        point_set3D(&pt[2], 0.5, 0.5, 0.5);
+        point_set3D(&pt[3], 0.5, 0.5, -0.5);
+        polygon_set(&p, 4, pt);
+        module_polygon(md, &p);
+
+        // // left face of cube
+        point_set3D(&pt[0], -0.5, -0.5, -0.5);
+        point_set3D(&pt[1], -0.5, -0.5, 0.5);
+        point_set3D(&pt[2], -0.5, 0.5, 0.5);
+        point_set3D(&pt[3], -0.5, 0.5, -0.5);
+        polygon_set(&p, 4, pt);
+        module_polygon(md, &p);
+
+        polygon_clear(&p);
     }
 }
 

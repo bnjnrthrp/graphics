@@ -45,13 +45,6 @@ int main(int argc, char *argv[])
                       1);
         }
     }
-    // matrix_rotateX(&vtm, cos(M_PI / 4.0), sin(M_PI / 4.0));
-    // // Put points into a temporary polygon for printing
-    // for (i = 0; i < Resolution * Resolution; i++)
-    // {
-    //     point_copy(&(ptt[i]), &(unitSphere[i]));
-    //     matrix_xformPoint(&vtm, &(ptt[i]), &(tpt[i]));
-    // }
 
     vector_set(&(view.vup), 0, 1, 0);
     view.d = 1.0; // focal length

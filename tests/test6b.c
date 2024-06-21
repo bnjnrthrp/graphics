@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
 
   // scene with three ships (body module)
   scene = module_create();
-  module_scale(scene, 0.7, 0.7, 0.7);
+  module_scale(scene, .7, .7, .7);
   module_rotateZ(scene, cos(0.5), sin(0.5));
   module_rotateY(scene, cos(-0.1), sin(-0.1));
   module_rotateX(scene, cos(0.2), sin(0.2));
@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
   module_module(scene, body);
 
   module_identity(scene);
-  module_scale(scene, 0.7, 0.7, 0.7);
+  module_scale(scene, .7, .7, .7);
   module_rotateZ(scene, cos(0.3), sin(0.3));
   module_rotateY(scene, cos(-0.05), sin(-0.05));
   module_rotateX(scene, cos(0.2), sin(0.2));

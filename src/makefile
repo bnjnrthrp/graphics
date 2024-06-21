@@ -32,10 +32,10 @@ _DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Fractals.h Image.h Noise.h Graphics
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = ppmtest lab1 createMask composite mandeltest polygons sphere lightspeed
+EXECUTABLES = ppmtest lab1 createMask composite mandeltest polygons sphere lightspeed cube tiefighters
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o mandeltest.o polygons.o sphere.o lightspeed.o
+_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o mandeltest.o polygons.o sphere.o lightspeed.o cube.o tiefighters.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -81,6 +81,11 @@ sphere: $(ODIR)/sphere.o
 lightspeed: $(ODIR)/lightspeed.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
+cube: $(ODIR)/cube.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+tiefighters: $(ODIR)/tiefighters.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean
 
