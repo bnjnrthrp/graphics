@@ -118,7 +118,8 @@ void cube(Module *mod)
 }
 
 // makes 3 X-wing fighters in a loose formation
-void static xwing_build(Module *md)
+void xwing_build(Module *md);
+void xwing_build(Module *md)
 {
     Module *scene;
     Module *engine;
@@ -128,8 +129,6 @@ void static xwing_build(Module *md)
     Module *body;
     Polygon p;
     Point pt[4];
-    View3D view;
-    Matrix vtm, gtm;
     Color Flame = {{1.0, 0.7, 0.2}};
     Color Red = {{1.0, 0.2, 0.1}};
     float bodyWidth = 2.0;
@@ -138,9 +137,6 @@ void static xwing_build(Module *md)
     {
         return;
     }
-
-    matrix_setView3D(&vtm, &view);
-    matrix_identity(&gtm);
 
     // engine
     engine = module_create();
@@ -328,9 +324,12 @@ void unitSphere(Module *mod, int Resolution)
     polygon_clear(&plygn);
 }
 
+/**
+ * A demo program that builds an animated scene of xwings in a dogfight with tie fighters. Who will win?!
+ */
 int main(int argc, char *argv[])
 {
-    const int nFrames = 25;
+    const int nFrames = 50;
     View3D view;
     Matrix vtm, gtm;
     Module *tie;
@@ -463,35 +462,6 @@ int main(int argc, char *argv[])
 
     xwing = module_create();
     xwing_build(xwing);
-    // Create a scene with 2 cubes
-    scene = module_create();
-    module_scale(scene, .7, .7, .7);
-    module_rotateZ(scene, cos(0.5), sin(0.5));
-    module_rotateY(scene, cos(-0.1), sin(-0.1));
-    module_rotateX(scene, cos(0.2), sin(0.2));
-    module_module(scene, xwing);
-
-    module_scale(scene, .7, .7, .7);
-    // module_rotateZ(scene, cos(0.5), sin(0.5));
-    module_rotateY(scene, cos(-0.1), sin(-0.1));
-    module_rotateX(scene, cos(0.2), sin(0.2));
-    module_translate(scene, -15, -10, -10);
-    module_module(scene, formation1);
-
-    module_identity(scene);
-    module_scale(scene, .7, .7, .7);
-    module_rotateZ(scene, cos(0.3), sin(0.3));
-    module_rotateY(scene, cos(-0.05), sin(-0.05));
-    module_rotateX(scene, cos(0.2), sin(0.2));
-    module_translate(scene, 5, -1, -50);
-    module_module(scene, formation2);
-
-    module_identity(scene);
-    module_scale(scene, 0.7, 0.7, 0.7);
-    module_rotateZ(scene, cos(0.1), sin(0.1));
-    module_rotateX(scene, cos(0.2), sin(0.2));
-    module_translate(scene, -35, -3, -60);
-    module_module(scene, formation3);
 
     // Create the image and drawstate
     src = image_create(720, 1024);
@@ -502,7 +472,7 @@ int main(int argc, char *argv[])
     for (t = 0; t < nFrames; t++)
     {
         image_fillc(src, Black);
-        module_delete(scene);
+
         scene = module_create();
         // Move the xwings
         module_identity(scene);
@@ -524,9 +494,9 @@ int main(int argc, char *argv[])
         // Move the second formation of tie fighters
 
         module_identity(scene);
-        module_rotateZ(scene, cos(0.5) + .3 * (double)t / (double)nFrames, sin(0.5) + .3 * (double)t / (double)nFrames);
-        module_rotateY(scene, cos(-0.1) + .5 * (double)t / (double)nFrames, sin(-0.1) + .5 * (double)t / (double)nFrames);
-        module_rotateX(scene, cos(0.2) - .3 * (double)t / (double)nFrames, sin(0.2) - .3 * (double)t / (double)nFrames);
+        module_rotateZ(scene, cos(0.5 - (double)t * M_PI / (double)nFrames), sin(0.5 - (double)t * M_PI / (double)nFrames));
+        module_rotateY(scene, cos(-0.1) + .5 * (double)t * M_PI / (double)nFrames, sin(-0.1) + .5 * (double)t * M_PI / (double)nFrames);
+        module_rotateX(scene, cos(0.2 - .7 * (double)t * M_PI / ((double)nFrames * 1.5)), sin(0.2 - .7 * (double)t * M_PI / ((double)nFrames) / 1.5));
         module_translate(scene, 10 + 15 * (double)t * (.5 * t / (double)nFrames), -30 + 5 * (double)t / (double)nFrames, -30 + 10 * (double)t / (double)nFrames);
         module_module(scene, formation2);
 
@@ -544,16 +514,19 @@ int main(int argc, char *argv[])
         sprintf(filename, "frame-%04d.ppm", t);
         // Write out the image
         image_write(src, filename);
+        module_delete(scene);
     }
 
     // Cleanup
-    module_delete(scene);
     module_delete(sphere);
     module_delete(wing);
     module_delete(formation1);
     module_delete(formation2);
     module_delete(formation3);
     module_delete(xwing);
+    module_delete(tie);
+    module_delete(strut);
+
     free(ds);
     image_free(src);
 
