@@ -96,6 +96,7 @@ void module_rotateX(Module *md, double cth, double sth);
 void module_rotateY(Module *md, double cth, double sth);
 void module_rotateXYZ(Module *md, Vector *u, Vector *v, Vector *w);
 void module_cube(Module *md, int solid);
+void module_cylinder(Module *md, int sides);
 void module_color(Module *md, Color *c);
 void module_bodyColor(Module *md, Color *c);
 void module_surfaceColor(Module *md, Color *c);

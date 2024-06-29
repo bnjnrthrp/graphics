@@ -5,7 +5,10 @@
  */
 
 #include <stdlib.h>
+#include <math.h>
 #include "Module.h"
+#define M_PI 3.14159265358979323846
+
 /**
  * Allocate and return an initialized but empty Element.
  *
@@ -796,6 +799,62 @@ void module_cube(Module *md, int solid)
 }
 
 /**
+ * Builds a cylinder using Bezier curves and adds it to the module
+ */
+void module_cylinder(Module *md, int sides)
+{
+    if (!md)
+    {
+        fprintf(stderr, "Invalid pointer provided to module_cylinder\n");
+    }
+
+    Polygon p;
+    Point xtop, xbot;
+    double x1, x2, z1, z2;
+    int i;
+
+    polygon_init(&p);
+    point_set3D(&xtop, 0, 1.0, 0.0);
+    point_set3D(&xbot, 0, 0.0, 0.0);
+
+    // make a fan for the top and bottom sides
+    // and quadrilaterals for the sides
+    for (i = 0; i < sides; i++)
+    {
+        Point pt[4];
+
+        x1 = cos(i * M_PI * 2.0 / sides);
+        z1 = sin(i * M_PI * 2.0 / sides);
+        x2 = cos(((i + 1) % sides) * M_PI * 2.0 / sides);
+        z2 = sin(((i + 1) % sides) * M_PI * 2.0 / sides);
+
+        point_copy(&pt[0], &xtop);
+        point_set3D(&pt[1], x1, 1.0, z1);
+        point_set3D(&pt[2], x2, 1.0, z2);
+
+        polygon_set(&p, 3, pt);
+        module_polygon(md, &p);
+
+        point_copy(&pt[0], &xbot);
+        point_set3D(&pt[1], x1, 0.0, z1);
+        point_set3D(&pt[2], x2, 0.0, z2);
+
+        polygon_set(&p, 3, pt);
+        module_polygon(md, &p);
+
+        point_set3D(&pt[0], x1, 0.0, z1);
+        point_set3D(&pt[1], x2, 0.0, z2);
+        point_set3D(&pt[2], x2, 1.0, z2);
+        point_set3D(&pt[3], x1, 1.0, z1);
+
+        polygon_set(&p, 4, pt);
+        module_polygon(md, &p);
+    }
+
+    polygon_clear(&p);
+}
+
+/**
  * Adds the foreground color value to the tail of the module’s list.
  *
  * @param md Pointer to the Module.
@@ -903,7 +962,9 @@ void module_bezierSurface(Module *md, BezierSurface *b, int divisions, int solid
     // Convert each control point into a 4x4 grid of Bezier curves
     BezierCurve x[4], y[4];
     Point p[4];
-    int i;
+    Line lineX[3];
+    Line lineY[3];
+    int i, j;
 
     // Horizontal curves
     for (i = 0; i < 4; i++)
@@ -924,16 +985,23 @@ void module_bezierSurface(Module *md, BezierSurface *b, int divisions, int solid
     {
         for (i = 0; i < 4; i++)
         {
-            module_bezierCurve(md, &x[0]);
-            module_bezierCurve(md, &y[i]);
+            for (j = 0; j < 3; j++)
+            {
+                line_set(&lineX[j], x[i].cp[j], x[i].cp[j + 1]);
+                line_set(&lineY[j], y[i].cp[j], y[i].cp[j + 1]);
+                module_line(md, &lineX[j]);
+                module_line(md, &lineY[j]);
+            }
         }
     }
     // Recursive case: subdivide the surface into 4 subsurfaces
     else
     {
         BezierSurface ul, ur, ll, lr; // Upper left, upper right, lower left, lower right
-        Point xPt[32];
-        Point yPt[8];
+        BezierCurve bcTmp;
+        Point xPt[4][8];
+        Point newPt[8][8];
+        Point tmp[8];
         Point ulCP[16];
         Point urCP[16];
         Point llCP[16];
@@ -950,8 +1018,42 @@ void module_bezierSurface(Module *md, BezierSurface *b, int divisions, int solid
         // Generate horizontal subcurves of the initial control points on one axis - doubles the number of curves in one axis
         for (i = 0; i < 4; i++)
         {
-            casteljau(&x[i], &(xPt[8 * i]));
+            casteljau(&x[i], xPt[i]);
         }
-        // Set the points to create the additional curves in the opposite direction, then perform casteljau's
+        for (i = 0; i < 8; i++)
+        {
+            // Set the points to create the additional curves in the opposite direction, then perform casteljau's
+            bezierCurve_init(&bcTmp);
+            for (j = 0; j < 8; j++)
+            {
+                point_copy(&tmp[0], &xPt[0][i]);
+                point_copy(&tmp[1], &xPt[1][i]);
+                point_copy(&tmp[2], &xPt[2][i]);
+                point_copy(&tmp[3], &xPt[3][i]);
+                bezierCurve_set(&bcTmp, tmp);
+            }
+            casteljau(&bcTmp, newPt[i]);
+        }
+        // Iterate through each column of points and put them into their final respective Bezier surface
+        for (i = 0; i < 4; i++)
+        {
+            for (j = 0; j < 4; j++)
+            {
+                point_copy(&(ulCP[i * 4 + j]), &newPt[j][i]);
+                point_copy(&(urCP[i * 4 + j]), &newPt[j + 4][i]);
+                point_copy(&(llCP[i * 4 + j]), &newPt[j][i + 4]);
+                point_copy(&(lrCP[i * 4 + j]), &newPt[j + 4][i + 4]);
+            }
+        }
+        bezierSurface_set(&ul, ulCP);
+        bezierSurface_set(&ur, urCP);
+        bezierSurface_set(&ll, llCP);
+        bezierSurface_set(&lr, lrCP);
+
+        // Recursively call module_bezier on the 4 subsurfaces with 1 less division
+        module_bezierSurface(md, &ul, divisions - 1, solid);
+        module_bezierSurface(md, &ur, divisions - 1, solid);
+        module_bezierSurface(md, &ll, divisions - 1, solid);
+        module_bezierSurface(md, &lr, divisions - 1, solid);
     }
 }
