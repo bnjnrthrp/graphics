@@ -5,14 +5,15 @@
 #ifndef MODULE_H
 #define MODULE_H
 
-#include "Point.h"
-#include "Line.h"
-#include "Polyline.h"
-#include "Polygon.h"
-#include "Matrix.h"
+#include "Bezier.h"
 #include "Color.h"
 #include "DrawState.h"
 #include "Lighting.h"
+#include "Line.h"
+#include "Matrix.h"
+#include "Point.h"
+#include "Polyline.h"
+#include "Polygon.h"
 
 /**
  * typedef enum to support polymorphism in what type of object the Element node holds.
@@ -20,6 +21,7 @@
 typedef enum ObjectType
 {
     ObjNone,
+    ObjBezier,
     ObjLine,
     ObjPoint,
     ObjPolyline,
@@ -39,6 +41,7 @@ typedef enum ObjectType
  */
 typedef union Object
 {
+    BezierCurve bezierCurve;
     Point point;
     Line line;
     Polyline polyline;
@@ -86,6 +89,7 @@ void module_scale2D(Module *md, double sx, double sy);
 void module_rotateZ(Module *md, double cth, double sth);
 void module_shear2D(Module *md, double shx, double shy);
 void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *lighting, Image *src);
+// 3D Module Functions
 void module_translate(Module *md, double tx, double ty, double tz);
 void module_scale(Module *md, double sx, double sy, double sz);
 void module_rotateX(Module *md, double cth, double sth);
@@ -96,6 +100,7 @@ void module_color(Module *md, Color *c);
 void module_bodyColor(Module *md, Color *c);
 void module_surfaceColor(Module *md, Color *c);
 void module_surfaceCoeff(Module *md, float coeff);
+void module_bezierCurve(Module *md, BezierCurve *b);
+void module_bezierSurface(Module *md, BezierSurface *b, int divisions, int solid);
 
-// 3D Module Functions
 #endif // MODULE_H

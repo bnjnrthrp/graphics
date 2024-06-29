@@ -1,4 +1,5 @@
 #include "alphaMask.h"
+#include "Bezier.h"
 #include "Circle.h"
 #include "Color.h"
 #include "DrawState.h"

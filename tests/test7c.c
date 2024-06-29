@@ -12,9 +12,11 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "graphics.h"
+#include "../include/Graphics.h"
+#define M_PI 3.14159265358979323846
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 	int frame;
 	Color blue, green, purple, red, white;
 	Point p[16];
@@ -28,18 +30,19 @@ int main(int argc, char *argv[]) {
 	Image *src = image_create(rows, cols);
 
 	// grab the command line argument, if one exists
-	if(argc > 1) {
+	if (argc > 1)
+	{
 		int tmp = atoi(argv[1]);
-		if( tmp >= 0 && tmp < 10 )
+		if (tmp >= 0 && tmp < 10)
 			divisions = tmp;
 	}
 	printf("Creating Bezier curves with %d subdivisions\n", divisions);
 
-	color_set(&white, 1.0, 1.0, 1.0 );
+	color_set(&white, 1.0, 1.0, 1.0);
 	color_set(&blue, .1, .2, .8);
-	color_set(&green, .2, 0.7, 0.3 );
-	color_set(&purple, 0.6, 0.1, 0.7 );
-	color_set(&red, 0.75, 0.3, 0.3 );
+	color_set(&green, .2, 0.7, 0.3);
+	color_set(&purple, 0.6, 0.1, 0.7);
+	color_set(&red, 0.75, 0.3, 0.3);
 
 	curve = module_create();
 
@@ -93,26 +96,27 @@ int main(int argc, char *argv[]) {
 	drawstate_setColor(&ds, white);
 
 	// set up the view
-	point_set3D(&(view.vrp), 0.0, 1.2, -3.0 );
-	vector_set( &(view.vpn), 0.0, -0.8, 2.5 );
-	vector_set( &(view.vup), 0.0, 1.0, 0.0 );
+	point_set3D(&(view.vrp), 0.0, 1.2, -3.0);
+	vector_set(&(view.vpn), 0.0, -0.8, 2.5);
+	vector_set(&(view.vup), 0.0, 1.0, 0.0);
 	view.d = 1.5;
 	view.du = 1.0;
-	view.dv = 1.0*rows/cols;
+	view.dv = 1.0 * rows / cols;
 	view.screeny = rows;
 	view.screenx = cols;
 	view.f = 0.0;
 	view.b = 3.0;
 
-	matrix_setView3D( &VTM, &view );
-	matrix_identity( &GTM );
+	matrix_setView3D(&VTM, &view);
+	matrix_identity(&GTM);
 
 	// Create the animation by adjusting the GTM
-	for(frame=0;frame<60;frame++) {
+	for (frame = 0; frame < 60; frame++)
+	{
 		char buffer[256];
-		
-		matrix_rotateY(&GTM, cos(M_PI/30.0), sin(M_PI/30.0) );
-		module_draw( curve, &VTM, &GTM, &ds, NULL, src );
+
+		matrix_rotateY(&GTM, cos(M_PI / 30.0), sin(M_PI / 30.0));
+		module_draw(curve, &VTM, &GTM, &ds, NULL, src);
 
 		sprintf(buffer, "bezSurf-frame%03d.ppm", frame);
 		image_write(src, buffer);
@@ -120,9 +124,9 @@ int main(int argc, char *argv[]) {
 	}
 
 	// clean up
-	image_free( src );
+	image_free(src);
 
-	module_delete( curve );
+	module_delete(curve);
 
-	return(0);
+	return (0);
 }

@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include "Point.h"
-#include "Module.h"
 
 typedef struct BezierCurve
 {
@@ -19,14 +18,12 @@ typedef struct BezierSurface
 
 // Bezier functions
 void bezierCurve_init(BezierCurve *b);
-void bezierSurface_init(BezierSurface *b);
 void bezierCurve_set(BezierCurve *b, Point *vlist);
-void bezierSurface_set(BezierSurface *b, Point *vlist);
+void bezierCurve_copy(BezierCurve *to, BezierCurve *from);
 void bezierCurve_zBuffer(BezierCurve *p, int flag);
-void bezierSurface_zBuffer(BezierCurve *p, int flag);
 void bezierCurve_draw(BezierCurve *b, Image *src, Color c);
+void bezierSurface_init(BezierSurface *b);
+void bezierSurface_set(BezierSurface *b, Point *vlist);
+void bezierSurface_zBuffer(BezierSurface *p, int flag);
 
-// Module functions
-void module_bezierCurve(Module *m, BezierCurve *b, int divisions);
-void module_bezierSurface(Module *m, BezierSurface *b, int divisions, int solid);
 #endif // BEZIER_H

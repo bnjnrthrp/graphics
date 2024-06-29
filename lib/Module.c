@@ -49,6 +49,10 @@ Element *element_init(ObjectType type, void *obj)
     else
         switch (type)
         {
+        case ObjBezier:
+            bezierCurve_init(&(e->obj.bezierCurve));
+            bezierCurve_copy(&(e->obj.bezierCurve), (BezierCurve *)obj);
+            break;
         case ObjLine:
             line_copy(&(e->obj.line), (Line *)obj);
             break;
@@ -79,6 +83,8 @@ Element *element_init(ObjectType type, void *obj)
             e->obj.coeff = *(float *)obj;
             break;
         case ObjLight:
+        case ObjNone:
+        case ObjModule:
             break;
         }
 
@@ -433,6 +439,24 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
     {
         switch (e->type)
         {
+        case ObjBezier:
+            Point cp[4], cpt[4];
+            BezierCurve b;
+            bezierCurve_init(&b);
+            // Iterate through the control point list
+            for (int i = 0; i < 4; i++)
+            {
+                point_copy(&(cp[i]), &(e->obj.bezierCurve.cp[i]));
+                // Transform the point by each matrix, but alternate the destination to avoid
+                // using the same point for cp and q
+                matrix_xformPoint(&LTM, &(cp[i]), &(cpt[i]));
+                matrix_xformPoint(GTM, &(cpt[i]), &(cp[i]));
+                matrix_xformPoint(VTM, &(cp[i]), &(cpt[i]));
+                point_normalize(&(cpt[i]));
+            }
+            bezierCurve_set(&b, cpt);
+            bezierCurve_draw(&b, src, ds->color);
+            break;
         case ObjColor:
             drawstate_setColor(ds, e->obj.color);
             break;
@@ -517,6 +541,7 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             break;
         }
         case ObjNone:
+        case ObjLight:
             break;
         }
         e = e->next; // Forward sequence to next element
@@ -837,5 +862,40 @@ void module_surfaceCoeff(Module *md, float coeff)
         }
         Element *e = element_init(ObjSurfaceCoeff, &coeff);
         module_insert(md, e);
+    }
+}
+
+/**
+ * Adds a Bezier Curve module to the list.
+ *
+ * @param m The Module to add the lines to.
+ * @param b The BezierCurve to subdivide.
+ * @param divisions The number of times to subdivide the Bezier curve.
+ */
+void module_bezierCurve(Module *md, BezierCurve *b)
+{
+    if (!md || !b)
+    {
+        fprintf(stderr, "Null pointer provided to module_bezierCurve\n");
+        exit(-1);
+    }
+    Element *e = element_init(ObjBezier, b);
+    module_insert(md, e);
+}
+
+/**
+ * Uses the de Casteljau algorithm to subdivide the Bezier surface divisions times, then draws either the lines connecting the control points, if solid is 0, or draws triangles using the four corner control points.
+ *
+ * @param m The Module to add the lines or triangles to.
+ * @param b The BezierSurface to subdivide.
+ * @param divisions The number of times to subdivide the Bezier surface.
+ * @param solid If 0, draws lines; if 1, draws triangles.
+ */
+void module_bezierSurface(Module *md, BezierSurface *b, int divisions, int solid)
+{
+    if (!md || !b)
+    {
+        fprintf(stderr, "Null pointer provided to module_bezierSurface\n");
+        exit(-1);
     }
 }

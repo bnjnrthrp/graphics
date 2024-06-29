@@ -70,9 +70,11 @@ endif
 
 # put the specific executable rules here
 
-test6a: $(ODIR)/test6a.o
+test7a: $(ODIR)/test7a.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test6b: $(ODIR)/test6b.o
+test7b: $(ODIR)/test7b.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+test7c: $(ODIR)/test7c.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 
