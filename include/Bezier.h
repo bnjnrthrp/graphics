@@ -25,5 +25,6 @@ void bezierCurve_draw(BezierCurve *b, Image *src, Color c);
 void bezierSurface_init(BezierSurface *b);
 void bezierSurface_set(BezierSurface *b, Point *vlist);
 void bezierSurface_zBuffer(BezierSurface *p, int flag);
+void casteljau(BezierCurve *b, Point *vlist);
 
 #endif // BEZIER_H

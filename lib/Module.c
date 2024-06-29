@@ -868,7 +868,7 @@ void module_surfaceCoeff(Module *md, float coeff)
 /**
  * Adds a Bezier Curve module to the list.
  *
- * @param m The Module to add the lines to.
+ * @param md The Module to add the lines to.
  * @param b The BezierCurve to subdivide.
  * @param divisions The number of times to subdivide the Bezier curve.
  */
@@ -884,9 +884,10 @@ void module_bezierCurve(Module *md, BezierCurve *b)
 }
 
 /**
- * Uses the de Casteljau algorithm to subdivide the Bezier surface divisions times, then draws either the lines connecting the control points, if solid is 0, or draws triangles using the four corner control points.
+ * Uses the de Casteljau algorithm to subdivide the Bezier surface divisions times, then draws either the lines connecting the control points
+ * if solid is 0, or draws filled triangles using the four corner control points.
  *
- * @param m The Module to add the lines or triangles to.
+ * @param md The Module to add the lines or triangles to.
  * @param b The BezierSurface to subdivide.
  * @param divisions The number of times to subdivide the Bezier surface.
  * @param solid If 0, draws lines; if 1, draws triangles.
@@ -897,5 +898,60 @@ void module_bezierSurface(Module *md, BezierSurface *b, int divisions, int solid
     {
         fprintf(stderr, "Null pointer provided to module_bezierSurface\n");
         exit(-1);
+    }
+
+    // Convert each control point into a 4x4 grid of Bezier curves
+    BezierCurve x[4], y[4];
+    Point p[4];
+    int i;
+
+    // Horizontal curves
+    for (i = 0; i < 4; i++)
+    {
+        // Horizontal Curves
+        bezierCurve_set(&x[i], &(b->cp[i * 4]));
+
+        // Vertical Curves
+        point_copy(&p[0], &b->cp[i]);
+        point_copy(&p[1], &b->cp[4 + i]);
+        point_copy(&p[2], &b->cp[8 + i]);
+        point_copy(&p[3], &b->cp[12 + i]);
+        bezierCurve_set(&y[i], p);
+    }
+
+    // Base case: Ready to draw wire frame
+    if (divisions == 0 && solid == 0)
+    {
+        for (i = 0; i < 4; i++)
+        {
+            module_bezierCurve(md, &x[0]);
+            module_bezierCurve(md, &y[i]);
+        }
+    }
+    // Recursive case: subdivide the surface into 4 subsurfaces
+    else
+    {
+        BezierSurface ul, ur, ll, lr; // Upper left, upper right, lower left, lower right
+        Point xPt[32];
+        Point yPt[8];
+        Point ulCP[16];
+        Point urCP[16];
+        Point llCP[16];
+        Point lrCP[16];
+        int i, j;
+
+        bezierSurface_init(&ul);
+        bezierSurface_init(&ur);
+        bezierSurface_init(&ll);
+        bezierSurface_init(&lr);
+
+        // Generate subsurfaces with de Casteljau's algorithm
+
+        // Generate horizontal subcurves of the initial control points on one axis - doubles the number of curves in one axis
+        for (i = 0; i < 4; i++)
+        {
+            casteljau(&x[i], &(xPt[8 * i]));
+        }
+        // Set the points to create the additional curves in the opposite direction, then perform casteljau's
     }
 }

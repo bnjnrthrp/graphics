@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	matrix_print(&VTM, stdout);
 
 	// Create the animation by adjusting the GTM
-	for (frame = 0; frame < 1; frame++)
+	for (frame = 0; frame < 10; frame++)
 	{
 		char buffer[256];
 

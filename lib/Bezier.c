@@ -218,7 +218,7 @@ static int checkBoundingBox(BezierCurve *b, int dim)
  * @param b the original Bezier curve
  * @param vlist a pointer to an array of points for the subpoints
  */
-static void casteljau(BezierCurve *b, Point *vlist)
+void casteljau(BezierCurve *b, Point *vlist)
 {
     if (!b || !vlist)
     {
@@ -288,6 +288,7 @@ void bezierCurve_draw(BezierCurve *b, Image *src, Color c)
         bezierCurve_init(&right);
         Point vList[8];
 
+        // Generate the subcurves with de Casteljau's algorithm
         casteljau(b, vList);
 
         // Set the points to the new bezierCurves and recursively call the function
