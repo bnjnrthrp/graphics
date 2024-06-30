@@ -855,6 +855,57 @@ void module_cylinder(Module *md, int sides)
 }
 
 /**
+ * Makes a unit pyramid of any size base. The height will be 1 and the number of sides is provided by the user.
+ * Default will be 3 (tetrahedron)
+ */
+void module_pyramid(Module *md, int sides)
+{
+    if (!md)
+    {
+        fprintf(stderr, "Invalid pointer provided to module_cylinder\n");
+    }
+    if (sides < 3)
+    {
+        sides = 3;
+    }
+
+    Polygon p;
+    Point top;
+    Point bottom[sides];
+    double x1, x2, z1, z2;
+    int i;
+
+    polygon_init(&p);
+    point_set3D(&top, 0.0, 1.0, 0.0);
+
+    // make a triangle for the base that touches the unit circle
+    for (i = 0; i < sides; i++)
+    {
+        Point pt[3];
+
+        x1 = cos(i * M_PI * 2.0 / sides);
+        z1 = sin(i * M_PI * 2.0 / sides);
+        x2 = cos(((i + 1) % sides) * M_PI * 2.0 / sides);
+        z2 = sin(((i + 1) % sides) * M_PI * 2.0 / sides);
+
+        point_copy(&pt[0], &top);
+        point_set3D(&pt[1], x1, 0.0, z1);
+        point_set3D(&pt[2], x2, 0.0, z2);
+
+        polygon_set(&p, 3, pt);
+        module_polygon(md, &p);
+
+        // Add the point to the base
+        point_set3D(&bottom[i], x1, 0.0, z1);
+    }
+    // Build the base
+    polygon_set(&p, sides, bottom);
+    module_polygon(md, &p);
+
+    polygon_clear(&p);
+}
+
+/**
  * Adds the foreground color value to the tail of the module’s list.
  *
  * @param md Pointer to the Module.

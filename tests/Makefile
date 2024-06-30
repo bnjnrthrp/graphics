@@ -72,6 +72,8 @@ endif
 
 umbrella: $(ODIR)/umbrella.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+pyramid: $(ODIR)/pyramid.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 cylinder: $(ODIR)/cylinder.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 creativeSurf: $(ODIR)/creativeSurf.o
