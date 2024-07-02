@@ -1,8 +1,12 @@
 /*
-	Demo code that creates a few pyramids.
+	Bruce A Maxwell
+	Fall 2014
+	CS 351
 
-	Takes a single command line argument to specify the number of edges on the base of the pyramid.
-	@author Benji Northrop
+	Creates a spinning animation of three pairs of 3D Bezier curves
+
+	Accepts one command line parameter, which is the number of
+	subdivisions to execute.
 */
 #include <stdio.h>
 #include <math.h>

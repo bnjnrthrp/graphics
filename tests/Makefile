@@ -70,6 +70,8 @@ endif
 
 # put the specific executable rules here
 
+sphere: $(ODIR)/sphere.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 umbrella: $(ODIR)/umbrella.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 pyramid: $(ODIR)/pyramid.o

@@ -855,6 +855,81 @@ void module_cylinder(Module *md, int sides)
 }
 
 /**
+ * This program will build a unit sphere with user provided resolution.
+ */
+void module_sphere(Module *md, int resolution)
+{
+    double center;
+    int i, j;
+    Point unitSphere[resolution * resolution + resolution];
+    Point top, bottom;
+    Polygon p;
+    Point pt[4];
+
+    polygon_init(&p);
+    point_set3D(&top, 0.0, 1.0, 0.0);
+    point_set3D(&bottom, 0.0, -1.0, 0.0);
+    // Set each point in each row going up to the top
+    for (i = 0; i < resolution + 1; i++)
+    {
+        // Determine the y coordinate of each center of the circle
+        center = sin((float)i * M_PI / (float)resolution - M_PI * 0.5); // [-1, 1]
+        for (j = 0; j < resolution; j++)
+        {
+            // Set points for each circle (x, z) at the height y
+            point_set3D(&(unitSphere[i * resolution + j]),
+                        cos((float)j * 2.0 * M_PI / (float)resolution) * cos((float)i * M_PI / (float)resolution - .5 * M_PI),
+                        center,
+                        sin((float)j * 2.0 * M_PI / (float)resolution) * cos((float)i * M_PI / (float)resolution - .5 * M_PI));
+        }
+    }
+
+    // Builds the middle ribbons using two rows of points and lacing the triangles together
+    // Does so by building a square with 4 points, then drawing 2 triangles per loop
+    // i is for each level, j is for each point going around the sphere
+    for (i = 0; i < resolution; i++)
+    {
+        for (j = 0; j < resolution - 1; j++)
+        {
+            point_copy(&pt[0], &unitSphere[(i + 1) * resolution + j]);     // Top left
+            point_copy(&pt[1], &unitSphere[i * resolution + j]);           // Bottom left
+            point_copy(&pt[2], &unitSphere[(i + 1) * resolution + j + 1]); // Top right
+            point_copy(&pt[3], &unitSphere[i * resolution + j + 1]);       // Bottom right
+            polygon_set(&p, 3, pt);                                        // First triangle
+            module_polygon(md, &p);
+            polygon_set(&p, 3, &pt[1]); // Second triangle
+            module_polygon(md, &p);
+        }
+        // Close the strip
+        point_copy(&pt[0], &unitSphere[(i + 1) * resolution + resolution - 1]); // End of top row
+        point_copy(&pt[1], &unitSphere[i * resolution + resolution - 1]);       // End of bottom row
+        point_copy(&pt[2], &unitSphere[(i + 1) * resolution]);                  // Start of top row
+        point_copy(&pt[3], &unitSphere[i * resolution]);                        // Start of bottom row
+        polygon_set(&p, 3, pt);                                                 // First triangle
+        module_polygon(md, &p);
+        polygon_set(&p, 3, &pt[1]); // Second triangle
+        module_polygon(md, &p);
+    }
+
+    // Builds the top fan
+    point_copy(&pt[0], &top);
+    for (i = 0; i < resolution - 1; i++) // Final set of size resolution
+    {
+        point_copy(&pt[1], &unitSphere[resolution * resolution + i]); // Final set of points
+        point_copy(&pt[2], &unitSphere[resolution * resolution + i + 1]);
+        polygon_set(&p, 3, pt);
+        module_polygon(md, &p);
+    }
+    // Builds the final triangle in the fan
+    point_copy(&pt[1], &unitSphere[resolution * resolution + resolution - 1]); // End of final set
+    point_copy(&pt[2], &unitSphere[resolution * resolution]);                  // Start of final set
+    polygon_set(&p, 3, pt);
+    module_polygon(md, &p);
+
+    polygon_clear(&p);
+}
+
+/**
  * Makes a unit pyramid of any size base. The height will be 1 and the number of sides is provided by the user.
  * Default will be 3 (tetrahedron)
  */

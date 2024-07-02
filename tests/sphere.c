@@ -1,7 +1,8 @@
 /*
-	Demo code that creates a few pyramids.
+	Demo code that creates a few spheres.
 
-	Takes a single command line argument to specify the number of edges on the base of the pyramid.
+	Takes a single command line argument to specify the number of divisions of the sphere. (i.e. how many points to build a unit sphere)
+	More divisions = more sphere-like
 	@author Benji Northrop
 */
 #include <stdio.h>
@@ -40,24 +41,32 @@ int main(int argc, char *argv[])
 
 	// create a pyramid with user provided sides
 	scene = module_create();
-	module_translate(scene, -2.0, 0.0, .4);
-	module_pyramid(scene, divisions);
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_translate(scene, -1.1, -1.1, 0.0);
+	module_sphere(scene, 3);
 
 	module_identity(scene);
-	module_translate(scene, 1.0, 0.0, .4);
-	module_pyramid(scene, 3);
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_translate(scene, 1.1, 1.1, -0.5);
+	module_sphere(scene, 4);
 
 	module_identity(scene);
-	module_translate(scene, -0.5, 0.0, -1.5);
-	module_pyramid(scene, 100);
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_sphere(scene, divisions);
 
 	module_identity(scene);
-	module_translate(scene, 0.0, 2.0, 0.0);
-	module_pyramid(scene, 4);
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_translate(scene, -1.1, 1.1, -0.5);
+	module_sphere(scene, 12);
+
+	module_identity(scene);
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_translate(scene, 1.1, -1.1, -0.5);
+	module_sphere(scene, 20);
 
 	// set up the view
-	point_set3D(&(view.vrp), 0.0, 1.3, -5.0);
-	vector_set(&(view.vpn), 0.0, 0.0, 1.0);
+	point_set3D(&(view.vrp), 0.0, 0.7, -5.0);
+	vector_set(&(view.vpn), 0.0, -0.7, 5.0);
 	vector_set(&(view.vup), 0.0, 1.0, 0.0);
 	view.d = 1.0;
 	view.du = 1.0;
@@ -80,11 +89,11 @@ int main(int argc, char *argv[])
 		matrix_rotateY(&GTM, cos(M_PI / 30.0), sin(M_PI / 30.0));
 		module_draw(scene, &VTM, &GTM, ds, NULL, src);
 
-		sprintf(buffer, "pyramid-frame%03d.ppm", frame);
+		sprintf(buffer, "sphere-frame%03d.ppm", frame);
 		image_write(src, buffer);
 		image_reset(src);
 	}
-
+	printf("Images complete\n");
 	// clean up
 	image_free(src);
 
