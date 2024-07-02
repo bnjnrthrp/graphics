@@ -18,7 +18,8 @@ int main(int argc, char *argv[])
 	Matrix VTM, GTM;
 	int rows = 300, cols = 400;
 	Image *src = image_create(rows, cols);
-	float random;
+	float dx, dy, value, val1, val2, val3;
+	float noiseValue[rows * cols];
 
 	srand48(56);
 
@@ -32,28 +33,8 @@ int main(int argc, char *argv[])
 
 	// create a pyramid with user provided sides
 	scene = module_create();
-	// for (int i = 0; i < 40; i++)
-	// {
-	// 	module_identity(scene);
-	// 	module_scale(scene, drand48(), drand48(), drand48());							// Scale by the same amount
-	// 	module_translate(scene, (0.5 - drand48()) * 5.0, 0.0, (0.5 - drand48()) * 5.0); // Round down for mountains
-	// 	module_color(scene, &brown);
-	// 	module_pyramid(scene, drand48() * 50);
 
-	// 	module_identity(scene);
-	// 	random = drand48();
-	// 	module_scale(scene, 0.5 * random, 0.5 * random, 0.5 * random);					// Scale by random amount
-	// 	module_translate(scene, (0.5 - drand48()) * 5.0, 2.5, (0.5 - drand48()) * 5.0); // Raise the clouds
-	// 	module_color(scene, &blue);
-	// 	for (int j = 0; j < 3; j++)
-	// 	{
-	// 		module_translate(scene, drand48() / 5.0, drand48() / 10.0, drand48() / 5.0);
-	// 		module_sphere(scene, drand48() * 50); // Draw several spheres in the local area for clouds
-	// 	}
-	// }
-
-	float dx, dy, value;
-	float noiseValue[rows * cols];
+	// Create a map over the image space with Perlin noise values
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
@@ -68,9 +49,10 @@ int main(int argc, char *argv[])
 
 	for (int i = 0; i < 30; i++)
 	{
-		float val1 = noiseValue[i * rows * cols / 80];
-		float val2 = noiseValue[(i * rows * cols + 10) / 80];
-		float val3 = noiseValue[(i * rows * cols + 20) / 80];
+		// Somewhat random sampling of the Perlin noise values
+		val1 = noiseValue[i * rows * cols / 80];
+		val2 = noiseValue[(i * rows * cols + 10) / 80];
+		val3 = noiseValue[(i * rows * cols + 20) / 80];
 		module_identity(scene);
 		module_scale(scene, (val1 + val3) / 2.0, val2, (val3 + val2) / 2.0);			// Scale by the same amount
 		module_translate(scene, (0.5 - drand48()) * 5.0, 0.0, (0.5 - drand48()) * 5.0); // Round down for mountains
