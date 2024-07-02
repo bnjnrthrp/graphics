@@ -87,6 +87,19 @@ cube: $(ODIR)/cube.o
 tiefighters: $(ODIR)/tiefighters.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
+mountains: $(ODIR)/mountains.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+sphere: $(ODIR)/sphere.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+umbrella: $(ODIR)/umbrella.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+pyramid: $(ODIR)/pyramid.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+cylinder: $(ODIR)/cylinder.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+creativeSurf: $(ODIR)/creativeSurf.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
 .PHONY: clean
 
 clean:

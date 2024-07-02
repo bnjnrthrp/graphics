@@ -70,16 +70,7 @@ endif
 
 # put the specific executable rules here
 
-sphere: $(ODIR)/sphere.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-umbrella: $(ODIR)/umbrella.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-pyramid: $(ODIR)/pyramid.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-cylinder: $(ODIR)/cylinder.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-creativeSurf: $(ODIR)/creativeSurf.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
 test6b: $(ODIR)/test6b.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 test7a: $(ODIR)/test7a.o
