@@ -99,6 +99,8 @@ cylinder: $(ODIR)/cylinder.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 creativeSurf: $(ODIR)/creativeSurf.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+greatPyramids: $(ODIR)/greatPyramids.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean
 

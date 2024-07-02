@@ -1,12 +1,7 @@
 /*
-	Bruce A Maxwell
-	Fall 2014
-	CS 351
+	Creates a spinning animation of a cylinder.
 
-	Creates a spinning animation of three pairs of 3D Bezier curves
-
-	Accepts one command line parameter, which is the number of
-	subdivisions to execute.
+	Original cylinder code provided by instructor Bruce Maxwell
 */
 #include <stdio.h>
 #include <math.h>

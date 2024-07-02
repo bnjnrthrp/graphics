@@ -1,6 +1,8 @@
-/*
-Uses Perlin noise to build topography on
-*/
+/**
+ *Demo program that builds mountains and clouds using a Perlin noise generator.
+ *
+ * @author Benji Northrop
+ */
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
