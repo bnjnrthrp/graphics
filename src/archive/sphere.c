@@ -1,84 +1,104 @@
-/**
- * A simple 3d viewing program to show a hologram model of the death star
- *
- * @author Benji Northrop
- */
+/*
+	Demo code that creates a few spheres.
+
+	Takes a single command line argument to specify the number of divisions of the sphere. (i.e. how many points to build a unit sphere)
+	More divisions = more sphere-like
+	@author Benji Northrop
+*/
+#include <stdio.h>
 #include <math.h>
-#include "Graphics.h"
+#include <stdlib.h>
+#include <string.h>
+#include "../include/Graphics.h"
 #define M_PI 3.14159265358979323846
 
-/*
-Program to demonstrate creating a 3D object
-*/
 int main(int argc, char *argv[])
 {
-    Image *src;
-    const int rows = 250;
-    const int cols = 250;
-    const int Resolution = 15;
-    const int nFrames = 25;
-    View3D view;
-    Color White, Black;
-    Point unitSphere[Resolution * Resolution];
-    Point tpt[Resolution * Resolution];
-    Point ptt[Resolution * Resolution];
-    int i, j, t;
-    Matrix vtm;
-    double center;
-    char filename[256];
+	int frame;
+	Color blue, white;
+	DrawState *ds;
+	Module *scene;
+	View3D view;
+	Matrix VTM, GTM;
+	int divisions = 12;
+	int rows = 300, cols = 400;
+	Image *src = image_create(rows, cols);
 
-    color_set(&White, 1, 1, 1);
-    color_set(&Black, 0, 0, 0);
+	// grab the command line argument, if one exists
+	if (argc > 1)
+	{
+		int tmp = atoi(argv[1]);
+		if (tmp >= 0 && tmp < 100)
+			divisions = tmp;
+	}
 
-    // Set up the unit sphere
-    for (i = 0; i < Resolution; i++)
-    {
-        // Determine the y coordinate of each center of the circle
-        center = sin(i * M_PI / (float)Resolution - .5 * M_PI);
-        for (j = 0; j < Resolution; j++)
-        {
-            // Set points for each circle (x, z) at the height y
-            point_set(&(unitSphere[i * Resolution + j]),
-                      cos(j * 2.0 * M_PI / (float)Resolution) * cos(i * M_PI / (float)Resolution - .5 * M_PI),
-                      center,
-                      sin(j * 2.0 * M_PI / (float)Resolution) * cos(i * M_PI / (float)Resolution - .5 * M_PI),
-                      1);
-        }
-    }
+	color_set(&white, 1.0, 1.0, 1.0);
+	color_set(&blue, 0.0, 0.0, 1.0);
 
-    vector_set(&(view.vup), 0, 1, 0);
-    view.d = 1.0; // focal length
-    view.du = 2.0;
-    view.dv = 2.0;
-    view.f = 0; // front clip plane
-    view.b = 4; // back clip plane
-    view.screenx = cols;
-    view.screeny = rows;
+	ds = drawstate_create();
+	// set up the drawstate
+	drawstate_setColor(ds, white);
 
-    src = image_create(rows, cols);
-    for (t = 0; t < nFrames; t++)
-    {
-        image_fillc(src, Black);
-        // rotate the VRP to its correct position
-        float alpha = (float)(t * 4.0) / 360.0;
-        point_set(&(view.vrp), cos(2.0 * M_PI * alpha), 2, sin(2.0 * M_PI * alpha), 1.0);
-        vector_set(&(view.vpn), -view.vrp.val[0], -view.vrp.val[1], -view.vrp.val[2]);
+	// create a pyramid with user provided sides
+	scene = module_create();
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_translate(scene, -1.1, -1.1, 0.0);
+	module_sphere(scene, 3);
 
-        matrix_setView3D(&vtm, &view);
-        // Create the image
+	module_identity(scene);
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_translate(scene, 1.1, 1.1, -0.5);
+	module_sphere(scene, 4);
 
-        for (int i = 0; i < Resolution * Resolution; i++)
-        {
-            matrix_xformPoint(&vtm, &(unitSphere[i]), &(tpt[i]));
-            point_normalize(&(tpt[i]));
+	module_identity(scene);
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_sphere(scene, divisions);
 
-            point_draw(&(tpt[i]), src, White);
-        }
+	module_identity(scene);
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_translate(scene, -1.1, 1.1, -0.5);
+	module_sphere(scene, 12);
 
-        sprintf(filename, "sphere-%02d.ppm", t);
-        image_write(src, filename);
-    }
-    image_free(src);
+	module_identity(scene);
+	module_scale(scene, 0.7, 0.7, 0.7);
+	module_translate(scene, 1.1, -1.1, -0.5);
+	module_sphere(scene, 20);
 
-    return (0);
+	// set up the view
+	point_set3D(&(view.vrp), 0.0, 0.7, -5.0);
+	vector_set(&(view.vpn), 0.0, -0.7, 5.0);
+	vector_set(&(view.vup), 0.0, 1.0, 0.0);
+	view.d = 1.0;
+	view.du = 1.0;
+	view.dv = 1.0 * rows / cols;
+	view.screeny = rows;
+	view.screenx = cols;
+	view.f = 0.0;
+	view.b = 3.0;
+
+	matrix_setView3D(&VTM, &view);
+	matrix_identity(&GTM);
+
+	matrix_print(&VTM, stdout);
+
+	// Create the animation by adjusting the GTM
+	for (frame = 0; frame < 40; frame++)
+	{
+		char buffer[256];
+
+		matrix_rotateY(&GTM, cos(M_PI / 30.0), sin(M_PI / 30.0));
+		module_draw(scene, &VTM, &GTM, ds, NULL, src);
+
+		sprintf(buffer, "sphere-frame%03d.ppm", frame);
+		image_write(src, buffer);
+		image_reset(src);
+	}
+	printf("Images complete\n");
+	// clean up
+	image_free(src);
+
+	module_delete(scene);
+	free(ds);
+
+	return (0);
 }
