@@ -95,6 +95,9 @@ void polygon_init(Polygon *p)
     p->oneSided = 1;
     p->nVertex = 0;
     p->vertex = NULL;
+    p->color = NULL;
+    p->normal = NULL;
+    p->zBuffer = 1;
 }
 
 /**
@@ -158,10 +161,18 @@ void polygon_clear(Polygon *p)
         exit(-1);
     }
 
-    // Check for vertex data, free if found and reset to null
+    // Check for vertex, color, and normal data, free if found and reset to null
     if (p->vertex)
         free(p->vertex);
     p->vertex = NULL;
+
+    if (p->color)
+        free(p->color);
+    p->color = NULL;
+
+    if (p->normal)
+        free(p->normal);
+    p->normal = NULL;
 
     // Reinitialize the polygon to default values
     polygon_init(p);
@@ -187,6 +198,132 @@ void polygon_setSided(Polygon *p, int oneSided)
     if (oneSided == 0 || oneSided == 1)
     {
         p->oneSided = oneSided;
+    }
+}
+
+/**
+ * Sets the colors of each vertex of a polygon
+ * @param p the polygon
+ * @param numV the number of colors in the list
+ * @param clist a pointer to the color array
+ */
+void polygon_setColors(Polygon *p, int numV, Color *clist)
+{
+    if (!p || !clist)
+    {
+        fprintf(stderr, "A null pointer was provided to polygon_setColors\n");
+        exit(-1);
+    }
+
+    // Check to ensure number of vertices is non-negative
+    if (numV < 0)
+    {
+        fprintf(stderr, "Number of vertices provided was < 0 (polygon_setColors())\n");
+        exit(-1);
+    }
+
+    // If there's already a colors list, then clear it out and reinitialize the memory
+    if (p->color)
+    {
+        free(p->color);
+    }
+    p->color = (Color *)malloc(sizeof(Color) * numV);
+    // Null check incase memory failed
+    if (!p->color)
+    {
+        fprintf(stderr, "polygon vertex memory allocation failed\n");
+        exit(-1);
+    }
+    for (int i = 0; i < numV; i++)
+    {
+        color_copy(&(p->color[i]), &(clist[i]));
+    }
+}
+
+/**
+ * Sets the normals of the polygon
+ * @param p the polygon
+ * @param numV the number of vertices in the vector list
+ * @param nlist a pointer to an array of normals
+ */
+void polygon_setNormals(Polygon *p, int numV, Vector *nlist)
+{
+    if (!p || !nlist)
+    {
+        fprintf(stderr, "A null pointer was provided to polygon_setNormals\n");
+        exit(-1);
+    }
+
+    // Check to ensure number of vertices is non-negative
+    if (numV < 0)
+    {
+        fprintf(stderr, "Number of vertices provided was < 0 (polygon_setNormals())\n");
+        exit(-1);
+    }
+
+    // If there's already a Normals list, then clear it out and reinitialize the memory
+    if (p->normal)
+    {
+        free(p->normal);
+    }
+    p->normal = (Vector *)malloc(sizeof(Vector) * numV);
+    // Null check incase memory failed
+    if (!p->normal)
+    {
+        fprintf(stderr, "polygon vertex memory allocation failed\n");
+        exit(-1);
+    }
+    for (int i = 0; i < numV; i++)
+    {
+        vector_copy(&(p->normal[i]), &(nlist[i]));
+    }
+}
+
+/**
+ * Sets all the fields of a polygon
+ * @param p the polygon to set
+ * @param numV the number of vertices of the polygon
+ * @param clist a pointer to the color array
+ * @param nlist a pointer to the normals array
+ * @param zBuffer The z-buffer value
+ * @param oneSided if the polygon is one-sided or not
+ */
+void polygon_setAll(Polygon *p, int numV, Point *vlist, Color *clist, Vector *nlist, int zBuffer, int oneSided)
+{
+    if (!p || !vlist || !clist || !nlist)
+    {
+        fprintf(stderr, "A null pointer was provided to polygon_setAll\n");
+        exit(-1);
+    }
+    // Bounds check the other data
+    if (numV < 0 || zBuffer < 0 || zBuffer > 1 || oneSided < 0 || oneSided > 1)
+    {
+        fprintf(stderr, "Invalid parameter (numV, zBuffer, or oneSided) provided to polygon_setAll\n");
+        exit(-1);
+    }
+    p->nVertex = numV;
+    polygon_set(p, numV, vlist);
+    polygon_setColors(p, numV, clist);
+    polygon_setNormals(p, numV, nlist);
+    polygon_zBuffer(p, zBuffer);
+    polygon_setSided(p, oneSided);
+}
+
+/**
+ * Sets the zbuffer of a polygon
+ * @param p the polygon
+ * @param flag 1 for true, 0 for false
+ */
+void polygon_zBuffer(Polygon *p, int flag)
+{
+    if (!p)
+    {
+        fprintf(stderr, "A null pointer was provided to polygon_zBuffer\n");
+        exit(-1);
+    }
+    if (flag == 0 || flag == 1)
+    {
+        p->zBuffer = flag;
     }
 }
 
@@ -220,6 +357,16 @@ void polygon_copy(Polygon *to, Polygon *from)
     {
         polygon_set(to, from->nVertex, from->vertex);
     }
+    if (from->color)
+    {
+        polygon_setColors(to, from->nVertex, from->color);
+    }
+    if (from->normal)
+    {
+        polygon_setNormals(to, from->nVertex, from->normal);
+    }
+    polygon_zBuffer(to, from->zBuffer);
+    polygon_setSided(to, from->oneSided);
 }
 
 /**

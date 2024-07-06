@@ -1,12 +1,16 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 #include "Point.h"
+#include "Vector.h"
 
 typedef struct Polygon
 {
     int oneSided;
     int nVertex;
     Point *vertex;
+    Color *color;
+    Vector *normal;
+    int zBuffer;
 } Polygon;
 
 // Constructors
@@ -21,6 +25,10 @@ void polygon_clear(Polygon *p);
 
 // setters/getters
 void polygon_setSided(Polygon *p, int oneSided);
+void polygon_setColors(Polygon *p, int numV, Color *clist);
+void polygon_setNormals(Polygon *p, int numV, Vector *nlist);
+void polygon_setAll(Polygon *p, int numV, Point *vlist, Color *clist, Vector *nlist, int zBuffer, int oneSided);
+void polygon_zBuffer(Polygon *p, int flag);
 void polygon_copy(Polygon *to, Polygon *from);
 void polygon_print(Polygon *p, FILE *fp);
 void polygon_normalize(Polygon *p);

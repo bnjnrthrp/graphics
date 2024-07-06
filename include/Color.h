@@ -2,7 +2,7 @@
 #define COLOR_H
 #include "ppmIO.h"
 
-typedef struct
+typedef struct Color
 {
     float c[3];
 } Color;
