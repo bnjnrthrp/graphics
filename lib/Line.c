@@ -106,8 +106,8 @@ void line_copy(Line *to, Line *from)
  */
 void line_draw(Line *l, Image *src, Color c)
 {
-    int x, y, dx, dy, e, stepX, stepY;
-    double x0, x1, y0, y1;
+    int x, y, dx, dy, dz, e, stepX, stepY;
+    double x0, x1, y0, y1, currZ, z0, z1;
 
     // Null check
     if (!l || !src)
@@ -119,12 +119,16 @@ void line_draw(Line *l, Image *src, Color c)
     // Uses modified Bresenham's algorithm
     x0 = l->a.val[0];
     y0 = l->a.val[1];
+    z0 = l->a.val[2];
     x1 = l->b.val[0];
     y1 = l->b.val[1];
+    z1 = l->b.val[2];
+
     dx = x1 - x0;
     dy = y1 - y0;
     x = x0;
     y = y0;
+    currZ = 1.0 / z0;
 
     /**
      * Special cases: determine if horizontal or vertical line. Horizontal will draw left to right on top, right to left on pixel row beneath it
@@ -146,10 +150,16 @@ void line_draw(Line *l, Image *src, Color c)
         {
             y = y0 - 1; // Sets the row to be one beneath the original ask - so both draw on top
         }
-        for (int i = 0; i < dx; i++) // -1 to drop the final pixel
+        dz = (1.0 / z1 - 1.0 / z0) / dx; // Calculate dz
+        for (int i = 0; i < dx; i++)     // -1 to drop the final pixel
         {
-            image_setColor(src, y, x, c);
+            if (currZ > 1.0 / image_getz(src, y, x))
+            {
+                image_setz(src, y, x, 1.0 / currZ); // 1.0/currZ returns the z value back to the original
+                image_setColor(src, y, x, c);
+            }
             x += stepX;
+            currZ += dz;
         }
     }
     else if (dx == 0)
@@ -165,10 +175,16 @@ void line_draw(Line *l, Image *src, Color c)
             y = y - 1;  // Start one higher than y0
             x = x0 - 1; // Sets the col to be one left of the original - so we draw to the "left" of the pixel line.
         }
+        dz = (1.0 / z1 - 1.0 / z0) / dy; // Calculate dz
         for (int i = 0; i < dy; i++)
         {
-            image_setColor(src, y, x, c);
+            if (currZ > 1.0 / image_getz(src, y, x))
+            {
+                image_setz(src, y, x, 1.0 / currZ);
+                image_setColor(src, y, x, c);
+            }
             y += stepY;
+            currZ += dz;
         }
     }
     else
@@ -223,12 +239,17 @@ void line_draw(Line *l, Image *src, Color c)
             {
                 // Set the initial error
                 e = 3 * dy - 2 * dx;
+                dz = (1.0 / z1 - 1.0 / z0) / dx; // Calculate 1/dz
 
                 // Step through all the x's
                 for (int i = 0; i < dx; i++)
                 {
-                    // Set the color of the current pixel
-                    image_setColor(src, y, x, c);
+                    if (currZ > 1.0 / image_getz(src, y, x))
+                    {
+                        image_setz(src, y, x, 1.0 / currZ);
+                        // Set the color of the current pixel
+                        image_setColor(src, y, x, c);
+                    }
 
                     // if the error is positive, we need to step up
                     if (e > 0)
@@ -243,6 +264,8 @@ void line_draw(Line *l, Image *src, Color c)
                     x += stepX;
                     // Step forward with dy (3 dy to account for new slope of 3/2)
                     e = e + 2 * dy;
+                    // Step currZ
+                    currZ += dz;
                 }
             }
         }
@@ -290,11 +313,16 @@ void line_draw(Line *l, Image *src, Color c)
 
             // Set the initial error
             e = 3 * dx - 2 * dy;
+            dz = (1.0 / z1 - 1.0 / z0) / dy; // Calculate dz
             // Iterate through y
             for (int i = 0; i < dy; i++)
             {
-                // Set the color of the current pixel
-                image_setColor(src, y, x, c);
+                if (currZ > 1.0 / image_getz(src, y, x))
+                {
+                    image_setz(src, y, x, 1.0 / currZ);
+                    // Set the color of the current pixel
+                    image_setColor(src, y, x, c);
+                }
                 // While the error is positive, we need to step up
                 if (e > 0)
                 {
@@ -308,6 +336,7 @@ void line_draw(Line *l, Image *src, Color c)
                 y += stepY;
                 // Step forward with dx
                 e = e + 2 * dx;
+                currZ += dz;
             }
         }
     }

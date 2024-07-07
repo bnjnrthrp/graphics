@@ -50,10 +50,10 @@ int main(int argc, char *argv[])
   src = image_create(400, 600);
 
   box(src, White, 100, 100, 100, 20);
-  // box(src, White, 100, 200, 100, 20);
-  // box(src, White, 150, 140, 70, 40);
-  // box(src, White, 160, 120, 10, 20);
-  // box(src, White, 160, 180, 10, 20);
+  box(src, White, 100, 200, 100, 20);
+  box(src, White, 150, 140, 70, 40);
+  box(src, White, 160, 120, 10, 20);
+  box(src, White, 160, 180, 10, 20);
 
   point_set2D(&p, 260, 160);
   circle_set(&circ, p, 60);

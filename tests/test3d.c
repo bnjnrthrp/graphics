@@ -5,8 +5,7 @@
 	Simple test program drawing lines in all four quadrants.
 */
 
-#include "../include/Line.h"
-#include "../include/Image.h"
+#include "../include/Graphics.h"
 
 int main(int argc, char *argv[])
 {

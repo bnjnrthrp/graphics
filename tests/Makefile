@@ -71,13 +71,13 @@ endif
 # put the specific executable rules here
 
 
-test6b: $(ODIR)/test6b.o
+test3b: $(ODIR)/test3b.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test7a: $(ODIR)/test7a.o
+test3a: $(ODIR)/test3a.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test7b: $(ODIR)/test7b.o
+test3d: $(ODIR)/test3d.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test7c: $(ODIR)/test7c.o
+test3c: $(ODIR)/test3c.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 
