@@ -153,9 +153,9 @@ void line_draw(Line *l, Image *src, Color c)
         dz = (1.0 / z1 - 1.0 / z0) / dx; // Calculate dz
         for (int i = 0; i < dx; i++)     // -1 to drop the final pixel
         {
-            if (currZ > 1.0 / image_getz(src, y, x))
+            if (currZ > image_getz(src, y, x))
             {
-                image_setz(src, y, x, 1.0 / currZ); // 1.0/currZ returns the z value back to the original
+                image_setz(src, y, x, currZ); // 1.0/currZ returns the z value back to the original
                 image_setColor(src, y, x, c);
             }
             x += stepX;
@@ -178,9 +178,9 @@ void line_draw(Line *l, Image *src, Color c)
         dz = (1.0 / z1 - 1.0 / z0) / dy; // Calculate dz
         for (int i = 0; i < dy; i++)
         {
-            if (currZ > 1.0 / image_getz(src, y, x))
+            if (currZ > image_getz(src, y, x))
             {
-                image_setz(src, y, x, 1.0 / currZ);
+                image_setz(src, y, x, currZ);
                 image_setColor(src, y, x, c);
             }
             y += stepY;
@@ -244,9 +244,9 @@ void line_draw(Line *l, Image *src, Color c)
                 // Step through all the x's
                 for (int i = 0; i < dx; i++)
                 {
-                    if (currZ > 1.0 / image_getz(src, y, x))
+                    if (currZ > image_getz(src, y, x))
                     {
-                        image_setz(src, y, x, 1.0 / currZ);
+                        image_setz(src, y, x, currZ);
                         // Set the color of the current pixel
                         image_setColor(src, y, x, c);
                     }
@@ -317,9 +317,9 @@ void line_draw(Line *l, Image *src, Color c)
             // Iterate through y
             for (int i = 0; i < dy; i++)
             {
-                if (currZ > 1.0 / image_getz(src, y, x))
+                if (currZ > image_getz(src, y, x))
                 {
-                    image_setz(src, y, x, 1.0 / currZ);
+                    image_setz(src, y, x, currZ);
                     // Set the color of the current pixel
                     image_setColor(src, y, x, c);
                 }

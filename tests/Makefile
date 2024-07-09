@@ -79,7 +79,10 @@ test3d: $(ODIR)/test3d.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 test3c: $(ODIR)/test3c.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
+test8a: $(ODIR)/test8a.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+cubism: $(ODIR)/cubism.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
  # this is the default target, it will run if you just type "make" in the terminal
 

@@ -504,14 +504,11 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             {
                 polygon_draw(&plygn, src, ds->color);
             }
-            else if (ds->shade == ShadeConstant)
-            {
-                polygon_drawFill(&plygn, src, ds->color);
-            }
             else
             {
-                printf("Found something not shadeframe or constant\n");
+                polygon_drawShade(&plygn, src, ds->color, ds);
             }
+
             polygon_clear(&plygn);
             break;
         }

@@ -470,11 +470,7 @@ void image_setz(Image *src, int r, int c, float val)
 
     if (val < 0)
     {
-        val = 0;
-    }
-    else if (val > 1)
-    {
-        val = 1;
+        val = 0.0;
     }
     src->z[r * src->rows + c] = val;
 };
