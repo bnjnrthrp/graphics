@@ -283,6 +283,9 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 					float scale = 1.4;
 					float depth = 1.0 - (1.0 / currZ);
 					color_copy(&tc, &(ds->color));
+					// for test8a
+					// color_set(&tc, depth, depth, depth);
+					// For cubism/all other depth scaling
 					color_set(&tc, scale * (ds->color.c[0] * depth), scale * (ds->color.c[1] * depth), scale * (ds->color.c[2] * depth));
 					image_setColor(src, scan, i, tc);
 				}

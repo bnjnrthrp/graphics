@@ -5,8 +5,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "Point.h"
 #include <math.h>
+#include "Point.h"
 
 /**
  * Set the 2D location (first two values) of the point to x and y. Sets z to 0.0 and h to 1.0.
@@ -93,6 +93,7 @@ void point_copy(Point *to, Point *from)
         {
             to->val[i] = from->val[i];
         }
+        to->pert = from->pert;
     }
 }
 /**
@@ -135,4 +136,61 @@ void point_print(Point *p, FILE *fp)
     {
         fprintf(fp, "(%.3f, %.3f, %.3f, %.3f)\n", p->val[0], p->val[1], p->val[2], p->val[3]);
     }
+}
+
+/**
+ * Finds the midpoint of two points and saves it in a provided destination point
+ *
+ * @param ab the destination midpoint
+ * @param a the start point
+ * @param b the end point
+ */
+void point_findMidpoint(Point *ab, Point *a, Point *b)
+{
+    if (!ab || !a || !b)
+    {
+        fprintf(stderr, "Invalid pointer provided to point_findMidpoint\n");
+        exit(-1);
+    }
+
+    point_set3D(ab, (a->val[0] + b->val[0]) * 0.5, (a->val[1] + b->val[1]) * 0.5, (a->val[2] + b->val[2]) * 0.5);
+    ab->pert = 0;
+}
+
+/**
+ * Applies a perturbation to a point, given a roughness scale and length. Adjusts the y coordinate by adding this perturbation.
+ * Perturbation = random * 2.0 - 1, giving us a a range between -1.0 to 1.0. This is then multiplified by length ^ roughness to
+ * provide a final adjustment range of (-l^r, l^r). This allows for smaller adjustments when adjusting the midpoint of two points close together.
+ *
+ * @param a the midpoint to adjust
+ * @param roughness the roughness value, typically something between 0.5-1.5
+ * @param length the length of the line of which a is the midpoint
+ */
+void point_perturb(Point *a, double roughness, double length)
+{
+    if (!a)
+    {
+        fprintf(stderr, "Invalid pointer provided to point_perturb\n");
+        exit(-1);
+    }
+    if (roughness < 1)
+    {
+        return;
+    }
+    double adjustment = ((drand48() * 2.0 - 1.0));
+    Point pt;
+    printf("point's pert is %d\n", a->pert);
+    if (a->pert == 0)
+    {
+        point_set3D(a,
+                    a->val[0],
+                    a->val[1] + adjustment * pow(length, roughness),
+                    a->val[2]);
+        a->pert = 1;
+    }
+    else
+    {
+        printf("Skipping this endpoint\n");
+    }
+    printf("Perts point is now %d\n", a->pert);
 }

@@ -101,6 +101,8 @@ creativeSurf: $(ODIR)/creativeSurf.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 greatPyramids: $(ODIR)/greatPyramids.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+tortilla: $(ODIR)/tortilla.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean
 

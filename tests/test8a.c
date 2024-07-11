@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
   matrix_identity(&VTM);
 
   // set the View parameters
-  point_set3D(&(view.vrp), 5, 5, -7.0);
-  vector_set(&(view.vpn), -5, -5, 7);
+  point_set3D(&(view.vrp), 5.0, 5.0, -7.0);
+  vector_set(&(view.vpn), -5.0, -5.0, 7.0);
   vector_set(&(view.vup), 0.0, 1.0, 0.0);
   view.d = 2.0;
   view.du = 1.6;

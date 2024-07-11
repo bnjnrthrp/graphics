@@ -99,6 +99,8 @@ void module_cube(Module *md, int solid);
 void module_cylinder(Module *md, int sides);
 void module_pyramid(Module *md, int sides);
 void module_sphere(Module *md, int resolution);
+void module_terrain(Module *md, int iterations, double roughness);
+void module_fractalTriangle(Module *md, Point *A, Point *B, Point *C, int s, double r);
 void module_color(Module *md, Color *c);
 void module_bodyColor(Module *md, Color *c);
 void module_surfaceColor(Module *md, Color *c);

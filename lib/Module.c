@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "Module.h"
+#include "Fractals.h"
 #define M_PI 3.14159265358979323846
 
 /**
@@ -975,6 +976,27 @@ void module_pyramid(Module *md, int sides)
     module_polygon(md, &p);
 
     polygon_clear(&p);
+}
+
+/**
+ * Builds a fractal landscape using a height map and a pseudo- diamond-square algorithm to generate the subsequent heights.
+ */
+void module_terrain(Module *md, int iterations, double roughness)
+{
+    // Initialize the first matrix of points
+    double heightMap[2][2];
+    int i, j;
+
+    // Set initial points to a random value between 0 and 1
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 2; j++)
+        {
+            heightMap[i][j] = drand48();
+        }
+    }
+    // Begin the recursion loop
+    buildHeightMap(md, 2, 2, heightMap, 0, iterations, roughness);
 }
 
 /**
