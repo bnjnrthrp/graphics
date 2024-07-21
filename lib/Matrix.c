@@ -314,14 +314,17 @@ void matrix_xformPolygon(Matrix *m, Polygon *p)
     }
     // Create a temp pointlist to hold the transformed list
     Point tmpVertex[p->nVertex];
+    Vector tmpNormal[p->nVertex];
 
     // In each point in the list, xform by the matrix and store it in
     for (int i = 0; i < p->nVertex; i++)
     {
         // Perform the transformation
         matrix_xformPoint(m, &(p->vertex[i]), &(tmpVertex[i]));
+        matrix_xformVector(m, &(p->normal[i]), &(tmpNormal[i]));
         // Copy the results back into the original polygon
         point_copy(&(p->vertex[i]), &(tmpVertex[i]));
+        vector_copy(&(p->normal[i]), &(tmpNormal[i]));
     }
 }
 
