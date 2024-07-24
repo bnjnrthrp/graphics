@@ -126,3 +126,17 @@ void vector_cross(Vector *a, Vector *b, Vector *c)
     tmp.val[3] = 0;                                             // Confirm c is 0.0
     vector_copy(c, &tmp);
 }
+
+void vector_calculateNormal(Vector *N, Point *a, Point *b, Point *c)
+{
+    if (!N || !a || !b || !c)
+    {
+        return;
+    }
+    // Determine the surface normal and save it to the normals structure
+    Vector Vba, Vca;
+    // Cross the two vectors and save it in N
+    vector_set(&Vba, b->val[0] - a->val[0], b->val[1] - a->val[1], b->val[2] - a->val[2]);
+    vector_set(&Vca, c->val[0] - a->val[0], c->val[1] - a->val[1], c->val[2] - a->val[2]);
+    vector_cross(&Vba, &Vca, N);
+}

@@ -87,6 +87,8 @@ Element *element_init(ObjectType type, void *obj)
             e->obj.coeff = *(float *)obj;
             break;
         case ObjLight:
+            light_init(&(e->obj.light));
+            light_copy(&(e->obj.light), (Light *)obj);
         case ObjNone:
         case ObjModule:
             break;
@@ -435,6 +437,7 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
         fprintf(stderr, "Null pointer provided to module_draw\n");
         exit(-1);
     }
+
     Matrix LTM;
     matrix_identity(&LTM);
 
@@ -499,15 +502,23 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             polygon_copy(&plygn, &(e->obj.polygon));
             matrix_xformPolygon(&LTM, &plygn);
             matrix_xformPolygon(GTM, &plygn);
+            if (ds->shade == ShadeGouraud)
+            {
+                polygon_shade(&plygn, ds, lighting);
+            }
             matrix_xformPolygon(VTM, &plygn);
             polygon_normalize(&plygn);
             if (ds->shade == ShadeFrame)
             {
                 polygon_draw(&plygn, src, ds->color);
             }
+            else if (ds->shade == ShadeFlat)
+            {
+                polygon_drawFillB(&plygn, src, ds->color);
+            }
             else
             {
-                polygon_drawShade(&plygn, src, ds->color, ds);
+                polygon_drawShade(&plygn, src, ds, lighting);
             }
 
             polygon_clear(&plygn);
@@ -1200,5 +1211,69 @@ void module_bezierSurface(Module *md, BezierSurface *b, int divisions, int solid
         module_bezierSurface(md, &ur, divisions - 1, solid);
         module_bezierSurface(md, &ll, divisions - 1, solid);
         module_bezierSurface(md, &lr, divisions - 1, solid);
+    }
+}
+
+/**
+ * Copies a light struct and adds it to the module
+ *
+ * @param md the module to add the light to
+ * @param light the light to add
+ */
+void module_addLight(Module *md, Lighting *light)
+{
+    if (!md || !light)
+    {
+        fprintf(stderr, "Null pointer sent to module_addLight\n");
+        exit(-1);
+    }
+    Element *e = element_init(ObjLight, light);
+    module_insert(md, e);
+}
+
+/**
+ * Traverses the module and parses the lighting for calculations
+ *
+ * @param md the module to traverse
+ * @param GTM the GTM
+ * @param the lighting struct to keep track of found lights
+ */
+void module_parseLighting(Module *md, Matrix *GTM, Lighting *lighting)
+{
+    if (!md || !GTM || !lighting)
+    {
+        fprintf(stderr, "Null pointer sent to module_parseLighting\n");
+        exit(-1);
+    }
+    Matrix LTM;
+
+    matrix_identity(&LTM);
+
+    Element *e = md->head;
+    while (e)
+    {
+        if (e->type == ObjMatrix)
+        {
+            matrix_multiply(&(e->obj.matrix), &LTM, &LTM);
+        }
+        else if (e->type == ObjIdentity)
+        {
+            matrix_identity(&LTM);
+        }
+        else if (e->type == ObjLight)
+        {
+            Light tmp;
+            Point p;
+            Vector v;
+            light_init(&tmp);
+            light_copy(&tmp, &(e->obj.light));
+            lighting_add(lighting, tmp.type, &tmp.color, &tmp.direction, &tmp.position, tmp.cutoff, tmp.sharpness);
+            matrix_xformPoint(&LTM, &tmp.position, &p);
+            matrix_xformPoint(GTM, &p, &tmp.position);
+
+            matrix_xformVector(&LTM, &tmp.direction, &v);
+            matrix_xformVector(GTM, &v, &tmp.direction);
+        }
+        e = e->next;
     }
 }

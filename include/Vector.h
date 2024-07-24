@@ -12,5 +12,6 @@ double vector_length(Vector *v);
 void vector_normalize(Vector *v);
 double vector_dot(Vector *a, Vector *b);
 void vector_cross(Vector *a, Vector *b, Vector *c);
+void vector_calculateNormal(Vector *N, Point *a, Point *b, Point *c);
 
 #endif // VECTOR_H

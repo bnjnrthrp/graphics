@@ -50,6 +50,7 @@ typedef union Object
     Color color;
     float coeff;
     void *module;
+    Light light;
 } Object;
 
 /**
@@ -107,5 +108,7 @@ void module_surfaceColor(Module *md, Color *c);
 void module_surfaceCoeff(Module *md, float coeff);
 void module_bezierCurve(Module *md, BezierCurve *b);
 void module_bezierSurface(Module *md, BezierSurface *b, int divisions, int solid);
+void module_addLight(Module *md, Lighting *light);
+void module_parseLighting(Module *md, Matrix *GTM, Lighting *lighting);
 
 #endif // MODULE_H

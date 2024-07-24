@@ -145,6 +145,20 @@ void polygon_set(Polygon *p, int numV, Point *vlist)
         point_copy(&(p->vertex[i]), &(vlist[i]));
     }
     p->nVertex = numV;
+
+    // Determine the surface normal and save it to the normals structure
+    Vector v10, v20, N[numV];
+    // Set V10
+    vector_set(&v10, p->vertex[1].val[0] - p->vertex[0].val[0], p->vertex[1].val[1] - p->vertex[0].val[1], p->vertex[1].val[2] - p->vertex[0].val[2]);
+    vector_set(&v20, p->vertex[2].val[0] - p->vertex[0].val[0], p->vertex[2].val[1] - p->vertex[0].val[1], p->vertex[2].val[2] - p->vertex[0].val[2]);
+    vector_cross(&v10, &v20, &N[0]);
+
+    // Copy the vector into each corresponding point
+    for (int i = 1; i < numV; i++)
+    {
+        vector_copy(&N[i], &N[0]);
+    }
+    polygon_setNormals(p, numV, N);
 }
 
 /**
@@ -587,4 +601,27 @@ void polygon_drawFillB(Polygon *p, Image *src, Color c)
             }
         }
     }
+}
+
+/**
+ * Calculates the shading at each vertex of a polygon
+ *
+ * @param p the polygon to calculate colors
+ */
+void polygon_shade(Polygon *p, DrawState *ds, Lighting *l)
+{
+    if (!p || !ds || !l)
+    {
+        fprintf(stderr, "Invalid pointer sent to polygon_shade\n");
+        exit(-1);
+    }
+    int i;
+    Color c[p->nVertex];
+
+    for (i = 0; i < p->nVertex; i++)
+    {
+        lighting_shading(l, &(p->normal[i]), &(ds->viewer), &(p->vertex[i]), &(ds->body), &(ds->surface), ds->surfaceCoeff, p->oneSided, &c[i]);
+    }
+
+    polygon_setColors(p, p->nVertex, c);
 }

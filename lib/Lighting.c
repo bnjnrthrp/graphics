@@ -24,8 +24,8 @@ void light_init(Light *light)
     color_set(&(light->color), 0.0, 0.0, 0.0);
     vector_set(&(light->direction), 0.0, 0.0, 0.0);
     point_set3D(&(light->position), 1.0, 1.0, 1.0);
-    light->cutoff = 1.0;
-    light->sharpness = 1.0;
+    light->cutoff = 0.0;
+    light->sharpness = 0.0;
 }
 
 /**
@@ -260,7 +260,7 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
         tmpB += (Cb->c[2] * l->light[i].color.c[2]) * theta + (l->light[i].color.c[2] * Cs->c[2]) * pow(beta, s);
     }
     // Debug only
-    printf("ambient light 0: %.2f, %.2f, %.2f\n", ambR, ambG, ambB);
-    printf("point light 1: %.2f, %.2f, %.2f\n", tmpR, tmpG, tmpB);
+    // printf("ambient light 0: %.2f, %.2f, %.2f\n", ambR, ambG, ambB);
+    // printf("point light 1: %.2f, %.2f, %.2f\n", tmpR, tmpG, tmpB);
     color_set(c, tmpR, tmpG, tmpB);
 }

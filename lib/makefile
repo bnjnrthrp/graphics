@@ -28,7 +28,7 @@ LIBDIR =.
 BINDIR =../bin
 
 # put all of the relevant include files here
-_DEPS = ppmIO.h alphaMask.h Bezier.h Color.h Image.h FPixel.h Fractals.h Noise.h Point.h Lighting.h Line.h Circle.h Ellipse.h Polyline.h Polygon.h Graphics.h Scanline.h list.h Vector.h Matrix.h View2D.h View3D.h DrawState.h Module.h
+_DEPS = ppmIO.h alphaMask.h Bezier.h Color.h Image.h FPixel.h Fractals.h Noise.h Point.h Lighting.h Scanline.h Line.h Circle.h Ellipse.h Polyline.h Polygon.h Graphics.h list.h Vector.h Matrix.h View2D.h View3D.h DrawState.h Module.h
 
 # convert them to point to the right place
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
