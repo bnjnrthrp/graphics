@@ -390,6 +390,7 @@ int main(int argc, char *argv[])
   ds = drawstate_create();
   point_copy(&(ds->viewer), &(view.vrp));
   ds->shade = ShadeGouraud;
+  // ds->shade = ShadeFrame;
 
   light = lighting_create();
   lighting_add(light, LightPoint, &White, NULL, &(view.vrp), 0.0, 0.0);

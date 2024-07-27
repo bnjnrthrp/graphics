@@ -146,25 +146,21 @@ void polygon_set(Polygon *p, int numV, Point *vlist)
     }
     p->nVertex = numV;
 
-    // Determine the surface normal and save it to the normals structure
-    Vector N[numV];
+    // // Determine the surface normal and save it to the normals structure
+    // Vector N[numV];
 
-    // Calculate the last and first vertices manually
-    vector_calculateNormal(&N[0], &(p->vertex[p->nVertex - 1]), &(p->vertex[0]), &(p->vertex[1]));
-    vector_calculateNormal(&N[numV - 1], &(p->vertex[p->nVertex - 2]), &(p->vertex[p->nVertex - 1]), &(p->vertex[0]));
+    // // Calculate the last and first vertices manually
+    // vector_calculateNormal(&N[0], &(p->vertex[p->nVertex - 1]), &(p->vertex[0]), &(p->vertex[1]));
+    // vector_calculateNormal(&N[numV - 1], &(p->vertex[p->nVertex - 2]), &(p->vertex[p->nVertex - 1]), &(p->vertex[0]));
 
-    for (int i = 1; i < p->nVertex - 1; i++)
-    {
-        vector_calculateNormal(&N[i], &(p->vertex[i - 1]), &(p->vertex[i]), &(p->vertex[i + 1]));
-    }
+    // for (int i = 1; i < p->nVertex - 1; i++)
+    // {
+    //     vector_calculateNormal(&N[i], &(p->vertex[i - 1]), &(p->vertex[i]), &(p->vertex[i + 1]));
+    // }
 
-    for (int i = 0; i < p->nVertex; i++)
-    {
-        vector_normalize(&N[i]);
-    }
-    // Copy the vector into each corresponding point
+    // // Copy the vector into each corresponding point
 
-    polygon_setNormals(p, numV, N);
+    // polygon_setNormals(p, numV, N);
 }
 
 /**
@@ -616,7 +612,7 @@ void polygon_drawFillB(Polygon *p, Image *src, Color c)
  */
 void polygon_shade(Polygon *p, DrawState *ds, Lighting *l)
 {
-    if (!p || !ds || !l)
+    if (!p || !ds)
     {
         fprintf(stderr, "Invalid pointer sent to polygon_shade\n");
         exit(-1);
@@ -628,6 +624,17 @@ void polygon_shade(Polygon *p, DrawState *ds, Lighting *l)
     {
         printf("Vector at %d is ", i);
         vector_print(&(p->normal[i]), stdout);
+        printf("null pointer is\n");
+        vector_print(&(p->normal[i]), stdout);
+        printf("not the normal\n");
+        point_print(&(ds->viewer), stdout);
+        printf("not the viewer\n");
+        point_print(&(p->vertex[i]), stdout);
+        printf("not the vertex\n");
+        printf("not body color %.2f\n", ds->body.c[0]);
+        printf("not surface color %.2f\n", ds->surface.c[0]);
+        printf("not the color %.2f\n", &c[i]);
+        printf("it's the lighting? %d\n", l->nLights);
         lighting_shading(l, &(p->normal[i]), &(ds->viewer), &(p->vertex[i]), &(ds->body), &(ds->surface), ds->surfaceCoeff, p->oneSided, &c[i]);
     }
 

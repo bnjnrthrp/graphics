@@ -521,7 +521,6 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             }
             else
             {
-                printf("Going to drawShade first\n");
                 polygon_drawShade(&plygn, src, ds, lighting);
             }
 
@@ -761,6 +760,7 @@ void module_cube(Module *md, int solid)
     else
     {
         Polygon p;
+        Vector N[4];
         polygon_init(&p);
 
         // Top of cube
@@ -769,6 +769,11 @@ void module_cube(Module *md, int solid)
         point_set3D(&pt[2], 0.5, 0.5, 0.5);
         point_set3D(&pt[3], 0.5, 0.5, -0.5);
         polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], 0, 1, 0);
+        }
+        polygon_setNormals(&p, 4, N);
         module_polygon(md, &p);
 
         // back of cube
@@ -777,6 +782,11 @@ void module_cube(Module *md, int solid)
         point_set3D(&pt[2], 0.5, 0.5, -0.5);
         point_set3D(&pt[3], -0.5, 0.5, -0.5);
         polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], 0, 0, -1);
+        }
+        polygon_setNormals(&p, 4, N);
         // module_rotateX(md, 0.0, 1.0);
         module_polygon(md, &p);
 
@@ -786,6 +796,11 @@ void module_cube(Module *md, int solid)
         point_set3D(&pt[2], 0.5, -0.5, -0.5);
         point_set3D(&pt[3], -0.5, -0.5, -0.5);
         polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], 0, -1, 0);
+        }
+        polygon_setNormals(&p, 4, N);
         // module_polygon(md, &p);
         // module_rotateX(md, 0.0, 1.0);
         module_polygon(md, &p);
@@ -796,6 +811,11 @@ void module_cube(Module *md, int solid)
         point_set3D(&pt[2], 0.5, -0.5, 0.5);
         point_set3D(&pt[3], -0.5, -0.5, 0.5);
         polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], 0, 0, 1);
+        }
+        polygon_setNormals(&p, 4, N);
         // module_polygon(md, &p);
         // module_rotateX(md, 0.0, 1.0);
         module_polygon(md, &p);
@@ -806,6 +826,11 @@ void module_cube(Module *md, int solid)
         point_set3D(&pt[2], 0.5, -0.5, -0.5);
         point_set3D(&pt[3], 0.5, -0.5, 0.5);
         polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], 1, 0, 0);
+        }
+        polygon_setNormals(&p, 4, N);
         // module_polygon(md, &p);
         // module_rotateY(md, 0.0, 1.0);
         module_polygon(md, &p);
@@ -816,6 +841,11 @@ void module_cube(Module *md, int solid)
         point_set3D(&pt[2], -0.5, -0.5, 0.5);
         point_set3D(&pt[3], -0.5, -0.5, -0.5);
         polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], -1, 0, 0);
+        }
+        polygon_setNormals(&p, 4, N);
         // module_polygon(md, &p);
         // module_rotateY(md, -1.0, 0.0);
         module_polygon(md, &p);

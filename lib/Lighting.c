@@ -20,10 +20,10 @@ void light_init(Light *light)
         fprintf(stderr, "Null pointer provided to light_init\n");
         exit(-1);
     }
-    light->type = LightAmbient;
+    light->type = LightNone;
     color_set(&(light->color), 0.0, 0.0, 0.0);
     vector_set(&(light->direction), 0.0, 0.0, 0.0);
-    point_set3D(&(light->position), 1.0, 1.0, 1.0);
+    point_set3D(&(light->position), 0.0, 0.0, 0.0);
     light->cutoff = 0.0;
     light->sharpness = 0.0;
 }
@@ -146,10 +146,6 @@ void lighting_add(Lighting *l, LightType type, Color *c, Vector *dir, Point *pos
 
     // Increment the number of lights
     l->nLights = l->nLights + 1;
-
-    // Calculate and print the ambient light values
-
-    // Calculate and print the ambient + point light sums
 }
 
 /**

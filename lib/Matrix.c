@@ -322,6 +322,7 @@ void matrix_xformPolygon(Matrix *m, Polygon *p)
         // Perform the transformation
         matrix_xformPoint(m, &(p->vertex[i]), &(tmpVertex[i]));
         matrix_xformVector(m, &(p->normal[i]), &(tmpNormal[i]));
+        vector_normalize(&(tmpNormal[i])); // Normalize the surface normals post-transformation
         // Copy the results back into the original polygon
         point_copy(&(p->vertex[i]), &(tmpVertex[i]));
         vector_copy(&(p->normal[i]), &(tmpNormal[i]));
