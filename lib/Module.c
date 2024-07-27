@@ -468,7 +468,9 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             drawstate_setColor(ds, e->obj.color);
             break;
         case ObjBodyColor:
+            printf("Setting the ds body color\n");
             drawstate_setBody(ds, e->obj.color);
+            printf("Complete\n");
             break;
         case ObjSurfaceColor:
             drawstate_setSurface(ds, e->obj.color);
@@ -504,6 +506,7 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             matrix_xformPolygon(GTM, &plygn);
             if (ds->shade == ShadeGouraud)
             {
+                printf("Calculating the polygon colors\n");
                 polygon_shade(&plygn, ds, lighting);
             }
             matrix_xformPolygon(VTM, &plygn);
@@ -514,10 +517,11 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             }
             else if (ds->shade == ShadeFlat)
             {
-                polygon_drawFillB(&plygn, src, ds->color);
+                polygon_drawFill(&plygn, src, ds->color);
             }
             else
             {
+                printf("Going to drawShade first\n");
                 polygon_drawShade(&plygn, src, ds, lighting);
             }
 
@@ -759,15 +763,11 @@ void module_cube(Module *md, int solid)
         Polygon p;
         polygon_init(&p);
 
-        // Bottom of cube
-        polygon_set(&p, 4, pt);
-        module_polygon(md, &p);
-
         // Top of cube
         point_set3D(&pt[0], -0.5, 0.5, -0.5);
-        point_set3D(&pt[1], 0.5, 0.5, -0.5);
+        point_set3D(&pt[1], -0.5, 0.5, 0.5);
         point_set3D(&pt[2], 0.5, 0.5, 0.5);
-        point_set3D(&pt[3], -0.5, 0.5, 0.5);
+        point_set3D(&pt[3], 0.5, 0.5, -0.5);
         polygon_set(&p, 4, pt);
         module_polygon(md, &p);
 
@@ -777,30 +777,47 @@ void module_cube(Module *md, int solid)
         point_set3D(&pt[2], 0.5, 0.5, -0.5);
         point_set3D(&pt[3], -0.5, 0.5, -0.5);
         polygon_set(&p, 4, pt);
+        // module_rotateX(md, 0.0, 1.0);
         module_polygon(md, &p);
 
-        // Front of cube
+        // Bottom of cube
         point_set3D(&pt[0], -0.5, -0.5, 0.5);
         point_set3D(&pt[1], 0.5, -0.5, 0.5);
-        point_set3D(&pt[2], 0.5, 0.5, 0.5);
-        point_set3D(&pt[3], -0.5, 0.5, 0.5);
+        point_set3D(&pt[2], 0.5, -0.5, -0.5);
+        point_set3D(&pt[3], -0.5, -0.5, -0.5);
         polygon_set(&p, 4, pt);
+        // module_polygon(md, &p);
+        // module_rotateX(md, 0.0, 1.0);
         module_polygon(md, &p);
 
-        // right face of cube
-        point_set3D(&pt[0], 0.5, -0.5, -0.5);
-        point_set3D(&pt[1], 0.5, -0.5, 0.5);
-        point_set3D(&pt[2], 0.5, 0.5, 0.5);
-        point_set3D(&pt[3], 0.5, 0.5, -0.5);
+        // // Front of cube
+        point_set3D(&pt[0], -0.5, 0.5, 0.5);
+        point_set3D(&pt[1], 0.5, 0.5, 0.5);
+        point_set3D(&pt[2], 0.5, -0.5, 0.5);
+        point_set3D(&pt[3], -0.5, -0.5, 0.5);
         polygon_set(&p, 4, pt);
+        // module_polygon(md, &p);
+        // module_rotateX(md, 0.0, 1.0);
         module_polygon(md, &p);
 
-        // // left face of cube
-        point_set3D(&pt[0], -0.5, -0.5, -0.5);
-        point_set3D(&pt[1], -0.5, -0.5, 0.5);
-        point_set3D(&pt[2], -0.5, 0.5, 0.5);
-        point_set3D(&pt[3], -0.5, 0.5, -0.5);
+        // // right face of cube
+        point_set3D(&pt[0], 0.5, 0.5, 0.5);
+        point_set3D(&pt[1], 0.5, 0.5, -0.5);
+        point_set3D(&pt[2], 0.5, -0.5, -0.5);
+        point_set3D(&pt[3], 0.5, -0.5, 0.5);
         polygon_set(&p, 4, pt);
+        // module_polygon(md, &p);
+        // module_rotateY(md, 0.0, 1.0);
+        module_polygon(md, &p);
+
+        // // // left face of cube
+        point_set3D(&pt[0], -0.5, 0.5, -0.5);
+        point_set3D(&pt[1], -0.5, 0.5, 0.5);
+        point_set3D(&pt[2], -0.5, -0.5, 0.5);
+        point_set3D(&pt[3], -0.5, -0.5, -0.5);
+        polygon_set(&p, 4, pt);
+        // module_polygon(md, &p);
+        // module_rotateY(md, -1.0, 0.0);
         module_polygon(md, &p);
 
         polygon_clear(&p);

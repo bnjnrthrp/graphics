@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     // Create the image and drawstate
     src = image_create(360, 360);
     ds = drawstate_create();
-    ds->shade = ShadeConstant;
+    ds->shade = ShadeFrame;
     drawstate_setColor(ds, Blue);
 
     module_draw(scene, &vtm, &gtm, ds, NULL, src);

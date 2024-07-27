@@ -140,7 +140,7 @@ int image_alloc(Image *src, int rows, int cols)
         src->data[0][i].rgb[1] = 0;
         src->data[0][i].rgb[2] = 0;
         src->a[i] = 1.0;
-        src->z[i] = 1.0;
+        src->z[i] = 0.0;
     }
 
     return 0;

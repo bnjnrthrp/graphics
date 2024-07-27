@@ -204,7 +204,9 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 
 	// walk around the polygon, starting with the last point
 	v1 = p->vertex[p->nVertex - 1];
+	printf("Trying to copy the colors into the polygon\n");
 	color_copy(&c1, &(p->color[p->nVertex - 1]));
+	printf("Copy the colors into the polygon\n");
 	for (i = 0; i < p->nVertex; i++)
 	{
 
@@ -338,7 +340,10 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 			}
 			else
 			{
-				// printf("Not drawing this pixel, current z is %.2f and image z is %.2f\n", currZ, image_getz(src, scan, i));
+				if (i % 10 == 0)
+				{
+					// printf("Not drawing this pixel, current z is %.2f and image z is %.2f\n", currZ, image_getz(src, scan, i));
+				}
 			}
 			color_set(&currColor, currColor.c[0] + dcPerCol.c[0], currColor.c[1] + dcPerCol.c[1], currColor.c[2] + dcPerCol.c[2]);
 			// printf("currZ is %.5f, dzPerCol is %.5f\n", currZ, dzPerCol);
@@ -453,6 +458,18 @@ void polygon_drawShade(Polygon *p, Image *src, DrawState *ds, Lighting *light)
 		exit(-1);
 	}
 	LinkedList *edges = NULL;
+
+	// Add the colors to the polygon
+	if (ds->shade != ShadeGouraud)
+	{
+		Color tmp[p->nVertex];
+		for (int i = 0; i < p->nVertex; i++)
+		{
+			printf("Adding color %d to the polygon\n", i);
+			color_copy(&(tmp[i]), &(ds->color));
+		}
+		polygon_setColors(p, p->nVertex, tmp);
+	}
 
 	// set up the edge list
 	edges = setupEdgeList(p, src);

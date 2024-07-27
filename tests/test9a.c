@@ -65,6 +65,10 @@ int main(int argc, char *argv[])
   // this would color the cube in ShadeConstant mode
   module_color(cube, &White);
 
+  // set body and surface color values for ShadeGouraud mode
+  module_bodyColor(cube, &White);
+  module_surfaceColor(cube, &DkGrey);
+
   // the example cube is blue (Y/-Y), red (Z/-Z), yellow (X/-X)
   // these colors should be the body colors
   module_cube(cube, 1);
@@ -72,7 +76,6 @@ int main(int argc, char *argv[])
   // manually add a light source to the Lighting structure
   // put it in the same place as the eye in world space
   light = lighting_create();
-  lighting_add(light, LightAmbient, &White, NULL, NULL, 0, 0);
   lighting_add(light, LightPoint, &White, NULL, &(view.vrp), 0, 0);
 
   // set the shading to Gouraud
@@ -80,7 +83,7 @@ int main(int argc, char *argv[])
 
   point_copy(&(ds->viewer), &(view.vrp));
   ds->shade = ShadeGouraud;
-  //	ds->shade = ShadeFlat;
+  // ds->shade = ShadeFrame;
 
   matrix_identity(&GTM);
   module_draw(cube, &VTM, &GTM, ds, light, src);

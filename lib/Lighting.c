@@ -231,9 +231,13 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
         // Universal calculations
         // Calculate theta = L * N
         theta = vector_dot(&L, N);
+        printf("Testing the normals\n");
         // Check if light is on facing side of polygon if polygon is one-sided - skip if true
         if (oneSided && theta < 0)
+        {
+            printf("Light is on wrong side of polygon\n");
             continue;
+        }
 
         // Normalize the view point
         vector_normalize(V);

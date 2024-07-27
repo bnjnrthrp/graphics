@@ -11,13 +11,22 @@
 
 void color_copy(Color *to, Color *from)
 {
-
+    if (!to || !from)
+    {
+        fprintf(stderr, "Invalid pointer sent to color_copy\n");
+        exit(-1);
+    }
     to->c[0] = from->c[0];
     to->c[1] = from->c[1];
     to->c[2] = from->c[2];
 }
 void color_set(Color *to, float r, float g, float b)
 {
+    if (!to)
+    {
+        fprintf(stderr, "Invalid pointer sent to color_set\n");
+        exit(-1);
+    }
     // check to see if any parameters are outside limits, and skip rest of checks if its ok.
     if (r < 0)
     {

@@ -147,17 +147,23 @@ void polygon_set(Polygon *p, int numV, Point *vlist)
     p->nVertex = numV;
 
     // Determine the surface normal and save it to the normals structure
-    Vector v10, v20, N[numV];
-    // Set V10
-    vector_set(&v10, p->vertex[1].val[0] - p->vertex[0].val[0], p->vertex[1].val[1] - p->vertex[0].val[1], p->vertex[1].val[2] - p->vertex[0].val[2]);
-    vector_set(&v20, p->vertex[2].val[0] - p->vertex[0].val[0], p->vertex[2].val[1] - p->vertex[0].val[1], p->vertex[2].val[2] - p->vertex[0].val[2]);
-    vector_cross(&v10, &v20, &N[0]);
+    Vector N[numV];
 
-    // Copy the vector into each corresponding point
-    for (int i = 1; i < numV; i++)
+    // Calculate the last and first vertices manually
+    vector_calculateNormal(&N[0], &(p->vertex[p->nVertex - 1]), &(p->vertex[0]), &(p->vertex[1]));
+    vector_calculateNormal(&N[numV - 1], &(p->vertex[p->nVertex - 2]), &(p->vertex[p->nVertex - 1]), &(p->vertex[0]));
+
+    for (int i = 1; i < p->nVertex - 1; i++)
     {
-        vector_copy(&N[i], &N[0]);
+        vector_calculateNormal(&N[i], &(p->vertex[i - 1]), &(p->vertex[i]), &(p->vertex[i + 1]));
     }
+
+    for (int i = 0; i < p->nVertex; i++)
+    {
+        vector_normalize(&N[i]);
+    }
+    // Copy the vector into each corresponding point
+
     polygon_setNormals(p, numV, N);
 }
 
@@ -620,6 +626,8 @@ void polygon_shade(Polygon *p, DrawState *ds, Lighting *l)
 
     for (i = 0; i < p->nVertex; i++)
     {
+        printf("Vector at %d is ", i);
+        vector_print(&(p->normal[i]), stdout);
         lighting_shading(l, &(p->normal[i]), &(ds->viewer), &(p->vertex[i]), &(ds->body), &(ds->surface), ds->surfaceCoeff, p->oneSided, &c[i]);
     }
 

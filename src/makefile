@@ -32,10 +32,10 @@ _DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Fractals.h Image.h Noise.h Graphics
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = ppmtest lab1 createMask composite mandeltest polygons sphere lightspeed cube tiefighters
+EXECUTABLES = cube
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = tiffmain.o ppmmain.o createMask.o compositeImage.o mandeltest.o polygons.o sphere.o lightspeed.o cube.o tiefighters.o
+_OBJ = cube.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -57,51 +57,8 @@ all:
 
 
 # put the specific executable rules here
-ppmtest: $(ODIR)/ppmmain.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-lab1: $(ODIR)/lab1.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-alphaMask: $(ODIR)/createMask.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-composite: $(ODIR)/compositeImage.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-mandeltest: $(ODIR)/mandeltest.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-polygons: $(ODIR)/polygons.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-sphere: $(ODIR)/sphere.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-lightspeed: $(ODIR)/lightspeed.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 cube: $(ODIR)/cube.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-tiefighters: $(ODIR)/tiefighters.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-
-mountains: $(ODIR)/mountains.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-sphere: $(ODIR)/sphere.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-umbrella: $(ODIR)/umbrella.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-pyramid: $(ODIR)/pyramid.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-cylinder: $(ODIR)/cylinder.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-creativeSurf: $(ODIR)/creativeSurf.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-greatPyramids: $(ODIR)/greatPyramids.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-tortilla: $(ODIR)/tortilla.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean
