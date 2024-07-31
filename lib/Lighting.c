@@ -52,6 +52,11 @@ void light_copy(Light *to, Light *from)
 Lighting *lighting_create(void)
 {
     Lighting *lighting = (Lighting *)malloc(sizeof(Lighting));
+    if (!lighting)
+    {
+        printf("lighting failed to malloc\n");
+        exit(-1);
+    }
     lighting->nLights = 0;
     lighting_init(lighting);
 
@@ -86,6 +91,12 @@ void lighting_init(Lighting *l)
     {
         lighting_clear(l);
     }
+    l->nLights = 0;
+    for (int i = 0; i < MAX_LIGHTS; i++)
+    {
+        light_init(&(l->light[i]));
+    }
+    printf("Initialized the lights, there are: %d lights\n", l->nLights);
 }
 
 /**
@@ -128,24 +139,25 @@ void lighting_add(Lighting *l, LightType type, Color *c, Vector *dir, Point *pos
         exit(-1);
     }
     // Check there's room for more lights
-    if (l->nLights == MAX_LIGHTS)
+    if (l->nLights >= MAX_LIGHTS)
     {
         fprintf(stderr, "You've reached the max capacity for lights\n");
         return;
     }
+    Light *tmp = &l->light[l->nLights];
 
-    // Update the light at the nLights index (next available)
-    l->light[l->nLights].type = type;
-    color_copy(&(l->light[l->nLights].color), c);
+    light_init(tmp);
+    tmp->type = type;
+    color_copy(&(tmp->color), c);
     if (dir)
-        vector_copy(&(l->light[l->nLights].direction), dir);
+        vector_copy(&(tmp->direction), dir);
     if (pos)
-        point_copy(&(l->light[l->nLights].position), pos);
-    l->light[l->nLights].cutoff = cutoff;
-    l->light[l->nLights].sharpness = sharpness;
+        point_copy(&(tmp->position), pos);
+    tmp->cutoff = cutoff;
+    tmp->sharpness = sharpness;
 
     // Increment the number of lights
-    l->nLights = l->nLights + 1;
+    (l->nLights)++;
 }
 
 /**
@@ -168,14 +180,16 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
         fprintf(stderr, "Null pointer provided to lighting_shading\n");
         exit(-1);
     }
+
     // Loop through every light
     float tmpR, tmpG, tmpB;
     float ambR, ambG, ambB;
 
     // Store the values of the original color into temporary variables
     ambR = ambG = ambB = tmpR = tmpG = tmpB = 0.0;
-    Vector Ds, L, H, negL;
+    Vector Ds, L, H, negL, View;
     double theta, sigma, beta, t;
+    vector_normalize(N);
     for (int i = 0; i < l->nLights; i++)
     {
 
@@ -221,23 +235,27 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
                 continue;
 
             break;
+        case LightNone:
+            continue;
         default:
             break;
         }
         // Universal calculations
         // Calculate theta = L * N
         theta = vector_dot(&L, N);
-        printf("Testing the normals\n");
         // Check if light is on facing side of polygon if polygon is one-sided - skip if true
         if (oneSided && theta < 0)
         {
-            printf("Light is on wrong side of polygon\n");
             continue;
         }
 
-        // Normalize the view point
-        vector_normalize(V);
-        sigma = vector_dot(V, N);
+        // Normalize the view point and normal
+        // Determine the view vector
+        // printf("View vector is: ");
+        // vector_print(V, stdout);
+        vector_set(&View, V->val[0] - p->val[0], V->val[1] - p->val[1], V->val[2] - p->val[2]);
+        vector_normalize(&View);
+        sigma = vector_dot(&View, N);
 
         // Check if viewer and light source on same side of surface?
         if ((theta < 0 && sigma > 0) || (theta > 0 && sigma < 0))
@@ -245,6 +263,7 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
 
         // Calculate H = (L + V) / 2
         vector_set(&H, (L.val[0] + V->val[0]) / 2.0, (L.val[1] + V->val[1]) / 2.0, (L.val[2] + V->val[2]) / 2.0);
+        vector_normalize(&H);
         // Calculate beta = H * N
         beta = vector_dot(&H, N);
         // printf("beta is: %.2f\n", beta);

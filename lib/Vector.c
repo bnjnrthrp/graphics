@@ -33,7 +33,7 @@ void vector_print(Vector *v, FILE *fp)
 {
     if (!v || !fp)
     {
-        fprintf(stderr, "Invalid pointer was provided to vector_point\n");
+        fprintf(stderr, "Invalid pointer was provided to vector_print\n");
         exit(-1);
     }
     fprintf(fp, "(%.3f, %.3f, %.3f, %.3f)\n", v->val[0], v->val[1], v->val[2], v->val[3]);
@@ -127,13 +127,14 @@ void vector_cross(Vector *a, Vector *b, Vector *c)
     vector_copy(c, &tmp);
 }
 
+// Calculates the surface normals at b using points a, b, c.
 void vector_calculateNormal(Vector *N, Point *a, Point *b, Point *c)
 {
     if (!N || !a || !b || !c)
     {
         return;
     }
-    // Determine the surface normal and save it to the normals structure
+    // Determine the surface normal at b and save it to the normals structure. Assumes a->b->c goes in a clockwise fashion
     Vector Vba, Vca;
     // Cross the two vectors and save it in N
     vector_set(&Vba, b->val[0] - a->val[0], b->val[1] - a->val[1], b->val[2] - a->val[2]);

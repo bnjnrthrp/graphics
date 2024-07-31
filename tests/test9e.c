@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
   printf("Final VTM: \n");
   matrix_print(&VTM, stdout);
 
-  // make a simple cube module
+  // make a simple triangle module
   point_set3D(&pt[0], 1.0, 100.0, 1.0);
   point_set3D(&pt[1], 1.0, 200.0, 2.0);
   point_set3D(&pt[2], 150.0, 150.0, 1.0);

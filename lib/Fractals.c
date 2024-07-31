@@ -145,18 +145,23 @@ void julia(Image *dst, float x0, float y0, float dx)
  * @param maxIterations the total number of iterations desired
  * @param roughness the roughness factor for calculating the size of the perturbations
  */
-void buildHeightMap(Module *md, int oldRows, int oldCols, double prevMap[oldRows][oldCols], int count, int maxIterations, double roughness)
+void buildHeightMap(Module *md, DrawState *ds, int oldRows, int oldCols, double prevMap[oldRows][oldCols], int count, int maxIterations, double roughness)
 {
     int i, j, newRows, newCols;
-    double x1, x2, y, z1, z2, prev, next, length, avgHeight;
+    double x1, x2, y, z1, z2, prev, next, avgHeight;
     Point pt[4];
     Polygon p;
-    Color White, Green, Blue, Brown;
+    Vector N[3];
+    Color White, Green, Blue, Brown, LtGrey, DkGrey, LtGreen, LtBlue;
 
     color_set(&White, 1.0, 1.0, 1.0);
     color_set(&Blue, 0.0, 0.0, 0.7);
+    color_set(&LtBlue, 0.1, .1, 0.8);
     color_set(&Green, 0.15, .5, 0.15);
+    color_set(&LtGreen, 0.3, .65, 0.3);
     color_set(&Brown, 0.55, 0.35, 0.0);
+    color_set(&LtGrey, .8, .8, .8);
+    color_set(&DkGrey, .3, .3, .3);
 
     if (!md || !prevMap || maxIterations < 0)
     {
@@ -191,24 +196,51 @@ void buildHeightMap(Module *md, int oldRows, int oldCols, double prevMap[oldRows
                 if (avgHeight > .4)
                 {
                     module_color(md, &White);
+                    module_bodyColor(md, &White);
+                    module_surfaceColor(md, &LtGrey);
                 }
                 else if (avgHeight > 0.2)
                 {
                     module_color(md, &Brown);
+                    module_bodyColor(md, &Brown);
+                    module_surfaceColor(md, &DkGrey);
                 }
                 else if (avgHeight > 0.0)
                 {
                     module_color(md, &Green);
+                    module_bodyColor(md, &Green);
+                    module_surfaceColor(md, &LtGreen);
                 }
                 else
                 {
                     module_color(md, &Blue);
+                    module_bodyColor(md, &Blue);
+                    module_surfaceColor(md, &LtBlue);
                 }
                 // Add triangles to the module
                 polygon_set(&p, 3, &pt[0]);
+                // Points are named in a Z shape, so calculate normals similarly
+                vector_calculateNormal(&N[0], &pt[1], &pt[0], &pt[2]);
+                vector_calculateNormal(&N[1], &pt[0], &pt[1], &pt[2]);
+                vector_calculateNormal(&N[2], &pt[1], &pt[2], &pt[0]);
+                for (int i = 0; i < 3; i++)
+                {
+                    vector_normalize(&N[i]);
+                }
+                printf("Normal is: ");
+                vector_print(&N[0], stdout);
+                polygon_setNormals(&p, 3, N);
                 module_polygon(md, &p);
 
                 polygon_set(&p, 3, &pt[1]);
+                vector_calculateNormal(&N[0], &pt[2], &pt[1], &pt[3]);
+                vector_calculateNormal(&N[1], &pt[3], &pt[2], &pt[1]);
+                vector_calculateNormal(&N[2], &pt[1], &pt[3], &pt[2]);
+                for (int i = 0; i < 3; i++)
+                {
+                    vector_normalize(&N[i]);
+                }
+                polygon_setNormals(&p, 3, N);
                 module_polygon(md, &p);
             }
         }
@@ -288,7 +320,7 @@ void buildHeightMap(Module *md, int oldRows, int oldCols, double prevMap[oldRows
             }
         }
         // Recursively call the heightmap again, with the new count and map
-        buildHeightMap(md, newRows, newCols, newMap, count, maxIterations, roughness);
+        buildHeightMap(md, ds, newRows, newCols, newMap, count, maxIterations, roughness);
     }
 }
 

@@ -394,8 +394,15 @@ int main(int argc, char *argv[])
 
   light = lighting_create();
   lighting_add(light, LightPoint, &White, NULL, &(view.vrp), 0.0, 0.0);
-
   // draw into the scene
+  // module_addLight(scene, light);
+  // module_parseLighting(scene, &gtm, light);
+  printf("size of lighting is %ld\n", sizeof(Lighting));
+  if (!light)
+  {
+    printf("null lighting pointer in main\n");
+    exit(-1);
+  }
   module_draw(scene, &vtm, &gtm, ds, light, src);
 
   image_write(src, "test9b.ppm");

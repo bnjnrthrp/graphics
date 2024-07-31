@@ -622,19 +622,6 @@ void polygon_shade(Polygon *p, DrawState *ds, Lighting *l)
 
     for (i = 0; i < p->nVertex; i++)
     {
-        printf("Vector at %d is ", i);
-        vector_print(&(p->normal[i]), stdout);
-        printf("null pointer is\n");
-        vector_print(&(p->normal[i]), stdout);
-        printf("not the normal\n");
-        point_print(&(ds->viewer), stdout);
-        printf("not the viewer\n");
-        point_print(&(p->vertex[i]), stdout);
-        printf("not the vertex\n");
-        printf("not body color %.2f\n", ds->body.c[0]);
-        printf("not surface color %.2f\n", ds->surface.c[0]);
-        printf("not the color %.2f\n", &c[i]);
-        printf("it's the lighting? %d\n", l->nLights);
         lighting_shading(l, &(p->normal[i]), &(ds->viewer), &(p->vertex[i]), &(ds->body), &(ds->surface), ds->surfaceCoeff, p->oneSided, &c[i]);
     }
 

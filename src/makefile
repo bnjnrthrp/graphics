@@ -26,13 +26,13 @@ LIBS = -limageIO -lm
 LFLAGS = -L$(LIBDIR) -L/opt/local/lib
 
 # put all of the relevant include files here
-_DEPS = ppmIO.h alphaMask.h Color.h FPixel.h Fractals.h Image.h Noise.h Graphics.h
+_DEPS = Graphics.h
 
 # convert them to point to the right place
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = cube
+EXECUTABLES = terrain
 
 # put a list of all the object files here for all executables (with .o endings)
 _OBJ = cube.o
@@ -58,7 +58,7 @@ all:
 
 # put the specific executable rules here
 
-cube: $(ODIR)/cube.o
+terrain: $(ODIR)/terrain.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean

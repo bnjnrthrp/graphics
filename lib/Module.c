@@ -438,6 +438,11 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
         exit(-1);
     }
 
+    // if (!lighting)
+    // {
+    //     printf("null lighting pointer here\n");
+    //     exit(-1);
+    // }
     Matrix LTM;
     matrix_identity(&LTM);
 
@@ -468,9 +473,7 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             drawstate_setColor(ds, e->obj.color);
             break;
         case ObjBodyColor:
-            printf("Setting the ds body color\n");
             drawstate_setBody(ds, e->obj.color);
-            printf("Complete\n");
             break;
         case ObjSurfaceColor:
             drawstate_setSurface(ds, e->obj.color);
@@ -506,7 +509,6 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             matrix_xformPolygon(GTM, &plygn);
             if (ds->shade == ShadeGouraud)
             {
-                printf("Calculating the polygon colors\n");
                 polygon_shade(&plygn, ds, lighting);
             }
             matrix_xformPolygon(VTM, &plygn);
@@ -552,7 +554,7 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             DrawState tempDS;
             drawstate_copy(&tempDS, ds);
             matrix_multiply(GTM, &LTM, &TM);
-            module_draw(e->obj.module, VTM, &TM, &tempDS, NULL, src);
+            module_draw(e->obj.module, VTM, &TM, &tempDS, lighting, src);
             break;
         }
         case ObjNone:
@@ -1039,8 +1041,13 @@ void module_pyramid(Module *md, int sides)
 /**
  * Builds a fractal landscape using a height map and a pseudo- diamond-square algorithm to generate the subsequent heights.
  */
-void module_terrain(Module *md, int iterations, double roughness)
+void module_terrain(Module *md, DrawState *ds, int iterations, double roughness)
 {
+    if (!md || !ds)
+    {
+        fprintf(stderr, "Invalid pointer to module_terrain\n");
+        exit(-1);
+    }
     // Initialize the first matrix of points
     double heightMap[2][2];
     int i, j;
@@ -1054,7 +1061,7 @@ void module_terrain(Module *md, int iterations, double roughness)
         }
     }
     // Begin the recursion loop
-    buildHeightMap(md, 2, 2, heightMap, 0, iterations, roughness);
+    buildHeightMap(md, ds, 2, 2, heightMap, 0, iterations, roughness);
 }
 
 /**

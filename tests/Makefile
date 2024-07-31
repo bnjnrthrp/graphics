@@ -74,6 +74,8 @@ test9a: $(ODIR)/test9a.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 test9b: $(ODIR)/test9b.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+test9c: $(ODIR)/test9c.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)	
 test9d: $(ODIR)/test9d.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 test9e: $(ODIR)/test9e.o

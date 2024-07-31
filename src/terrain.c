@@ -36,10 +36,12 @@ int main(int argc, char *argv[])
 	DrawState *ds;
 	Module *scene;
 	View3D view;
+	Lighting *light;
 	Matrix VTM, GTM;
 	int rows = 300, cols = 400;
 	Image *src = image_create(rows, cols);
 	Point A, B, C;
+	Color White, Grey;
 
 	if (argc > 1)
 	{
@@ -73,10 +75,13 @@ int main(int argc, char *argv[])
 
 	// Clip the iterations to between 0-6
 
+	color_set(&White, 1, 1, 1);
+	color_set(&Grey, .5, .5, .5);
+
 	ds = drawstate_create();
 	// set up the drawstate
 	// ds->shade = ShadeFrame;
-	ds->shade = ShadeDepth;
+	ds->shade = ShadeGouraud;
 
 	// create the triangle endpoints
 	point_set3D(&A, 0.0, 0.0, 0.0); // first row, constant x, even spacing in z
@@ -89,7 +94,7 @@ int main(int argc, char *argv[])
 	module_translate(scene, -0.5, 0.0, -0.5);
 
 	module_scale(scene, 3.0, 1.0, 3.0);
-	module_terrain(scene, iterations, roughness);
+	module_terrain(scene, ds, iterations, roughness);
 
 	// set up the view
 	point_set3D(&(view.vrp), 0.0, 3.0, -5.0);
@@ -106,6 +111,10 @@ int main(int argc, char *argv[])
 	matrix_setView3D(&VTM, &view);
 	matrix_identity(&GTM);
 
+	light = lighting_create();
+	lighting_add(light, LightAmbient, &Grey, NULL, NULL, 0, 0);
+	lighting_add(light, LightPoint, &White, NULL, &(view.vrp), 0, 0);
+
 	matrix_print(&VTM, stdout);
 
 	// Create the animation by adjusting the GTM
@@ -114,9 +123,9 @@ int main(int argc, char *argv[])
 		char buffer[256];
 
 		matrix_rotateY(&GTM, cos(M_PI / 30.0), sin(M_PI / 30.0));
-		module_draw(scene, &VTM, &GTM, ds, NULL, src);
+		module_draw(scene, &VTM, &GTM, ds, light, src);
 
-		sprintf(buffer, "tortilla-frame%03d.ppm", frame);
+		sprintf(buffer, "terrain-frame%03d.ppm", frame);
 		image_write(src, buffer);
 		image_reset(src);
 	}
