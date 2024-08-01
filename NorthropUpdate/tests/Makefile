@@ -25,11 +25,11 @@ _DEPS = Graphics.h
 # convert them to point to the right place
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
-# put a list of the executables heree
-EXECUTABLES = test9a test9b test9c test9d test9e
+# put a list of the executables here
+EXECUTABLES = test9a test9b test9c test9d test9e testLighting_shading
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = test5a.o debugTest5b.o
+_OBJ = test9a.o test9b.o test9c.o test9d.o test9e.o testLighting_shading.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
