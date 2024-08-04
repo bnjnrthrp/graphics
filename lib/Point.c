@@ -73,10 +73,12 @@ void point_normalize(Point *p)
         {
             fprintf(stderr, "Uh oh, you tried to divide by 0 in point_normalize\n");
             point_print(p, stdout);
-            exit(-1);
         }
-        p->val[0] = p->val[0] / p->val[3];
-        p->val[1] = p->val[1] / p->val[3];
+        else
+        {
+            p->val[0] = p->val[0] / p->val[3];
+            p->val[1] = p->val[1] / p->val[3];
+        }
     }
 }
 /**

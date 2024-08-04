@@ -57,7 +57,7 @@ OUTPUT = tests
 ifeq ($(OS),Windows_NT)
 	EXT = .exe
 else
-	EXT = .out
+	EXT = .o
 endif
 #while linux/mac doesn't care about the extension, windows does, so we 
 #want to check the OS and set the extension accordingly. Technically, we 

@@ -73,6 +73,18 @@ double vector_length(Vector *v)
     return sqrt(v->val[0] * v->val[0] + v->val[1] * v->val[1] + v->val[2] * v->val[2]);
 }
 
+void vector_subtract(Vector *a, Vector *b, Vector *c)
+{
+    if (!a || !b || !c)
+        exit(-1);
+    float tempX, tempY, tempZ;
+    tempX = b->val[0] - a->val[0];
+    tempY = b->val[1] - a->val[1];
+    tempZ = b->val[2] - a->val[2];
+
+    vector_set(c, tempX, tempY, tempZ);
+}
+
 /**
  * Normalize the vector to unit length
  * @param v the vector

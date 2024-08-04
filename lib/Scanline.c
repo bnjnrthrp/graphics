@@ -220,6 +220,7 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 				ll_insert(edges, edge, compYStart);
 		}
 		v1 = v2;
+		color_copy(&c1, &c2);
 	}
 
 	// check for empty edges (like nothing in the viewport)
@@ -312,7 +313,7 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 				}
 				else if (ds->shade == ShadeGouraud)
 				{
-					color_set(&tc, currColor.c[0] / (p1->zIntersect), currColor.c[1] / (p1->zIntersect), currColor.c[2] / (p1->zIntersect));
+					color_set(&tc, currColor.c[0] / (currZ), currColor.c[1] / (currZ), currColor.c[2] / (currZ));
 					// printf("Drawing Gouraud shading, color: (%.5f, %.5f, %.5f)\n", tc.c[0], tc.c[1], tc.c[2]);
 					image_setColor(src, scan, i, tc);
 				}
@@ -385,6 +386,9 @@ static int processEdgeList(LinkedList *edges, Image *src, DrawState *ds)
 				// update the edge information with the dPerScan values
 				tedge->xIntersect += tedge->dxPerScan;
 				tedge->zIntersect += tedge->dzPerScan;
+				tedge->cIntersect.c[0] += tedge->dcPerScan.c[0];
+				tedge->cIntersect.c[1] += tedge->dcPerScan.c[1];
+				tedge->cIntersect.c[2] += tedge->dcPerScan.c[2];
 				// adjust in the case of partial overlap
 				if (tedge->dxPerScan < 0.0 && tedge->xIntersect < tedge->x1)
 				{

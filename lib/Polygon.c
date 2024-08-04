@@ -623,7 +623,9 @@ void polygon_shade(Polygon *p, DrawState *ds, Lighting *l)
 
     for (i = 0; i < p->nVertex; i++)
     {
-        lighting_shading(l, &(p->normal[i]), &(ds->viewer), &(p->vertex[i]), &(ds->body), &(ds->surface), ds->surfaceCoeff, p->oneSided, &c[i]);
+        Vector tempV;
+        vector_subtract(&(p->vertex[i]), &(ds->viewer), &tempV);
+        lighting_shading(l, &(p->normal[i]), &tempV, &(p->vertex[i]), &(ds->body), &(ds->surface), ds->surfaceCoeff, p->oneSided, &c[i]);
     }
 
     polygon_setColors(p, p->nVertex, c);

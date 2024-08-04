@@ -60,6 +60,14 @@ all:
 
 terrain: $(ODIR)/terrain.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+pyramid: $(ODIR)/pyramid.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+greatPyramids: $(ODIR)/greatPyramids.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+sphere: $(ODIR)/sphere.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean
 

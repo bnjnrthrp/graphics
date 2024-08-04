@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "Lighting.h"
+#define M_PI 3.14159265358979323846
 
 /**
  * Initializes a light to default values
@@ -21,11 +22,11 @@ void light_init(Light *light)
         exit(-1);
     }
     light->type = LightNone;
-    color_set(&(light->color), 0.0, 0.0, 0.0);
-    vector_set(&(light->direction), 0.0, 0.0, 0.0);
+    color_set(&(light->color), 1.0, 1.0, 1.0);
+    vector_set(&(light->direction), 0.0, 0.0, -1.0);
     point_set3D(&(light->position), 0.0, 0.0, 0.0);
-    light->cutoff = 0.0;
-    light->sharpness = 0.0;
+    light->cutoff = M_PI;
+    light->sharpness = 1.0;
 }
 
 /**
@@ -96,7 +97,6 @@ void lighting_init(Lighting *l)
     {
         light_init(&(l->light[i]));
     }
-    printf("Initialized the lights, there are: %d lights\n", l->nLights);
 }
 
 /**
@@ -187,9 +187,11 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
 
     // Store the values of the original color into temporary variables
     ambR = ambG = ambB = tmpR = tmpG = tmpB = 0.0;
-    Vector Ds, L, H, negL, View;
+    Vector Ds, L, H, negL;
     double theta, sigma, beta, t;
+    vector_normalize(V);
     vector_normalize(N);
+
     for (int i = 0; i < l->nLights; i++)
     {
 
@@ -238,13 +240,13 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
         case LightNone:
             continue;
         default:
-            break;
+            continue;
         }
         // Universal calculations
         // Calculate theta = L * N
         theta = vector_dot(&L, N);
         // Check if light is on facing side of polygon if polygon is one-sided - skip if true
-        if (oneSided && theta < 0)
+        if (oneSided == 1 && theta < 0)
         {
             continue;
         }
@@ -253,16 +255,16 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
         // Determine the view vector
         // printf("View vector is: ");
         // vector_print(V, stdout);
-        vector_set(&View, V->val[0] - p->val[0], V->val[1] - p->val[1], V->val[2] - p->val[2]);
-        vector_normalize(&View);
-        sigma = vector_dot(&View, N);
+        // vector_set(&View, V->val[0] - p->val[0], V->val[1] - p->val[1], V->val[2] - p->val[2]);
+        // vector_normalize(&View);
+        sigma = vector_dot(V, N);
 
         // Check if viewer and light source on same side of surface?
         if ((theta < 0 && sigma > 0) || (theta > 0 && sigma < 0))
             continue;
 
         // Calculate H = (L + V) / 2
-        vector_set(&H, (L.val[0] + V->val[0]) / 2.0, (L.val[1] + V->val[1]) / 2.0, (L.val[2] + V->val[2]) / 2.0);
+        vector_set(&H, (L.val[0] + V->val[0]), (L.val[1] + V->val[1]), (L.val[2] + V->val[2]));
         vector_normalize(&H);
         // Calculate beta = H * N
         beta = vector_dot(&H, N);

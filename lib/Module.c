@@ -869,6 +869,7 @@ void module_cylinder(Module *md, int sides)
     Polygon p;
     Point xtop, xbot;
     double x1, x2, z1, z2;
+    Vector N[4];
     int i;
 
     polygon_init(&p);
@@ -889,23 +890,39 @@ void module_cylinder(Module *md, int sides)
         point_copy(&pt[0], &xtop);
         point_set3D(&pt[1], x1, 1.0, z1);
         point_set3D(&pt[2], x2, 1.0, z2);
-
         polygon_set(&p, 3, pt);
+
+        vector_set(&N[0], 0, 1, 0);
+        vector_set(&N[1], 0, 1, 0);
+        vector_set(&N[2], 0, 1, 0);
+        polygon_setNormals(&p, 3, N);
+
         module_polygon(md, &p);
 
         point_copy(&pt[0], &xbot);
         point_set3D(&pt[1], x1, 0.0, z1);
         point_set3D(&pt[2], x2, 0.0, z2);
-
         polygon_set(&p, 3, pt);
+
+        vector_set(&N[0], 0, -1, 0);
+        vector_set(&N[1], 0, -1, 0);
+        vector_set(&N[2], 0, -1, 0);
+        polygon_setNormals(&p, 3, N);
+
         module_polygon(md, &p);
 
         point_set3D(&pt[0], x1, 0.0, z1);
         point_set3D(&pt[1], x2, 0.0, z2);
         point_set3D(&pt[2], x2, 1.0, z2);
         point_set3D(&pt[3], x1, 1.0, z1);
-
         polygon_set(&p, 4, pt);
+
+        vector_set(&N[0], x1, 0.0, z1);
+        vector_set(&N[1], x2, 0.0, z2);
+        vector_set(&N[2], x2, 0.0, z2);
+        vector_set(&N[3], x1, 0.0, z1);
+        polygon_setNormals(&p, 4, N);
+
         module_polygon(md, &p);
     }
 
@@ -920,13 +937,18 @@ void module_sphere(Module *md, int resolution)
     double center;
     int i, j;
     Point unitSphere[resolution * resolution + resolution];
+    Vector unitNormals[resolution * resolution + resolution];
+    Vector N[4];
     Point top, bottom;
+    Vector topVector, bottomVector;
     Polygon p;
     Point pt[4];
 
     polygon_init(&p);
     point_set3D(&top, 0.0, 1.0, 0.0);
     point_set3D(&bottom, 0.0, -1.0, 0.0);
+    vector_set(&topVector, 0.0, 1.0, 0.0);
+    vector_set(&bottomVector, 0.0, -1.0, 0.0);
     // Set each point in each row going up to the top
     for (i = 0; i < resolution + 1; i++)
     {
@@ -939,6 +961,11 @@ void module_sphere(Module *md, int resolution)
                         cos((float)j * 2.0 * M_PI / (float)resolution) * cos((float)i * M_PI / (float)resolution - .5 * M_PI),
                         center,
                         sin((float)j * 2.0 * M_PI / (float)resolution) * cos((float)i * M_PI / (float)resolution - .5 * M_PI));
+
+            vector_set(&unitNormals[i * resolution + j],
+                       cos((float)j * 2.0 * M_PI / (float)resolution) * cos((float)i * M_PI / (float)resolution - .5 * M_PI),
+                       center,
+                       sin((float)j * 2.0 * M_PI / (float)resolution) * cos((float)i * M_PI / (float)resolution - .5 * M_PI));
         }
     }
 
@@ -953,9 +980,18 @@ void module_sphere(Module *md, int resolution)
             point_copy(&pt[1], &unitSphere[i * resolution + j]);           // Bottom left
             point_copy(&pt[2], &unitSphere[(i + 1) * resolution + j + 1]); // Top right
             point_copy(&pt[3], &unitSphere[i * resolution + j + 1]);       // Bottom right
-            polygon_set(&p, 3, pt);                                        // First triangle
+
+            vector_copy(&N[0], &unitNormals[(i + 1) * resolution + j]);     // Top left
+            vector_copy(&N[1], &unitNormals[i * resolution + j]);           // Bottom left
+            vector_copy(&N[2], &unitNormals[(i + 1) * resolution + j + 1]); // Top right
+            vector_copy(&N[3], &unitNormals[i * resolution + j + 1]);
+
+            polygon_set(&p, 3, pt); // First triangle
+            polygon_setNormals(&p, 3, N);
             module_polygon(md, &p);
+
             polygon_set(&p, 3, &pt[1]); // Second triangle
+            polygon_setNormals(&p, 3, &N[1]);
             module_polygon(md, &p);
         }
         // Close the strip
@@ -963,25 +999,43 @@ void module_sphere(Module *md, int resolution)
         point_copy(&pt[1], &unitSphere[i * resolution + resolution - 1]);       // End of bottom row
         point_copy(&pt[2], &unitSphere[(i + 1) * resolution]);                  // Start of top row
         point_copy(&pt[3], &unitSphere[i * resolution]);                        // Start of bottom row
-        polygon_set(&p, 3, pt);                                                 // First triangle
+
+        // Copy the normals for the points
+        vector_copy(&N[0], &unitNormals[(i + 1) * resolution + resolution - 1]);
+        vector_copy(&N[1], &unitNormals[i * resolution + resolution - 1]);
+        vector_copy(&N[2], &unitNormals[(i + 1) * resolution]);
+        vector_copy(&N[3], &unitNormals[i * resolution]);
+
+        // Set the polygons and write the module
+        polygon_set(&p, 3, pt); // First triangle
+        polygon_setNormals(&p, 3, N);
         module_polygon(md, &p);
         polygon_set(&p, 3, &pt[1]); // Second triangle
+        polygon_setNormals(&p, 3, &N[1]);
         module_polygon(md, &p);
     }
 
     // Builds the top fan
     point_copy(&pt[0], &top);
+    vector_copy(&N[0], &topVector);
     for (i = 0; i < resolution - 1; i++) // Final set of size resolution
     {
         point_copy(&pt[1], &unitSphere[resolution * resolution + i]); // Final set of points
         point_copy(&pt[2], &unitSphere[resolution * resolution + i + 1]);
+        vector_copy(&N[1], &unitNormals[resolution * resolution + i]);
+        vector_copy(&N[2], &unitNormals[resolution * resolution + i + 1]);
         polygon_set(&p, 3, pt);
+        polygon_setNormals(&p, 3, N);
+
         module_polygon(md, &p);
     }
     // Builds the final triangle in the fan
-    point_copy(&pt[1], &unitSphere[resolution * resolution + resolution - 1]); // End of final set
-    point_copy(&pt[2], &unitSphere[resolution * resolution]);                  // Start of final set
+    point_copy(&pt[1], &unitSphere[resolution * resolution + resolution - 1]);  // End of final set
+    point_copy(&pt[2], &unitSphere[resolution * resolution]);                   // Start of final set
+    vector_copy(&N[1], &unitNormals[resolution * resolution + resolution - 1]); // End of final set
+    vector_copy(&N[2], &unitNormals[resolution * resolution]);
     polygon_set(&p, 3, pt);
+    polygon_setNormals(&p, 3, pt);
     module_polygon(md, &p);
 
     polygon_clear(&p);
@@ -1005,6 +1059,7 @@ void module_pyramid(Module *md, int sides)
     Polygon p;
     Point top;
     Point bottom[sides];
+    Vector N[sides];
     double x1, x2, z1, z2;
     int i;
 
@@ -1026,6 +1081,12 @@ void module_pyramid(Module *md, int sides)
         point_set3D(&pt[2], x2, 0.0, z2);
 
         polygon_set(&p, 3, pt);
+
+        vector_calculateNormal(&N[0], &pt[1], &pt[0], &pt[2]);
+        vector_calculateNormal(&N[1], &pt[2], &pt[1], &pt[0]);
+        vector_calculateNormal(&N[2], &pt[0], &pt[2], &pt[1]);
+        polygon_setNormals(&p, 3, N);
+
         module_polygon(md, &p);
 
         // Add the point to the base
@@ -1033,6 +1094,11 @@ void module_pyramid(Module *md, int sides)
     }
     // Build the base
     polygon_set(&p, sides, bottom);
+    for (int i = 0; i < sides; i++)
+    {
+        vector_set(&N[i], 0, -1, 0);
+    }
+    polygon_setNormals(&p, sides, N);
     module_polygon(md, &p);
 
     polygon_clear(&p);
