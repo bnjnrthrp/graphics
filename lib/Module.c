@@ -781,78 +781,78 @@ void module_cube(Module *md, int solid)
         module_polygon(md, &p);
 
         // back of cube
-        // point_set3D(&pt[0], -0.5, -0.5, -0.5);
-        // point_set3D(&pt[1], 0.5, -0.5, -0.5);
-        // point_set3D(&pt[2], 0.5, 0.5, -0.5);
-        // point_set3D(&pt[3], -0.5, 0.5, -0.5);
-        // polygon_set(&p, 4, pt);
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     vector_set(&N[i], 0, 0, -1);
-        // }
-        // polygon_setNormals(&p, 4, N);
-        // // module_rotateX(md, 0.0, 1.0);
-        // module_polygon(md, &p);
+        point_set3D(&pt[0], -0.5, -0.5, -0.5);
+        point_set3D(&pt[1], 0.5, -0.5, -0.5);
+        point_set3D(&pt[2], 0.5, 0.5, -0.5);
+        point_set3D(&pt[3], -0.5, 0.5, -0.5);
+        polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], 0, 0, -1);
+        }
+        polygon_setNormals(&p, 4, N);
+        // module_rotateX(md, 0.0, 1.0);
+        module_polygon(md, &p);
 
-        // // Bottom of cube
-        // point_set3D(&pt[0], -0.5, -0.5, 0.5);
-        // point_set3D(&pt[1], 0.5, -0.5, 0.5);
-        // point_set3D(&pt[2], 0.5, -0.5, -0.5);
-        // point_set3D(&pt[3], -0.5, -0.5, -0.5);
-        // polygon_set(&p, 4, pt);
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     vector_set(&N[i], 0, -1, 0);
-        // }
-        // polygon_setNormals(&p, 4, N);
-        // // module_polygon(md, &p);
-        // // module_rotateX(md, 0.0, 1.0);
+        // Bottom of cube
+        point_set3D(&pt[0], -0.5, -0.5, 0.5);
+        point_set3D(&pt[1], 0.5, -0.5, 0.5);
+        point_set3D(&pt[2], 0.5, -0.5, -0.5);
+        point_set3D(&pt[3], -0.5, -0.5, -0.5);
+        polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], 0, -1, 0);
+        }
+        polygon_setNormals(&p, 4, N);
         // module_polygon(md, &p);
+        // module_rotateX(md, 0.0, 1.0);
+        module_polygon(md, &p);
 
-        // // // Front of cube
-        // point_set3D(&pt[0], -0.5, 0.5, 0.5);
-        // point_set3D(&pt[1], 0.5, 0.5, 0.5);
-        // point_set3D(&pt[2], 0.5, -0.5, 0.5);
-        // point_set3D(&pt[3], -0.5, -0.5, 0.5);
-        // polygon_set(&p, 4, pt);
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     vector_set(&N[i], 0, 0, 1);
-        // }
-        // polygon_setNormals(&p, 4, N);
-        // // module_polygon(md, &p);
-        // // module_rotateX(md, 0.0, 1.0);
+        // // Front of cube
+        point_set3D(&pt[0], -0.5, 0.5, 0.5);
+        point_set3D(&pt[1], 0.5, 0.5, 0.5);
+        point_set3D(&pt[2], 0.5, -0.5, 0.5);
+        point_set3D(&pt[3], -0.5, -0.5, 0.5);
+        polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], 0, 0, 1);
+        }
+        polygon_setNormals(&p, 4, N);
         // module_polygon(md, &p);
+        // module_rotateX(md, 0.0, 1.0);
+        module_polygon(md, &p);
 
-        // // // right face of cube
-        // point_set3D(&pt[0], 0.5, 0.5, 0.5);
-        // point_set3D(&pt[1], 0.5, 0.5, -0.5);
-        // point_set3D(&pt[2], 0.5, -0.5, -0.5);
-        // point_set3D(&pt[3], 0.5, -0.5, 0.5);
-        // polygon_set(&p, 4, pt);
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     vector_set(&N[i], 1, 0, 0);
-        // }
-        // polygon_setNormals(&p, 4, N);
-        // // module_polygon(md, &p);
-        // // module_rotateY(md, 0.0, 1.0);
+        // // right face of cube
+        point_set3D(&pt[0], 0.5, 0.5, 0.5);
+        point_set3D(&pt[1], 0.5, 0.5, -0.5);
+        point_set3D(&pt[2], 0.5, -0.5, -0.5);
+        point_set3D(&pt[3], 0.5, -0.5, 0.5);
+        polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], 1, 0, 0);
+        }
+        polygon_setNormals(&p, 4, N);
         // module_polygon(md, &p);
+        // module_rotateY(md, 0.0, 1.0);
+        module_polygon(md, &p);
 
-        // // // // left face of cube
-        // point_set3D(&pt[0], -0.5, 0.5, -0.5);
-        // point_set3D(&pt[1], -0.5, 0.5, 0.5);
-        // point_set3D(&pt[2], -0.5, -0.5, 0.5);
-        // point_set3D(&pt[3], -0.5, -0.5, -0.5);
-        // polygon_set(&p, 4, pt);
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     vector_set(&N[i], -1, 0, 0);
-        // }
-        // polygon_setNormals(&p, 4, N);
-        // // module_polygon(md, &p);
-        // // module_rotateY(md, -1.0, 0.0);
+        // // // left face of cube
+        point_set3D(&pt[0], -0.5, 0.5, -0.5);
+        point_set3D(&pt[1], -0.5, 0.5, 0.5);
+        point_set3D(&pt[2], -0.5, -0.5, 0.5);
+        point_set3D(&pt[3], -0.5, -0.5, -0.5);
+        polygon_set(&p, 4, pt);
+        for (int i = 0; i < 4; i++)
+        {
+            vector_set(&N[i], -1, 0, 0);
+        }
+        polygon_setNormals(&p, 4, N);
         // module_polygon(md, &p);
+        // module_rotateY(md, -1.0, 0.0);
+        module_polygon(md, &p);
 
         polygon_clear(&p);
     }

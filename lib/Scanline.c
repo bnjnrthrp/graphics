@@ -135,7 +135,7 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c1, Color c2,
 		edge->dcPerScan.c[i] = (c2.c[i] / end.val[2] - c1.c[i] / start.val[2]) / dscan;
 		edge->dnPerScan.val[i] = (n2.val[i] / end.val[2] - n1.val[i] / start.val[2]) / dscan;
 	}
-	// edge->dnPerScan.val[3] = edge->dzPerScan; // matches dz per scan
+	edge->dnPerScan.val[3] = edge->dzPerScan; // matches dz per scan
 	// edge->dnPerScan.val[3] = 0.0; // matches dz per scan
 
 	// Point dpPerScan = x/z, y/z, 1/z
@@ -156,7 +156,7 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c1, Color c2,
 			edge->cIntersect.c[i] = (c1.c[i] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dcPerScan.c[i];
 			edge->nIntersect.val[i] = (n1.val[i] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dnPerScan.val[i];
 		}
-		// edge->nIntersect.val[3] = (1.0 / edge->z0) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dzPerScan;
+		edge->nIntersect.val[3] = (1.0 / edge->z0) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dzPerScan;
 
 		edge->pIntersect.val[0] = (p1.val[0] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dpPerScan.val[0];
 		edge->pIntersect.val[1] = (p1.val[1] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dpPerScan.val[1];
@@ -172,7 +172,7 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c1, Color c2,
 			edge->cIntersect.c[i] = (c1.c[i] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dcPerScan.c[i];
 			edge->nIntersect.val[i] = (n1.val[i] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dnPerScan.val[i];
 		}
-		// edge->nIntersect.val[3] = (1.0 / edge->z0) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dzPerScan;
+		edge->nIntersect.val[3] = (1.0 / edge->z0) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dzPerScan;
 
 		// Update the Point for Phong shading
 		edge->pIntersect.val[0] = (p1.val[0] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dpPerScan.val[0];
@@ -193,11 +193,11 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c1, Color c2,
 			edge->cIntersect.c[i] += edge->dcPerScan.c[i] * (0.0 - edge->y0);
 			edge->nIntersect.val[i] += edge->dnPerScan.val[i] * (0.0 - edge->y0);
 		}
+		edge->nIntersect.val[3] += edge->dzPerScan * (0.0 - edge->y0);
+
 		edge->pIntersect.val[0] += edge->dpPerScan.val[0] * (0.0 - edge->y0);
 		edge->pIntersect.val[1] += edge->dpPerScan.val[1] * (0.0 - edge->y0);
-
 		edge->pIntersect.val[2] += edge->dzPerScan * (0.0 - edge->y0);
-		// edge->nIntersect.val[3] += edge->dzPerScan * (0.0 - edge->y0);
 
 		//   update y0
 		edge->y0 = 0;
@@ -322,7 +322,7 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 			dpPerCol.val[j] = (p2->pIntersect.val[j] - p1->pIntersect.val[j]) / (p2->xIntersect - p1->xIntersect);
 			dnPerCol.val[j] = (p2->nIntersect.val[j] - p1->nIntersect.val[j]) / (p2->xIntersect - p1->xIntersect);
 		}
-		// dnPerCol.val[3] = (p2->nIntersect.val[2] - p1->nIntersect.val[2]) / (p2->xIntersect - p1->xIntersect);
+		dnPerCol.val[3] = (p2->nIntersect.val[2] - p1->nIntersect.val[2]) / (p2->xIntersect - p1->xIntersect);
 		// dnPerCol.val[3] = 0.0;
 
 		// if the xIntersect values are the same, don't draw anything.
@@ -346,7 +346,7 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 				currPoint.val[j] += (0 - start) * dpPerCol.val[j];
 				currNorm.val[j] += (0 - start) * dnPerCol.val[j];
 			}
-			// currNorm.val[3] += (0 - start) * dnPerCol.val[3];
+			currNorm.val[3] += (0 - start) * dnPerCol.val[3];
 			start = 0;
 		}
 		// identify the ending column
@@ -396,7 +396,7 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 						tn.val[j] = currNorm.val[j] / currZ;
 						tp.val[j] = currPoint.val[j] / currZ;
 					}
-					// tn.val[3] = currNorm.val[3] / currZ;
+					tn.val[3] = currNorm.val[3] / currZ;
 
 					vector_subtract(&tp, &(ds->viewer), &V); // Get view vector from the ds
 					// vector_normalize(&tn);
@@ -428,7 +428,7 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 				currNorm.val[j] += dnPerCol.val[j];
 				currPoint.val[j] += dpPerCol.val[j];
 			}
-			// currNorm.val[3] += dnPerCol.val[3];
+			currNorm.val[3] += dnPerCol.val[3];
 			// printf("Filled in the color at pixel %d, %d\n", scan, i);
 		}
 		// move ahead to the next pair of edges
