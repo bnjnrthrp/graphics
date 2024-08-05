@@ -10,8 +10,10 @@ typedef struct Polygon
     int oneSided;
     int nVertex;
     Point *vertex;
+    Point *vertex3D;
     Color *color;
     Vector *normal;
+    Vector *normalPhong;
     int zBuffer;
 } Polygon;
 
@@ -23,12 +25,14 @@ void polygon_free(Polygon *p);
 // Initialize, set, free
 void polygon_init(Polygon *p);
 void polygon_set(Polygon *p, int numV, Point *vlist);
+void polygon_setVertex3D(Polygon *p, int numV, Point *vlist);
 void polygon_clear(Polygon *p);
 
 // setters/getters
 void polygon_setSided(Polygon *p, int oneSided);
 void polygon_setColors(Polygon *p, int numV, Color *clist);
 void polygon_setNormals(Polygon *p, int numV, Vector *nlist);
+void polygon_setNormalsPhong(Polygon *p, int numV, Vector *nlist);
 void polygon_setAll(Polygon *p, int numV, Point *vlist, Color *clist, Vector *nlist, int zBuffer, int oneSided);
 void polygon_zBuffer(Polygon *p, int flag);
 void polygon_copy(Polygon *to, Polygon *from);

@@ -389,7 +389,7 @@ int main(int argc, char *argv[])
   src = image_create(view.screeny, view.screenx);
   ds = drawstate_create();
   point_copy(&(ds->viewer), &(view.vrp));
-  ds->shade = ShadeGouraud;
+  ds->shade = ShadePhong;
   // ds->shade = ShadeFrame;
 
   light = lighting_create();

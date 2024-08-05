@@ -24,11 +24,13 @@ typedef struct tEdge
 {
 	float x0, y0, z0;			 /* start point for the edge */
 	float x1, y1, z1;			 /* end point for the edge */
-	int yStart, yEnd;			 /* start row and end row */
+	int yStart, yEnd, oneSided;	 /* start row and end row */
 	float xIntersect, dxPerScan; /* where the edge intersects the current scanline and how it changes */
 								 /* we'll add more here later */
 	float zIntersect, dzPerScan;
 	Color cIntersect, dcPerScan;
+	Vector nIntersect, dnPerScan;
+	Point pIntersect, dpPerScan;
 	struct tEdge *next;
 } Edge;
 
@@ -71,10 +73,11 @@ static int compXIntersect(const void *a, const void *b)
 	Eventually, the points will be 3D and we'll add color and texture
 	coordinates.
  */
-static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c0, Color c1)
+static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c1, Color c2, Point p1, Point p2, Vector n1, Vector n2, int oneSided)
 {
 	Edge *edge;
 	float dscan = end.val[1] - start.val[1];
+	int i;
 
 	/******
 				 Your code starts here
@@ -100,6 +103,7 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c0, Color c1)
 	edge->x1 = end.val[0];
 	edge->y1 = end.val[1];
 	edge->z1 = end.val[2];
+	edge->oneSided = oneSided;
 	// turn on an edge only if the edge starts in the top half of it or
 	// the lower half of the pixel above it.  In other words, round the
 	// start y value to the nearest integer and assign it to
@@ -124,10 +128,20 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c0, Color c1)
 	// Calculate the slope, dxPerScan == dx / dy
 	edge->dxPerScan = (edge->x1 - edge->x0) / dscan;
 	edge->dzPerScan = (1.0 / edge->z1 - 1.0 / edge->z0) / dscan;
-	edge->dcPerScan.c[0] = (c1.c[0] / end.val[2] - c0.c[0] / start.val[2]) / dscan;
-	edge->dcPerScan.c[1] = (c1.c[1] / end.val[2] - c0.c[1] / start.val[2]) / dscan;
-	edge->dcPerScan.c[2] = (c1.c[2] / end.val[2] - c0.c[2] / start.val[2]) / dscan;
+	// dcPerScan = R/z G/z B/z
+	// dnPerScan = Nx/z Ny/z Nz/z 1/z
+	for (i = 0; i < 3; i++)
+	{
+		edge->dcPerScan.c[i] = (c2.c[i] / end.val[2] - c1.c[i] / start.val[2]) / dscan;
+		edge->dnPerScan.val[i] = (n2.val[i] / end.val[2] - n1.val[i] / start.val[2]) / dscan;
+	}
+	// edge->dnPerScan.val[3] = edge->dzPerScan; // matches dz per scan
+	// edge->dnPerScan.val[3] = 0.0; // matches dz per scan
 
+	// Point dpPerScan = x/z, y/z, 1/z
+	edge->dpPerScan.val[0] = (p2.val[0] / end.val[2] - p1.val[0] / start.val[2]) / dscan;
+	edge->dpPerScan.val[1] = (p2.val[1] / end.val[2] - p1.val[1] / start.val[2]) / dscan;
+	edge->dpPerScan.val[2] = edge->dzPerScan;
 	// Calculate xIntersect, adjusting for the fraction of the point in the pixel.
 	// Scanlines go through the middle of pixels
 	// Move the edge to the first scanline it crosses
@@ -137,18 +151,33 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c0, Color c1)
 		// xIntersect = x0 + (.5 - (y0 - floor(y0)) * dx/dy
 		edge->xIntersect = edge->x0 + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dxPerScan;
 		edge->zIntersect = (1.0 / edge->z0) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dzPerScan;
-		edge->cIntersect.c[0] = (c0.c[0] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dcPerScan.c[0];
-		edge->cIntersect.c[1] = (c0.c[1] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dcPerScan.c[1];
-		edge->cIntersect.c[2] = (c0.c[2] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dcPerScan.c[2];
+		for (i = 0; i < 3; i++)
+		{
+			edge->cIntersect.c[i] = (c1.c[i] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dcPerScan.c[i];
+			edge->nIntersect.val[i] = (n1.val[i] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dnPerScan.val[i];
+		}
+		// edge->nIntersect.val[3] = (1.0 / edge->z0) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dzPerScan;
+
+		edge->pIntersect.val[0] = (p1.val[0] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dpPerScan.val[0];
+		edge->pIntersect.val[1] = (p1.val[1] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dpPerScan.val[1];
+		edge->pIntersect.val[2] = (1.0 / edge->z0) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dzPerScan;
 	}
 	else
 	{
 		// xIntersect = x0 + (1.0 - y0 - floor(y0) + .5) * dx/dy
 		edge->xIntersect = edge->x0 + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dxPerScan;
 		edge->zIntersect = (1.0 / edge->z0) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dzPerScan;
-		edge->cIntersect.c[0] = (c0.c[0] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dcPerScan.c[0];
-		edge->cIntersect.c[1] = (c0.c[1] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dcPerScan.c[1];
-		edge->cIntersect.c[2] = (c0.c[2] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dcPerScan.c[2];
+		for (i = 0; i < 3; i++)
+		{
+			edge->cIntersect.c[i] = (c1.c[i] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dcPerScan.c[i];
+			edge->nIntersect.val[i] = (n1.val[i] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dnPerScan.val[i];
+		}
+		// edge->nIntersect.val[3] = (1.0 / edge->z0) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dzPerScan;
+
+		// Update the Point for Phong shading
+		edge->pIntersect.val[0] = (p1.val[0] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dpPerScan.val[0];
+		edge->pIntersect.val[1] = (p1.val[1] / start.val[2]) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dpPerScan.val[1];
+		edge->pIntersect.val[2] = (1.0 / edge->z0) + (1.0 - (edge->y0 - (int)(edge->y0)) + .5) * edge->dzPerScan;
 	}
 	// adjust if the edge starts above the image
 	// move the intersections down to scanline zero
@@ -159,9 +188,17 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c0, Color c1)
 		// xIntersect would be the new x when sloping from the negative y to 0. xI1 = xI0 + dx/dy * (0 - y0)
 		edge->xIntersect += edge->dxPerScan * (0.0 - edge->y0);
 		edge->zIntersect += edge->dzPerScan * (0.0 - edge->y0);
-		edge->cIntersect.c[0] += edge->dcPerScan.c[0] * (0.0 - edge->y0);
-		edge->cIntersect.c[1] += edge->dcPerScan.c[1] * (0.0 - edge->y0);
-		edge->cIntersect.c[2] += edge->dcPerScan.c[2] * (0.0 - edge->y0);
+		for (i = 0; i < 3; i++)
+		{
+			edge->cIntersect.c[i] += edge->dcPerScan.c[i] * (0.0 - edge->y0);
+			edge->nIntersect.val[i] += edge->dnPerScan.val[i] * (0.0 - edge->y0);
+		}
+		edge->pIntersect.val[0] += edge->dpPerScan.val[0] * (0.0 - edge->y0);
+		edge->pIntersect.val[1] += edge->dpPerScan.val[1] * (0.0 - edge->y0);
+
+		edge->pIntersect.val[2] += edge->dzPerScan * (0.0 - edge->y0);
+		// edge->nIntersect.val[3] += edge->dzPerScan * (0.0 - edge->y0);
+
 		//   update y0
 		edge->y0 = 0;
 		//   update x0
@@ -190,6 +227,8 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 	LinkedList *edges = NULL;
 	Point v1, v2;
 	Color c1, c2;
+	Vector n1, n2;
+	Point p1, p2;
 	int i;
 
 	// create a linked list
@@ -198,12 +237,18 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 	// walk around the polygon, starting with the last point
 	v1 = p->vertex[p->nVertex - 1];
 	color_copy(&c1, &(p->color[p->nVertex - 1]));
+	p1 = p->vertex3D[p->nVertex - 1];
+	// n1 = p->normalPhong[p->nVertex - 1];
+	n1 = p->normal[p->nVertex - 1];
 	for (i = 0; i < p->nVertex; i++)
 	{
 
 		// the current point (i) is the end of the segment
 		v2 = p->vertex[i];
 		color_copy(&c2, &(p->color[i]));
+		p2 = p->vertex3D[i];
+		// n2 = p->normalPhong[i];
+		n2 = p->normal[i];
 		// if it is not a horizontal line
 		if ((int)(v1.val[1] + 0.5) != (int)(v2.val[1] + 0.5))
 		{
@@ -211,9 +256,9 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 
 			// if the first coordinate is smaller (top edge)
 			if (v1.val[1] < v2.val[1])
-				edge = makeEdgeRec(v1, v2, src, c1, c2);
+				edge = makeEdgeRec(v1, v2, src, c1, c2, p1, p2, n1, n2, p->oneSided);
 			else
-				edge = makeEdgeRec(v2, v1, src, c2, c1);
+				edge = makeEdgeRec(v2, v1, src, c2, c1, p2, p1, n2, n1, p->oneSided);
 
 			// insert the edge into the list of edges if it's not null
 			if (edge)
@@ -221,6 +266,8 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 		}
 		v1 = v2;
 		color_copy(&c1, &c2);
+		p1 = p2;
+		n1 = n2;
 	}
 
 	// check for empty edges (like nothing in the viewport)
@@ -237,12 +284,14 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 	Draw one scanline of a polygon given the scanline, the active edges,
 	a DrawState, the image, and some Lights (for Phong shading only).
  */
-static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawState *ds)
+static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawState *ds, Lighting *l)
 {
 	Edge *p1, *p2;
-	int i, start, end;
+	int i, j, start, end;
 	float currZ, dzPerCol;
 	Color tc, currColor, dcPerCol;
+	Point tp, currPoint, dpPerCol;
+	Vector tn, currNorm, dnPerCol, V;
 
 	// loop over the list
 	p1 = ll_head(active);
@@ -256,12 +305,25 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 			break;
 		}
 		currZ = p1->zIntersect;
-		color_copy(&currColor, &p1->cIntersect);
 		dzPerCol = (p2->zIntersect - p1->zIntersect) / (p2->xIntersect - p1->xIntersect);
+
+		color_copy(&currColor, &p1->cIntersect);
 		color_set(&dcPerCol,
 				  (p2->cIntersect.c[0] - p1->cIntersect.c[0]) / (p2->xIntersect - p1->xIntersect),
 				  (p2->cIntersect.c[1] - p1->cIntersect.c[1]) / (p2->xIntersect - p1->xIntersect),
 				  (p2->cIntersect.c[2] - p1->cIntersect.c[2]) / (p2->xIntersect - p1->xIntersect));
+
+		// tp = p1->pIntersect;
+		point_copy(&currPoint, &(p1->pIntersect));
+		// tn = p1->nIntersect;
+		vector_copy(&currNorm, &(p1->nIntersect));
+		for (j = 0; j < 3; j++)
+		{
+			dpPerCol.val[j] = (p2->pIntersect.val[j] - p1->pIntersect.val[j]) / (p2->xIntersect - p1->xIntersect);
+			dnPerCol.val[j] = (p2->nIntersect.val[j] - p1->nIntersect.val[j]) / (p2->xIntersect - p1->xIntersect);
+		}
+		// dnPerCol.val[3] = (p2->nIntersect.val[2] - p1->nIntersect.val[2]) / (p2->xIntersect - p1->xIntersect);
+		// dnPerCol.val[3] = 0.0;
 
 		// if the xIntersect values are the same, don't draw anything.
 		// Just go to the next pair.
@@ -278,9 +340,13 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 		if (start < 0)
 		{
 			currZ += (0 - start) * dzPerCol;
-			currColor.c[0] += (0 - start) * dcPerCol.c[0];
-			currColor.c[1] += (0 - start) * dcPerCol.c[1];
-			currColor.c[2] += (0 - start) * dcPerCol.c[2];
+			for (j = 0; j < 3; j++)
+			{
+				currColor.c[j] += (0 - start) * dcPerCol.c[j];
+				currPoint.val[j] += (0 - start) * dpPerCol.val[j];
+				currNorm.val[j] += (0 - start) * dnPerCol.val[j];
+			}
+			// currNorm.val[3] += (0 - start) * dnPerCol.val[3];
 			start = 0;
 		}
 		// identify the ending column
@@ -317,18 +383,53 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 					// printf("Drawing Gouraud shading, color: (%.5f, %.5f, %.5f)\n", tc.c[0], tc.c[1], tc.c[2]);
 					image_setColor(src, scan, i, tc);
 				}
+				else if (ds->shade == ShadePhong)
+				{
+					if (!l)
+					{
+						fprintf(stderr, "Invalid lighting pointer sent to fillScan\n");
+						exit(-1);
+					}
+					// color_set(&tc, currColor.c[0] / (currZ), currColor.c[1] / (currZ), currColor.c[2] / (currZ));
+					for (j = 0; j < 3; j++)
+					{
+						tn.val[j] = currNorm.val[j] / currZ;
+						tp.val[j] = currPoint.val[j] / currZ;
+					}
+					// tn.val[3] = currNorm.val[3] / currZ;
+
+					vector_subtract(&tp, &(ds->viewer), &V); // Get view vector from the ds
+					// vector_normalize(&tn);
+					// printf("Normal is at: ");
+					// vector_print(&tn, stdout);
+					lighting_shading(l, &tn, &V, &tp, &ds->body, &ds->surface, ds->surfaceCoeff, p1->oneSided, &tc);
+					// if (tc.c[0] == 0 && tc.c[1] == 0 && tc.c[2] == 0 && i % 10 == 0)
+					// {
+					// 	// printf("Printing black at %d, %d\n", i, scan);
+					// 	// printf("point is: ");
+					// 	// point_print(&tp, stdout);
+					// 	// printf("normal is: ");
+					// 	// vector_print(&tn, stdout);
+					// 	// color_set(&tc, 1.0, 1.0, 1.0);
+					// }
+					image_setColor(src, scan, i, tc);
+				}
 				else
 				{
 					image_setColor(src, scan, i, ds->color);
 				}
 				image_setz(src, scan, i, currZ);
 			}
-
 			// Increment the color and z
-			currColor.c[0] += dcPerCol.c[0];
-			currColor.c[1] += dcPerCol.c[1];
-			currColor.c[2] += dcPerCol.c[2];
 			currZ += dzPerCol;
+			for (j = 0; j < 3; j++)
+			{
+				currColor.c[j] += dcPerCol.c[j];
+				currNorm.val[j] += dnPerCol.val[j];
+				currPoint.val[j] += dpPerCol.val[j];
+			}
+			// currNorm.val[3] += dnPerCol.val[3];
+			// printf("Filled in the color at pixel %d, %d\n", scan, i);
 		}
 		// move ahead to the next pair of edges
 		p1 = ll_next(active);
@@ -338,7 +439,7 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 /*
 	 Process the edge list, asmes the edges list has at least one entry
 */
-static int processEdgeList(LinkedList *edges, Image *src, DrawState *ds)
+static int processEdgeList(LinkedList *edges, Image *src, DrawState *ds, Lighting *light)
 {
 	LinkedList *active = NULL;
 	LinkedList *tmplist = NULL;
@@ -372,7 +473,7 @@ static int processEdgeList(LinkedList *edges, Image *src, DrawState *ds)
 
 		// if there are active edges
 		// fill out the scanline
-		fillScan(scan, active, src, ds->color, ds);
+		fillScan(scan, active, src, ds->color, ds, light);
 
 		// remove any ending edges and update the rest
 		for (tedge = ll_pop(active); tedge != NULL; tedge = ll_pop(active))
@@ -386,9 +487,16 @@ static int processEdgeList(LinkedList *edges, Image *src, DrawState *ds)
 				// update the edge information with the dPerScan values
 				tedge->xIntersect += tedge->dxPerScan;
 				tedge->zIntersect += tedge->dzPerScan;
-				tedge->cIntersect.c[0] += tedge->dcPerScan.c[0];
-				tedge->cIntersect.c[1] += tedge->dcPerScan.c[1];
-				tedge->cIntersect.c[2] += tedge->dcPerScan.c[2];
+				for (int i = 0; i < 3; i++)
+				{
+					tedge->cIntersect.c[i] += tedge->dcPerScan.c[i];
+					tedge->nIntersect.val[i] += tedge->dnPerScan.val[i];
+				}
+				tedge->pIntersect.val[0] += tedge->dpPerScan.val[0];
+				tedge->pIntersect.val[1] += tedge->dpPerScan.val[1];
+				tedge->pIntersect.val[2] += tedge->dzPerScan;
+
+				tedge->nIntersect.val[3] += tedge->dzPerScan;
 				// adjust in the case of partial overlap
 				if (tedge->dxPerScan < 0.0 && tedge->xIntersect < tedge->x1)
 				{
@@ -460,7 +568,7 @@ void polygon_drawShade(Polygon *p, Image *src, DrawState *ds, Lighting *light)
 		return;
 	}
 	// process the edge list (should be able to take an arbitrary edge list)
-	processEdgeList(edges, src, ds);
+	processEdgeList(edges, src, ds, light);
 	// clean up
 	ll_delete(edges, (void (*)(const void *))free);
 

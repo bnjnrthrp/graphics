@@ -97,6 +97,8 @@ void polygon_init(Polygon *p)
     p->vertex = NULL;
     p->color = NULL;
     p->normal = NULL;
+    p->vertex3D = NULL;
+    p->normalPhong = NULL;
     p->zBuffer = 1;
 }
 
@@ -145,22 +147,6 @@ void polygon_set(Polygon *p, int numV, Point *vlist)
         point_copy(&(p->vertex[i]), &(vlist[i]));
     }
     p->nVertex = numV;
-
-    // // Determine the surface normal and save it to the normals structure
-    // Vector N[numV];
-
-    // // Calculate the last and first vertices manually
-    // vector_calculateNormal(&N[0], &(p->vertex[p->nVertex - 1]), &(p->vertex[0]), &(p->vertex[1]));
-    // vector_calculateNormal(&N[numV - 1], &(p->vertex[p->nVertex - 2]), &(p->vertex[p->nVertex - 1]), &(p->vertex[0]));
-
-    // for (int i = 1; i < p->nVertex - 1; i++)
-    // {
-    //     vector_calculateNormal(&N[i], &(p->vertex[i - 1]), &(p->vertex[i]), &(p->vertex[i + 1]));
-    // }
-
-    // // Copy the vector into each corresponding point
-
-    // polygon_setNormals(p, numV, N);
 }
 
 /**
@@ -190,6 +176,11 @@ void polygon_clear(Polygon *p)
         free(p->normal);
     p->normal = NULL;
 
+    if (p->vertex3D)
+        free(p->vertex3D);
+
+    if (p->normalPhong)
+        free(p->normalPhong);
     // Reinitialize the polygon to default values
     polygon_init(p);
 }
@@ -293,6 +284,76 @@ void polygon_setNormals(Polygon *p, int numV, Vector *nlist)
     {
         vector_copy(&(p->normal[i]), &(nlist[i]));
         vector_normalize(&(p->normal[i]));
+    }
+}
+
+void polygon_setNormalsPhong(Polygon *p, int numV, Vector *nlist)
+{
+    if (!p || !nlist)
+    {
+        fprintf(stderr, "A null pointer was provided to polygon_setNormals\n");
+        exit(-1);
+    }
+
+    // Check to ensure number of vertices is non-negative
+    if (numV < 0)
+    {
+        fprintf(stderr, "Number of vertices provided was < 0 (polygon_setNormalsPhong())\n");
+        exit(-1);
+    }
+
+    // If there's already a Normals list, then clear it out and reinitialize the memory
+    if (p->normalPhong)
+    {
+        free(p->normalPhong);
+    }
+    p->normalPhong = (Vector *)malloc(sizeof(Vector) * numV);
+    // Null check incase memory failed
+    if (!p->normalPhong)
+    {
+        fprintf(stderr, "polygon vertex memory allocation failed\n");
+        exit(-1);
+    }
+    for (int i = 0; i < numV; i++)
+    {
+        vector_copy(&(p->normalPhong[i]), &(nlist[i]));
+        vector_normalize(&(p->normalPhong[i]));
+    }
+}
+
+/**
+ * Sets the vertex list for the points in 3D space (after LTM and GTM, stores for Phong shading)
+ */
+void polygon_setVertex3D(Polygon *p, int numV, Point *plist)
+{
+    if (!p || !plist)
+    {
+        fprintf(stderr, "Invalid pointer provided to polygon_setVertex3D\n");
+        exit(-1);
+    }
+    if (numV < 0)
+    {
+        fprintf(stderr, "NumV to polygon_setVertex3D was < 0\n");
+        return;
+    }
+
+    if (p->vertex3D)
+        free(p->vertex3D);
+
+    p->vertex3D = (Point *)malloc(sizeof(Point) * numV);
+
+    if (!p->vertex3D)
+    {
+        fprintf(stderr, "Point3d memory allocation fail in polygon_setVertex3D\n");
+        exit(-1);
+    }
+    for (int i = 0; i < numV; i++)
+    {
+        point_copy(&(p->vertex3D[i]), &(plist[i]));
+        printf("Setting vertex: ");
+        point_print(&(p->vertex3D[i]), stdout);
+        printf("Normals are: ");
+        vector_print(&(p->normal[i]), stdout);
     }
 }
 
@@ -445,6 +506,12 @@ void polygon_normalize(Polygon *p)
     for (int i = 0; i < p->nVertex; i++)
     {
         point_normalize(&(p->vertex[i]));
+        // point_normalize(&(p->vertex3D[i]));
+        printf("points now at: ");
+        point_print(&(p->vertex[i]), stdout);
+        // point_print(&(p->vertex3D[i]), stdout);
+        printf("normals vectors at: ");
+        vector_print(&(p->normal[i]), stdout);
     }
 }
 

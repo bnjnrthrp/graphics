@@ -76,19 +76,22 @@ int main(int argc, char *argv[])
   // manually add a light source to the Lighting structure
   // put it in the same place as the eye in world space
   light = lighting_create();
+  // lighting_add(light, LightAmbient, &DkGrey, NULL, NULL, 0, 0);
   lighting_add(light, LightPoint, &White, NULL, &(view.vrp), 0, 0);
 
   // set the shading to Gouraud
   ds = drawstate_create();
 
   point_copy(&(ds->viewer), &(view.vrp));
-  ds->shade = ShadeGouraud;
+  // ds->shade = ShadeGouraud;
+  ds->shade = ShadePhong;
   // ds->shade = ShadeFrame;
 
   matrix_identity(&GTM);
   module_draw(cube, &VTM, &GTM, ds, light, src);
 
   // write out the image
+  // image_write(src, "test9aGouraund.ppm");
   image_write(src, "test9a.ppm");
 
   // free stuff here
