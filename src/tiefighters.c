@@ -395,7 +395,7 @@ int main(int argc, char *argv[])
     src = image_create(720, 1024);
     ds = drawstate_create();
     point_copy(&(ds->viewer), &(view.vrp));
-    ds->shade = ShadePhong;
+    ds->shade = ShadeGouraud;
     drawstate_setColor(ds, OffWhite);
 
     for (t = 0; t < nFrames; t++)

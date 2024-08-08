@@ -11,11 +11,28 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "Scanline.h"
+#include "Polygon.h"
+#include "List.h"
+#include "DrawState.h"
 
 /********************
 Scanline Fill Algorithm
 ********************/
+
+// define the struct here, because it is local to only this file
+typedef struct tEdge
+{
+	float x0, y0, z0;			 /* start point for the edge */
+	float x1, y1, z1;			 /* end point for the edge */
+	int yStart, yEnd, oneSided;	 /* start row and end row */
+	float xIntersect, dxPerScan; /* where the edge intersects the current scanline and how it changes */
+								 /* we'll add more here later */
+	float zIntersect, dzPerScan;
+	Color cIntersect, dcPerScan;
+	Vector nIntersect, dnPerScan;
+	Point pIntersect, dpPerScan;
+	struct tEdge *next;
+} Edge;
 
 /*
 	This is a comparison function that returns a value < 0 if a < b, a
@@ -221,8 +238,8 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 	v1 = p->vertex[p->nVertex - 1];
 	color_copy(&c1, &(p->color[p->nVertex - 1]));
 	p1 = p->vertex3D[p->nVertex - 1];
-	n1 = p->normalPhong[p->nVertex - 1];
-	// n1 = p->normal[p->nVertex - 1];
+	// n1 = p->normalPhong[p->nVertex - 1];
+	n1 = p->normal[p->nVertex - 1];
 	for (i = 0; i < p->nVertex; i++)
 	{
 
@@ -230,8 +247,8 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 		v2 = p->vertex[i];
 		color_copy(&c2, &(p->color[i]));
 		p2 = p->vertex3D[i];
-		n2 = p->normalPhong[i];
-		// n2 = p->normal[i];
+		// n2 = p->normalPhong[i];
+		n2 = p->normal[i];
 		// if it is not a horizontal line
 		if ((int)(v1.val[1] + 0.5) != (int)(v2.val[1] + 0.5))
 		{
@@ -267,7 +284,7 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 	Draw one scanline of a polygon given the scanline, the active edges,
 	a DrawState, the image, and some Lights (for Phong shading only).
  */
-static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawState *ds, Lighting *l, PolygonDB *db)
+static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawState *ds, Lighting *l)
 {
 	Edge *p1, *p2;
 	int i, j, start, end;
@@ -296,8 +313,10 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 				  (p2->cIntersect.c[1] - p1->cIntersect.c[1]) / (p2->xIntersect - p1->xIntersect),
 				  (p2->cIntersect.c[2] - p1->cIntersect.c[2]) / (p2->xIntersect - p1->xIntersect));
 
-		currPoint = p1->pIntersect;
-		currNorm = p1->nIntersect;
+		// tp = p1->pIntersect;
+		point_copy(&currPoint, &(p1->pIntersect));
+		// tn = p1->nIntersect;
+		vector_copy(&currNorm, &(p1->nIntersect));
 		for (j = 0; j < 3; j++)
 		{
 			dpPerCol.val[j] = (p2->pIntersect.val[j] - p1->pIntersect.val[j]) / (p2->xIntersect - p1->xIntersect);
@@ -380,10 +399,19 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 					tn.val[3] = currNorm.val[3] / currZ;
 
 					vector_subtract(&tp, &(ds->viewer), &V); // Get view vector from the ds
-					vector_normalize(&tn);
-					// printf("Normal prior to lighting_shading: ");
+					// vector_normalize(&tn);
+					// printf("Normal is at: ");
 					// vector_print(&tn, stdout);
-					lighting_shading(l, &tn, &V, &tp, &ds->body, &ds->surface, ds->surfaceCoeff, p1->oneSided, &tc, db);
+					lighting_shading(l, &tn, &V, &tp, &ds->body, &ds->surface, ds->surfaceCoeff, p1->oneSided, &tc);
+					// if (tc.c[0] == 0 && tc.c[1] == 0 && tc.c[2] == 0 && i % 10 == 0)
+					// {
+					// 	// printf("Printing black at %d, %d\n", i, scan);
+					// 	// printf("point is: ");
+					// 	// point_print(&tp, stdout);
+					// 	// printf("normal is: ");
+					// 	// vector_print(&tn, stdout);
+					// 	// color_set(&tc, 1.0, 1.0, 1.0);
+					// }
 					image_setColor(src, scan, i, tc);
 				}
 				else
@@ -411,7 +439,7 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 /*
 	 Process the edge list, asmes the edges list has at least one entry
 */
-static int processEdgeList(LinkedList *edges, Image *src, DrawState *ds, Lighting *light, PolygonDB *db)
+static int processEdgeList(LinkedList *edges, Image *src, DrawState *ds, Lighting *light)
 {
 	LinkedList *active = NULL;
 	LinkedList *tmplist = NULL;
@@ -445,7 +473,7 @@ static int processEdgeList(LinkedList *edges, Image *src, DrawState *ds, Lightin
 
 		// if there are active edges
 		// fill out the scanline
-		fillScan(scan, active, src, ds->color, ds, light, db);
+		fillScan(scan, active, src, ds->color, ds, light);
 
 		// remove any ending edges and update the rest
 		for (tedge = ll_pop(active); tedge != NULL; tedge = ll_pop(active))
@@ -507,15 +535,15 @@ void polygon_drawFill(Polygon *p, Image *src, Color c)
 	DrawState ds;
 	drawstate_setColor(&ds, c);
 	ds.shade = ShadeConstant;
-	polygon_drawShade(p, src, &ds, NULL, NULL);
+	polygon_drawShade(p, src, &ds, NULL);
 }
 
 /*
 	Draws a filled polygon of the specified color into the image src.
  */
-void polygon_drawShade(Polygon *p, Image *src, DrawState *ds, Lighting *light, PolygonDB *db)
+void polygon_drawShade(Polygon *p, Image *src, DrawState *ds, Lighting *light)
 {
-	if (!p || !src || !ds || !db)
+	if (!p || !src || !ds)
 	{
 		fprintf(stderr, "Invalid pointer sent to polygon_drawShade\n");
 		exit(-1);
@@ -540,7 +568,7 @@ void polygon_drawShade(Polygon *p, Image *src, DrawState *ds, Lighting *light, P
 		return;
 	}
 	// process the edge list (should be able to take an arbitrary edge list)
-	processEdgeList(edges, src, ds, light, db);
+	processEdgeList(edges, src, ds, light);
 	// clean up
 	ll_delete(edges, (void (*)(const void *))free);
 

@@ -6,8 +6,8 @@
 
 #include <stdlib.h>
 #include "Polygon.h"
+#include "list.h"
 #include "Line.h"
-#define DEFAULT 1000
 
 // Constructors
 /**
@@ -350,15 +350,10 @@ void polygon_setVertex3D(Polygon *p, int numV, Point *plist)
     for (int i = 0; i < numV; i++)
     {
         point_copy(&(p->vertex3D[i]), &(plist[i]));
-        // printf("Setting vertex: ");
-        // point_print(&(p->vertex3D[i]), stdout);
-        // printf("Normals are: ");
-        // vector_print(&(p->normal[i]), stdout);
-        // if (p->normalPhong)
-        // {
-        //     printf("Phong normals are: ");
-        //     vector_print(&p->normalPhong[i], stdout);
-        // }
+        printf("Setting vertex: ");
+        point_print(&(p->vertex3D[i]), stdout);
+        printf("Normals are: ");
+        vector_print(&(p->normal[i]), stdout);
     }
 }
 
@@ -512,17 +507,11 @@ void polygon_normalize(Polygon *p)
     {
         point_normalize(&(p->vertex[i]));
         // point_normalize(&(p->vertex3D[i]));
-        // printf("points now at: ");
-        // point_print(&(p->vertex[i]), stdout);
-        // printf("3D points at: ");
+        printf("points now at: ");
+        point_print(&(p->vertex[i]), stdout);
         // point_print(&(p->vertex3D[i]), stdout);
-        // printf("normals vectors at: ");
-        // vector_print(&(p->normal[i]), stdout);
-        // if (p->normalPhong)
-        // {
-        //     printf("Phong normals are: ");
-        //     vector_print(&p->normalPhong[i], stdout);
-        // }
+        printf("normals vectors at: ");
+        vector_print(&(p->normal[i]), stdout);
     }
 }
 
