@@ -238,8 +238,8 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 	v1 = p->vertex[p->nVertex - 1];
 	color_copy(&c1, &(p->color[p->nVertex - 1]));
 	p1 = p->vertex3D[p->nVertex - 1];
-	// n1 = p->normalPhong[p->nVertex - 1];
-	n1 = p->normal[p->nVertex - 1];
+	n1 = p->normalPhong[p->nVertex - 1];
+	// n1 = p->normal[p->nVertex - 1];
 	for (i = 0; i < p->nVertex; i++)
 	{
 
@@ -247,8 +247,8 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 		v2 = p->vertex[i];
 		color_copy(&c2, &(p->color[i]));
 		p2 = p->vertex3D[i];
-		// n2 = p->normalPhong[i];
-		n2 = p->normal[i];
+		n2 = p->normalPhong[i];
+		// n2 = p->normal[i];
 		// if it is not a horizontal line
 		if ((int)(v1.val[1] + 0.5) != (int)(v2.val[1] + 0.5))
 		{

@@ -248,26 +248,16 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
         // Check if light is on facing side of polygon if polygon is one-sided - skip if true
         if (oneSided == 1 && theta < 0)
         {
-            // printf("light on facing side of polygon and polygon onesided. Theta = %.5f\n", theta);
-            // printf("lighting is ");
-            // vector_print(&L, stdout);
-            // printf("normal is ");
-            // vector_print(N, stdout);
             continue;
         }
 
         // Normalize the view point and normal
         // Determine the view vector
-        // printf("View vector is: ");
-        // vector_print(V, stdout);
-        // vector_set(&View, V->val[0] - p->val[0], V->val[1] - p->val[1], V->val[2] - p->val[2]);
-        // vector_normalize(&View);
         sigma = vector_dot(V, N);
 
         // Check if viewer and light source on same side of surface?
         if ((theta < 0 && sigma > 0) || (theta > 0 && sigma < 0))
         {
-            printf("viewer and light on same surface\n");
             continue;
         }
 

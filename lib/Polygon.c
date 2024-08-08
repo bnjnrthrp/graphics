@@ -350,10 +350,6 @@ void polygon_setVertex3D(Polygon *p, int numV, Point *plist)
     for (int i = 0; i < numV; i++)
     {
         point_copy(&(p->vertex3D[i]), &(plist[i]));
-        printf("Setting vertex: ");
-        point_print(&(p->vertex3D[i]), stdout);
-        printf("Normals are: ");
-        vector_print(&(p->normal[i]), stdout);
     }
 }
 
@@ -443,6 +439,15 @@ void polygon_copy(Polygon *to, Polygon *from)
     {
         polygon_setNormals(to, from->nVertex, from->normal);
     }
+    if (from->normalPhong)
+    {
+        polygon_setNormalsPhong(to, from->nVertex, from->normalPhong);
+    }
+    if (from->vertex3D)
+    {
+        polygon_setVertex3D(to, from->nVertex, from->vertex3D);
+    }
+
     polygon_zBuffer(to, from->zBuffer);
     polygon_setSided(to, from->oneSided);
 }
@@ -506,12 +511,6 @@ void polygon_normalize(Polygon *p)
     for (int i = 0; i < p->nVertex; i++)
     {
         point_normalize(&(p->vertex[i]));
-        // point_normalize(&(p->vertex3D[i]));
-        printf("points now at: ");
-        point_print(&(p->vertex[i]), stdout);
-        // point_print(&(p->vertex3D[i]), stdout);
-        printf("normals vectors at: ");
-        vector_print(&(p->normal[i]), stdout);
     }
 }
 

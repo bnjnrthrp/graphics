@@ -32,10 +32,10 @@ _DEPS = Graphics.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = terrain
+EXECUTABLES = cube terrain sphere
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = cube.o
+_OBJ = cube.o terrain.o sphere.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -60,6 +60,7 @@ all:
 
 terrain: $(ODIR)/terrain.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
 pyramid: $(ODIR)/pyramid.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
@@ -68,6 +69,7 @@ greatPyramids: $(ODIR)/greatPyramids.o
 
 sphere: $(ODIR)/sphere.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
 
 .PHONY: clean
 
