@@ -5,7 +5,6 @@
 #include "DrawState.h"
 #include "Ellipse.h"
 #include "FPixel.h"
-#include "Fractals.h"
 #include "Image.h"
 #include "Lighting.h"
 #include "Line.h"
