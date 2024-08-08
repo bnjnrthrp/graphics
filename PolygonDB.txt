@@ -1,0 +1,141 @@
+
+PolygonDB *polygonDB_create(int size)
+{
+    PolygonDB *db = (PolygonDB *)malloc(sizeof(PolygonDB));
+    polygonDB_init(db, DEFAULT);
+    return db;
+}
+
+void polygonDB_init(PolygonDB *db, int size)
+{
+    if (!db)
+    {
+        fprintf(stderr, "Invalid pointer sent to polygonDB_init\n");
+        exit(-1);
+    }
+    if (db->p)
+        free(db->p);
+    if (size < 0)
+        return;
+    db->p = (Polygon *)malloc(sizeof(Polygon) * size);
+    db->size = 0;
+}
+void polygonDB_add(PolygonDB *db, Polygon *p)
+{
+    if (!db || !p)
+    {
+        fprintf(stderr, "Invalid pointer provided to polygonDB_add\n");
+        exit(-1);
+    }
+    polygon_copy(&(db->p[db->size]), p);
+    db->size++;
+}
+void polygonDB_expand(PolygonDB *db)
+{
+    if (!db)
+    {
+        fprintf(stderr, "Invalid pointer sent to polygonDB_expand\n");
+        exit(-1);
+    }
+    Polygon *tmp = (Polygon *)malloc(sizeof(Polygon) * db->size * 2); // Double the size of the polygon array
+    for (int i = 0; i < db->size; i++)
+    {
+        polygon_copy(&tmp[i], &db->p[i]); // Copy the polygons to the new array
+    }
+    free(db->p); // Free the old polygon array
+    db->p = tmp;
+}
+void polygonDB_free(PolygonDB *db)
+{
+    if (!db)
+    {
+        fprintf(stderr, "Invalid pointer sent to polygonDB_free\n");
+        exit(-1);
+    }
+
+    if (db->p)
+    {
+        free(db->p);
+    }
+    free(db);
+}
+
+
+///////////////////////////////
+#include "RayTracer.h"
+
+Color ray_cast(Vector *V, Point *pt, Lighting *l, PolygonDB *db)
+{
+    if (!V || !pt || !l || !db)
+    {
+        fprintf(stderr, "Invalid pointer provided to ray_calculateShadows\n");
+        exit(-1);
+    }
+    for (int i = 0; i < l->nLights; i++)
+    {
+        ray_polygonIntersect(V, pt, l, db);
+    }
+}
+
+int ray_polygonIntersect(Vector *V, Point *pt, Lighting *l, PolygonDB *db)
+{
+    if (!V || !pt || !l | !db)
+    {
+        fprintf(stderr, "Invalid pointer provided to polygon_intersect\n");
+        exit(-1);
+    }
+
+    for (int i = 0; i < db->size; i++)
+    {
+        if (db->p[i].nVertex > 4 || db->p[i].nVertex < 3)
+        {
+            fprintf(stderr, "Incompatible polygon sent to polygon_intersect\n");
+            return 1;
+        }
+
+        if (db->p[i].nVertex == 4) // Divide the polygon into 2 separate triangles and combine the results when returning
+        {
+            Point t1[3];
+            Point t2[3];
+            Polygon p1, p2;
+
+            polygon_init(&p1);
+            polygon_init(&p2);
+            point_copy(&t1, &(db->p[i].vertex3D[0]));
+            point_copy(&t1, &(db->p[i].vertex3D[1]));
+            point_copy(&t1, &(db->p[i].vertex3D[3]));
+
+            point_copy(&t2, &(db->p[i].vertex3D[1]));
+            point_copy(&t2, &(db->p[i].vertex3D[2]));
+            point_copy(&t2, (&db->p[i].vertex3D[3]));
+            polygon_setVertex3D(&p1, 3, t1);
+            polygon_setVertex3D(&p2, 3, t2);
+            return triangle_intersect(&p1, pt, l) * triangle_intersect(&p2, pt, l);
+        }
+    }
+    //     For each light source Li
+    // (a) Send a ray (or many, if an area source) towards Li
+    // (b) Intersect the ray with each polygon in the scene
+    // (c) If the ray intersects an opaque polygon, Li is blocked.
+    // (d) If the ray intersects only transparent polygons, Li is partially blocked.
+    // (e) Add the contribution of shading the surface with Li to C.
+    // 7. Calculate the perfect reflection/transmission direction vr
+    // 8. Calculate the magnitude of the surface reflection/transmission
+    // 9. return C + 
+RayIntersect(vr; PolygonDatabase)
+
+    // 3 points
+    return triangle_intersect(p, pt, l);
+}
+
+int ray_triangleIntersect(Vector *V, Point *p, Light *l)
+{
+    // Determine the parametric equation for the rat from the point to the light
+    // P(t) = A * tV . . . A = point
+    Vector V, N;
+    vector_set(&V, l->position.val[0] - point->val[0], l->position.val[1] - point->val[1], l->position.val[2] - point->val[2]);
+    vector_calculateNormal(&N, &(plygn->vertex3D[0]), &(plygn->vertex3D[1]), &(plygn->vertex3D[2]));
+
+    // t can be any value from [0, 1]
+    return (0);
+}

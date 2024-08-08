@@ -4,6 +4,9 @@
         "cmath": "c",
         "stdlib.h": "c",
         "polygon.h": "c",
-        "graphics.h": "c"
+        "graphics.h": "c",
+        "stdbool.h": "c",
+        "vector.h": "c",
+        "drawstate.h": "c"
     }
 }

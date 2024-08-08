@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 	ds = drawstate_create();
 	// set up the drawstate
 	drawstate_setColor(ds, white);
-	ds->shade = ShadeGouraud;
+	ds->shade = ShadePhong;
 
 	// create a pyramid with user provided sides
 	scene = module_create();
