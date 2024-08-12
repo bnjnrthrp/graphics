@@ -26,7 +26,7 @@ _DEPS = Graphics.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables heree
-EXECUTABLES = test9a test9b test9c test9d test9e
+EXECUTABLES = test9a cubeTest
 
 # put a list of all the object files here for all executables (with .o endings)
 _OBJ = test5a.o debugTest5b.o
@@ -70,6 +70,8 @@ endif
 
 # put the specific executable rules here
 
+cubeTest: $(ODIR)/cubeTest.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 test9a: $(ODIR)/test9a.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 test9b: $(ODIR)/test9b.o

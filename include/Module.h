@@ -14,6 +14,9 @@
 #include "Point.h"
 #include "Polyline.h"
 #include "Polygon.h"
+#include "RayTracer.h"
+#include "Fractals.h"
+#include "View3D.h"
 
 /**
  * typedef enum to support polymorphism in what type of object the Element node holds.
@@ -100,6 +103,7 @@ void module_cube(Module *md, int solid);
 void module_cylinder(Module *md, int sides);
 void module_pyramid(Module *md, int sides);
 void module_sphere(Module *md, int resolution);
+void module_buildHeightMap(Module *md, DrawState *ds, int oldRows, int oldCols, double prevMap[oldRows][oldCols], int count, int maxIterations, double roughness);
 void module_terrain(Module *md, DrawState *ds, int iterations, double roughness);
 void module_fractalTriangle(Module *md, Point *A, Point *B, Point *C, int s, double r);
 void module_color(Module *md, Color *c);
@@ -110,5 +114,8 @@ void module_bezierCurve(Module *md, BezierCurve *b);
 void module_bezierSurface(Module *md, BezierSurface *b, int divisions, int solid);
 void module_addLight(Module *md, Lighting *light);
 void module_parseLighting(Module *md, Matrix *GTM, Lighting *lighting);
+void module_drawRay(Module *md, View3D *view, Matrix *VTM, Matrix *GTM, Lighting *lighting, DrawState *ds, RayTracer *rt, Image *src);
+void module_rayBuildDb(Module *md, Matrix *GTM, DrawState *ds, RayTracer *rt);
+Color module_rayIntersect(Lighting *l, DrawState *ds, Point *pt, Vector *Vij, RayTracer *rt, float beta);
 
 #endif // MODULE_H

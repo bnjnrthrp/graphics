@@ -485,6 +485,14 @@ void polygon_print(Polygon *p, FILE *fp)
             point_print(&(p->vertex[i]), fp);
         }
     }
+    if (p->normalPhong)
+    {
+        printf("Normals:\n");
+        for (int i = 0; i < p->nVertex; i++)
+        {
+            vector_print(&(p->normalPhong[i]), fp);
+        }
+    }
 }
 
 /**

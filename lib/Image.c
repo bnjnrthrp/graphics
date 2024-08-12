@@ -286,7 +286,8 @@ FPixel image_getf(Image *src, int r, int c)
     }
     if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
     {
-        return; // If the image set is out of the image, early return
+      FPixel empty = {{0.0, 0.0, 0.0}};
+        return empty; // If the image set is out of the image, early return
     }
     return src->data[r][c];
 };
@@ -308,7 +309,7 @@ float image_getc(Image *src, int r, int c, int b)
     }
     if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
     {
-        return; // If the image set is out of the image, early return
+        return 0.0; // If the image set is out of the image, early return
     }
     return src->data[r][c].rgb[b];
 };
@@ -516,7 +517,8 @@ Color image_getColor(Image *src, int r, int c)
 
     if (r < 0 || c < 0 || r >= src->rows || c >= src->cols)
     {
-        return; // If the image set is out of the image, early return
+      Color black = {{0.0, 0.0, 0.0}};
+        return black; // If the image set is out of the image, early return
     }
 
     Color color;

@@ -41,3 +41,30 @@ void matrix_setView3D(Matrix *vtm, View3D *view)
     matrix_scale2D(vtm, -view->screenx / (2 * d2), -view->screeny / (2 * d2)); // scale to image size, flip axes
     matrix_translate2D(vtm, view->screenx / 2, view->screeny / 2);             // translate image to center
 }
+
+void view_calculateCOP(Point *COP, Point *VRP, double d, Vector *VPN)
+{
+    if (!COP || !VRP || !VPN)
+    {
+        fprintf(stderr, "Invalid pointer provided to view_calculateCOP\n");
+        exit(-1);
+    }
+    // COP = VRP - d in direction of -VPN
+
+    // BAM have to normalize the VPN for this to work properly
+    Vector v;
+    vector_normalize(VPN);
+    vector_copy(&v, VPN);
+    vector_normalize(&v);
+    point_set3D(COP,
+                VRP->val[0] - d * v.val[0],
+                VRP->val[1] - d * v.val[1],
+                VRP->val[2] - d * v.val[2]);
+
+    printf("VPN: ");
+    vector_print(VPN, stdout);
+    printf("VRP: ");
+    vector_print(VRP, stdout);
+    printf("COP: ");
+    point_print(COP, stdout);
+}

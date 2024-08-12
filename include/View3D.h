@@ -20,5 +20,6 @@ typedef struct View3D
 } View3D;
 
 void matrix_setView3D(Matrix *vtm, View3D *view);
+void view_calculateCOP(Point *COP, Point *VRP, double d, Vector *VPN);
 
 #endif // VIEW3D_H

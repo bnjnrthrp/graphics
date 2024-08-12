@@ -40,4 +40,5 @@ void lighting_clear(Lighting *l);
 void lighting_add(Lighting *l, LightType type, Color *c, Vector *dir, Point *pos, float cutoff, float sharpness);
 void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
                       Color *Cs, float s, int oneSided, Color *c);
+void lighting_shadingSingle(Light *l, Vector *N, Vector *V, Point *p, Color *Cb, Color *Cs, float s, int oneSided, Color *c);
 #endif // LIGHTING_H

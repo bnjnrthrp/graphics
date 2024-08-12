@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include "Module.h"
-#include "Fractals.h"
 #define M_PI 3.14159265358979323846
 
 /**
@@ -452,6 +451,7 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
         switch (e->type)
         {
         case ObjBezier:
+        {
             Point cp[4], cpt[4];
             BezierCurve b;
             bezierCurve_init(&b);
@@ -468,7 +468,8 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             }
             bezierCurve_set(&b, cpt);
             bezierCurve_draw(&b, src, ds->color);
-            break;
+        }
+        break;
         case ObjColor:
             drawstate_setColor(ds, e->obj.color);
             break;
@@ -481,6 +482,7 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
         case ObjSurfaceCoeff:
             drawstate_setSurfaceCoeff(ds, e->obj.coeff);
         case ObjPoint:
+        {
             Point p, pt;
             point_copy(&p, &(e->obj.point));
             // Transform the point by each matrix, but alternate the destination to avoid
@@ -490,8 +492,10 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             matrix_xformPoint(VTM, &p, &pt);
             point_normalize(&pt);
             point_draw(&pt, src, ds->color);
-            break;
+        }
+        break;
         case ObjLine:
+        {
             Line line;
             line_copy(&line, &(e->obj.line));
             matrix_xformLine(&LTM, &line);
@@ -499,7 +503,8 @@ void module_draw(Module *md, Matrix *VTM, Matrix *GTM, DrawState *ds, Lighting *
             matrix_xformLine(VTM, &line);
             line_normalize(&line);
             line_draw(&line, src, ds->color);
-            break;
+        }
+        break;
         case ObjPolygon:
         {
             Polygon plygn;
@@ -699,11 +704,11 @@ void module_cube(Module *md, int solid)
     Point pt[5];
 
     // Bottom of cube
-    point_set3D(&pt[0], -0.5, -0.5, -0.5);
-    point_set3D(&pt[1], 0.5, -0.5, -0.5);
-    point_set3D(&pt[2], 0.5, -0.5, 0.5);
-    point_set3D(&pt[3], -0.5, -0.5, 0.5);
-    point_set3D(&pt[4], -0.5, -0.5, -0.5);
+    point_set3D(&pt[0], -1.0, -1.0, -1.0);
+    point_set3D(&pt[1], 1.0, -1.0, -1.0);
+    point_set3D(&pt[2], 1.0, -1.0, 1.0);
+    point_set3D(&pt[3], -1.0, -1.0, 1.0);
+    point_set3D(&pt[4], -1.0, -1.0, -1.0);
 
     if (solid == 0)
     {
@@ -715,47 +720,47 @@ void module_cube(Module *md, int solid)
         module_polyline(md, &p);
 
         // Top of cube
-        point_set3D(&pt[0], -0.5, 0.5, -0.5);
-        point_set3D(&pt[1], 0.5, 0.5, -0.5);
-        point_set3D(&pt[2], 0.5, 0.5, 0.5);
-        point_set3D(&pt[3], -0.5, 0.5, 0.5);
-        point_set3D(&pt[4], -0.5, 0.5, -0.5);
+        point_set3D(&pt[0], -1.0, 1.0, -1.0);
+        point_set3D(&pt[1], 1.0, 1.0, -1.0);
+        point_set3D(&pt[2], 1.0, 1.0, 1.0);
+        point_set3D(&pt[3], -1.0, 1.0, 1.0);
+        point_set3D(&pt[4], -1.0, 1.0, -1.0);
         polyline_set(&p, 5, pt);
         module_polyline(md, &p);
 
         // back of cube
-        point_set3D(&pt[0], -0.5, -0.5, -0.5);
-        point_set3D(&pt[1], 0.5, -0.5, -0.5);
-        point_set3D(&pt[2], 0.5, 0.5, -0.5);
-        point_set3D(&pt[3], -0.5, 0.5, -0.5);
-        point_set3D(&pt[4], -0.5, -0.5, -0.5);
+        point_set3D(&pt[0], -1.0, -1.0, -1.0);
+        point_set3D(&pt[1], 1.0, -1.0, -1.0);
+        point_set3D(&pt[2], 1.0, 1.0, -1.0);
+        point_set3D(&pt[3], -1.0, 1.0, -1.0);
+        point_set3D(&pt[4], -1.0, -1.0, -1.0);
         polyline_set(&p, 5, pt);
         module_polyline(md, &p);
 
         // Front of cube
-        point_set3D(&pt[0], -0.5, -0.5, 0.5);
-        point_set3D(&pt[1], 0.5, -0.5, 0.5);
-        point_set3D(&pt[2], 0.5, 0.5, 0.5);
-        point_set3D(&pt[3], -0.5, 0.5, 0.5);
-        point_set3D(&pt[4], -0.5, -0.5, 0.5);
+        point_set3D(&pt[0], -1.0, -1.0, 1.0);
+        point_set3D(&pt[1], 1.0, -1.0, 1.0);
+        point_set3D(&pt[2], 1.0, 1.0, 1.0);
+        point_set3D(&pt[3], -1.0, 1.0, 1.0);
+        point_set3D(&pt[4], -1.0, -1.0, 1.0);
         polyline_set(&p, 5, pt);
         module_polyline(md, &p);
 
         // right face of cube
-        point_set3D(&pt[0], 0.5, -0.5, -0.5);
-        point_set3D(&pt[1], 0.5, -0.5, 0.5);
-        point_set3D(&pt[2], 0.5, 0.5, 0.5);
-        point_set3D(&pt[3], 0.5, 0.5, -0.5);
-        point_set3D(&pt[4], 0.5, -0.5, -0.5);
+        point_set3D(&pt[0], 1.0, -1.0, -1.0);
+        point_set3D(&pt[1], 1.0, -1.0, 1.0);
+        point_set3D(&pt[2], 1.0, 1.0, 1.0);
+        point_set3D(&pt[3], 1.0, 1.0, -1.0);
+        point_set3D(&pt[4], 1.0, -1.0, -1.0);
         polyline_set(&p, 5, pt);
         module_polyline(md, &p);
 
         // // left face of cube
-        point_set3D(&pt[0], -0.5, -0.5, -0.5);
-        point_set3D(&pt[1], -0.5, -0.5, 0.5);
-        point_set3D(&pt[2], -0.5, 0.5, 0.5);
-        point_set3D(&pt[3], -0.5, 0.5, -0.5);
-        point_set3D(&pt[4], -0.5, -0.5, -0.5);
+        point_set3D(&pt[0], -1.0, -1.0, -1.0);
+        point_set3D(&pt[1], -1.0, -1.0, 1.0);
+        point_set3D(&pt[2], -1.0, 1.0, 1.0);
+        point_set3D(&pt[3], -1.0, 1.0, -1.0);
+        point_set3D(&pt[4], -1.0, -1.0, -1.0);
         polyline_set(&p, 5, pt);
         module_polyline(md, &p);
 
@@ -768,93 +773,100 @@ void module_cube(Module *md, int solid)
         polygon_init(&p);
 
         // Top of cube
-        point_set3D(&pt[0], -0.5, 0.5, -0.5);
-        point_set3D(&pt[1], -0.5, 0.5, 0.5);
-        point_set3D(&pt[2], 0.5, 0.5, 0.5);
-        point_set3D(&pt[3], 0.5, 0.5, -0.5);
+        point_set3D(&pt[0], -1.0, 1.0, -1.0);
+        point_set3D(&pt[1], -1.0, 1.0, 1.0);
+        point_set3D(&pt[2], 1.0, 1.0, 1.0);
+        point_set3D(&pt[3], 1.0, 1.0, -1.0);
         polygon_set(&p, 4, pt);
         for (int i = 0; i < 4; i++)
         {
             vector_set(&N[i], 0, 1, 0);
         }
         polygon_setNormals(&p, 4, N);
+        polygon_setNormalsPhong(&p, 4, N);
         module_polygon(md, &p);
 
         // back of cube
-        point_set3D(&pt[0], -0.5, -0.5, -0.5);
-        point_set3D(&pt[1], 0.5, -0.5, -0.5);
-        point_set3D(&pt[2], 0.5, 0.5, -0.5);
-        point_set3D(&pt[3], -0.5, 0.5, -0.5);
+        point_set3D(&pt[0], -1.0, -1.0, -1.0);
+        point_set3D(&pt[1], 1.0, -1.0, -1.0);
+        point_set3D(&pt[2], 1.0, 1.0, -1.0);
+        point_set3D(&pt[3], -1.0, 1.0, -1.0);
         polygon_set(&p, 4, pt);
         for (int i = 0; i < 4; i++)
         {
             vector_set(&N[i], 0, 0, -1);
         }
         polygon_setNormals(&p, 4, N);
+        polygon_setNormalsPhong(&p, 4, N);
         // module_rotateX(md, 0.0, 1.0);
         module_polygon(md, &p);
 
         // Bottom of cube
-        point_set3D(&pt[0], -0.5, -0.5, 0.5);
-        point_set3D(&pt[1], 0.5, -0.5, 0.5);
-        point_set3D(&pt[2], 0.5, -0.5, -0.5);
-        point_set3D(&pt[3], -0.5, -0.5, -0.5);
+        point_set3D(&pt[0], -1.0, -1.0, 1.0);
+        point_set3D(&pt[1], 1.0, -1.0, 1.0);
+        point_set3D(&pt[2], 1.0, -1.0, -1.0);
+        point_set3D(&pt[3], -1.0, -1.0, -1.0);
         polygon_set(&p, 4, pt);
         for (int i = 0; i < 4; i++)
         {
             vector_set(&N[i], 0, -1, 0);
         }
         polygon_setNormals(&p, 4, N);
+        polygon_setNormalsPhong(&p, 4, N);
         // module_polygon(md, &p);
         // module_rotateX(md, 0.0, 1.0);
         module_polygon(md, &p);
 
         // // Front of cube
-        point_set3D(&pt[0], -0.5, 0.5, 0.5);
-        point_set3D(&pt[1], 0.5, 0.5, 0.5);
-        point_set3D(&pt[2], 0.5, -0.5, 0.5);
-        point_set3D(&pt[3], -0.5, -0.5, 0.5);
+        point_set3D(&pt[0], -1.0, 1.0, 1.0);
+        point_set3D(&pt[1], 1.0, 1.0, 1.0);
+        point_set3D(&pt[2], 1.0, -1.0, 1.0);
+        point_set3D(&pt[3], -1.0, -1.0, 1.0);
         polygon_set(&p, 4, pt);
         for (int i = 0; i < 4; i++)
         {
             vector_set(&N[i], 0, 0, 1);
         }
         polygon_setNormals(&p, 4, N);
+        polygon_setNormalsPhong(&p, 4, N);
         // module_polygon(md, &p);
         // module_rotateX(md, 0.0, 1.0);
         module_polygon(md, &p);
 
         // // right face of cube
-        point_set3D(&pt[0], 0.5, 0.5, 0.5);
-        point_set3D(&pt[1], 0.5, 0.5, -0.5);
-        point_set3D(&pt[2], 0.5, -0.5, -0.5);
-        point_set3D(&pt[3], 0.5, -0.5, 0.5);
+        point_set3D(&pt[0], 1.0, 1.0, 1.0);
+        point_set3D(&pt[1], 1.0, 1.0, -1.0);
+        point_set3D(&pt[2], 1.0, -1.0, -1.0);
+        point_set3D(&pt[3], 1.0, -1.0, 1.0);
         polygon_set(&p, 4, pt);
         for (int i = 0; i < 4; i++)
         {
             vector_set(&N[i], 1, 0, 0);
         }
         polygon_setNormals(&p, 4, N);
+        polygon_setNormalsPhong(&p, 4, N);
         // module_polygon(md, &p);
         // module_rotateY(md, 0.0, 1.0);
         module_polygon(md, &p);
 
         // // // left face of cube
-        point_set3D(&pt[0], -0.5, 0.5, -0.5);
-        point_set3D(&pt[1], -0.5, 0.5, 0.5);
-        point_set3D(&pt[2], -0.5, -0.5, 0.5);
-        point_set3D(&pt[3], -0.5, -0.5, -0.5);
+        point_set3D(&pt[0], -1.0, 1.0, -1.0);
+        point_set3D(&pt[1], -1.0, 1.0, 1.0);
+        point_set3D(&pt[2], -1.0, -1.0, 1.0);
+        point_set3D(&pt[3], -1.0, -1.0, -1.0);
         polygon_set(&p, 4, pt);
         for (int i = 0; i < 4; i++)
         {
             vector_set(&N[i], -1, 0, 0);
         }
         polygon_setNormals(&p, 4, N);
+        polygon_setNormalsPhong(&p, 4, N);
         // module_polygon(md, &p);
         // module_rotateY(md, -1.0, 0.0);
         module_polygon(md, &p);
 
         polygon_clear(&p);
+        printf("Setting the cube\n");
     }
 }
 
@@ -1107,6 +1119,198 @@ void module_pyramid(Module *md, int sides)
 }
 
 /**
+ * Builds a heightmap on a 1 x 1 grid that will be subdivided a given number of times. Adds a perturbation to each midpoint as it subdivides
+ *
+ * @param md the module to add the terrain submap to
+ * @param prevMap The 2D matrix with the previous iteration's height values
+ * @param count the current iteration number
+ * @param maxIterations the total number of iterations desired
+ * @param roughness the roughness factor for calculating the size of the perturbations
+ */
+void module_buildHeightMap(Module *md, DrawState *ds, int oldRows, int oldCols, double prevMap[oldRows][oldCols], int count, int maxIterations, double roughness)
+{
+    int i, j, newRows, newCols;
+    double x1, x2, y, z1, z2, prev, next, avgHeight;
+    Point pt[4];
+    Polygon p;
+    Vector N[3];
+    Color White, Green, Blue, Brown, LtGrey, DkGrey, LtGreen, LtBlue;
+
+    color_set(&White, 1.0, 1.0, 1.0);
+    color_set(&Blue, 0.0, 0.0, 0.7);
+    color_set(&LtBlue, 0.05, .05, 0.75);
+    color_set(&Green, 0.15, .5, 0.15);
+    color_set(&LtGreen, 0.2, .55, 0.20);
+    color_set(&Brown, 0.55, 0.35, 0.0);
+    color_set(&LtGrey, .8, .8, .8);
+    color_set(&DkGrey, .3, .3, .3);
+
+    if (!md || !prevMap || maxIterations < 0)
+    {
+        fprintf(stderr, "Invalid pointer provided to buildHeightMap\n");
+        exit(-1);
+    }
+
+    // Base case: if iterations == count, then we're ready to draw
+    if (count == maxIterations)
+    {
+        // Initialize the polygon for drawing
+        polygon_init(&p);
+
+        // Iterate through the matrix and create the points
+        for (i = 0; i < oldRows - 1; i++)
+        {
+            for (j = 0; j < oldCols - 1; j++)
+            {
+                // x value becomes the index / cols and z value is z / rows. Builds a triangle mesh 2 triangles at a time
+                // y Value is determined by the matrix at that position
+                x1 = (double)j / (double)oldCols;
+                x2 = (double)(j + 1) / (double)oldCols;
+                z1 = (double)i / (double)oldRows;
+                z2 = (double)(i + 1) / (double)oldRows;
+                point_set3D(&pt[0], x1, prevMap[i][j], z1);
+                point_set3D(&pt[1], x2, prevMap[i][j + 1], z1);
+                point_set3D(&pt[2], x1, prevMap[i + 1][j], z2);
+                point_set3D(&pt[3], x2, prevMap[i + 1][j + 1], z2);
+
+                avgHeight = (pt[0].val[1] + pt[1].val[1] + pt[2].val[1] + pt[3].val[1]) / 4.0;
+
+                if (avgHeight > .4)
+                {
+                    module_color(md, &LtBlue);
+                    module_bodyColor(md, &White);
+                    module_surfaceColor(md, &LtGrey);
+                    module_surfaceCoeff(md, 1);
+                }
+                else if (avgHeight > 0.2)
+                {
+                    module_color(md, &Brown);
+                    module_bodyColor(md, &Brown);
+                    module_surfaceColor(md, &Brown);
+                    module_surfaceCoeff(md, 1);
+                }
+                else if (avgHeight > 0.0)
+                {
+                    module_color(md, &Green);
+                    module_bodyColor(md, &Green);
+                    module_surfaceColor(md, &Green);
+                    module_surfaceCoeff(md, 1);
+                }
+                else
+                {
+                    module_color(md, &Blue);
+                    module_bodyColor(md, &Blue);
+                    module_surfaceColor(md, &Blue);
+                    module_surfaceCoeff(md, 1);
+                }
+                // Add triangles to the module
+                polygon_set(&p, 3, &pt[0]);
+                // Points are named in a Z shape, so calculate normals similarly
+                vector_calculateNormal(&N[0], &pt[1], &pt[0], &pt[2]);
+                vector_calculateNormal(&N[1], &pt[0], &pt[1], &pt[2]);
+                vector_calculateNormal(&N[2], &pt[1], &pt[2], &pt[0]);
+                for (int i = 0; i < 3; i++)
+                {
+                    vector_normalize(&N[i]);
+                }
+                // printf("Normal is: ");
+                // vector_print(&N[0], stdout);
+                polygon_setNormals(&p, 3, N);
+                module_polygon(md, &p);
+
+                polygon_set(&p, 3, &pt[1]);
+                vector_calculateNormal(&N[0], &pt[2], &pt[1], &pt[3]);
+                vector_calculateNormal(&N[1], &pt[3], &pt[2], &pt[1]);
+                vector_calculateNormal(&N[2], &pt[1], &pt[3], &pt[2]);
+                for (int i = 0; i < 3; i++)
+                {
+                    vector_normalize(&N[i]);
+                }
+                polygon_setNormals(&p, 3, N);
+                module_polygon(md, &p);
+            }
+        }
+        // Cleanup
+        polygon_clear(&p);
+    }
+    else
+    {
+        count++; // Increase the counter for this cycle
+        // Calculate the size of the expanded height map
+        newRows = newCols = pow(2, count) + 1;
+        // Initialize a new height map with the expanded size
+        double newMap[newRows][newCols];
+        for (i = 0; i < newRows; i++)
+        {
+            for (j = 0; j < newCols; j++)
+            {
+                newMap[i][j] = 0;
+            }
+        }
+
+        // Copy the values from the old heightmap to the new one
+        for (i = 0; i < oldRows; i++)
+        {
+            for (j = 0; j < oldCols; j++)
+            {
+                newMap[2 * i][2 * j] = prevMap[i][j];
+            }
+        }
+
+        // Loop through new map now, and interpolate the height values that remain in each row first
+        /**
+         *  **Note - the values changing from 0 to something will have a random perturbation factor added in
+         *  old map     new map         first pass      second pass
+         *  1 3 1       1 0 3 0 1       1 2 3 2 1       1 2 3 2 1
+         *  3 5 3   ->  0 0 0 0 0   ->  0 0 0 0 0  ->   2 3 4 3 2
+         *  1 3 1       3 0 5 0 3       3 4 5 4 3       3 4 5 4 3
+         *              0 0 0 0 0       0 0 0 0 0       2 3 4 3 2
+         *              1 0 3 0 1       1 2 3 2 1       1 2 3 2 1
+         */
+        for (i = 0; i < newRows; i = i + 2)
+        {
+            for (j = 0; j < newCols; j++)
+            {
+                if (newMap[i][j] == 0)
+                {
+                    prev = newMap[i][j - 1];
+                    next = newMap[i][j + 1];
+
+                    // Perturb the value between these two and then insert the data
+                    y = average(prev, next);
+                    y = perturb(y, roughness, count);
+
+                    newMap[i][j] = y;
+                }
+            }
+        }
+
+        // Repeat loop in the remaining rows to fill the zeroes, interpolate from the
+        // upper and lower values and perturb
+        for (i = 1; i < newRows - 1; i = i + 2)
+        {
+            for (j = 0; j < newCols; j++)
+            {
+                // Perturb the value between these two and then insert the data
+                if (newMap[i][j] == 0)
+                {
+                    prev = newMap[i - 1][j];
+                    next = newMap[i + 1][j];
+
+                    // Perturb the value between these two and then insert the data
+                    y = average(prev, next);
+
+                    y = perturb(y, roughness, count);
+                    newMap[i][j] = y;
+                }
+            }
+        }
+        // Recursively call the heightmap again, with the new count and map
+        module_buildHeightMap(md, ds, newRows, newCols, newMap, count, maxIterations, roughness);
+    }
+}
+
+/**
  * Builds a fractal landscape using a height map and a pseudo- diamond-square algorithm to generate the subsequent heights.
  */
 void module_terrain(Module *md, DrawState *ds, int iterations, double roughness)
@@ -1129,7 +1333,7 @@ void module_terrain(Module *md, DrawState *ds, int iterations, double roughness)
         }
     }
     // Begin the recursion loop
-    buildHeightMap(md, ds, 2, 2, heightMap, 0, iterations, roughness);
+    module_buildHeightMap(md, ds, 2, 2, heightMap, 0, iterations, roughness);
 }
 
 /**
@@ -1397,5 +1601,315 @@ void module_parseLighting(Module *md, Matrix *GTM, Lighting *lighting)
             matrix_xformVector(GTM, &v, &tmp.direction);
         }
         e = e->next;
+    }
+}
+
+/**
+ * Draw the module using a ray tracer for hidden surface removal, shadows
+ *
+ * @param md the module to draw
+ * @param GTM the global transformation matrix
+ * @param lighting the lighting struct
+ * @param ds the drawstate
+ * @param rt the ray tracer struct
+ */
+void module_drawRay(Module *md, View3D *view, Matrix *VTM, Matrix *GTM, Lighting *lighting, DrawState *ds, RayTracer *rt, Image *src)
+{
+    if (!md || !VTM || !GTM || !lighting || !ds || !rt || !src)
+    {
+        fprintf(stderr, "Null pointer sent to module_drawRay\n");
+        exit(-1);
+    }
+    int i, row, col;
+    Vector Vij, U, dU, dUperCol, dV, dVperRow;
+    Point COP, Pij, Pij2, ul, ur, ll, lr; // upper left, upper right, lower left, lower right of View Plane
+    Color color;
+    double u, v, uStep, vStep;
+
+    printf("building the database\n\n");
+    module_rayBuildDb(md, GTM, ds, rt); // First pass to build the polygon database
+    printf("Build complete. Polygons: %d, Max: %d\n\n", rt->size, rt->max);
+    polygon_print(&(rt->db[0]), stdout);
+
+    // Calculate the COP
+    view_calculateCOP(&COP, &view->vrp, view->d, &view->vpn);
+    printf("COP is: ");
+    vector_print(&COP, stdout);
+
+    vector_normalize(&view->vpn);
+    vector_normalize(&view->vup);
+    vector_cross(&(view->vup), &(view->vpn), &U);
+    vector_normalize(&U);
+
+    // Determine 4 points of View Plane in world coordinates
+    for (i = 0; i < 3; i++)
+    {
+        // Point = VRP - du/2 * U + dv/2 * VUP
+        ul.val[i] = view->vrp.val[i] + 0.5 * U.val[i] * view->du + 0.5 * view->vup.val[i] * view->dv;
+        ur.val[i] = view->vrp.val[i] - 0.5 * U.val[i] * view->du + 0.5 * view->vup.val[i] * view->dv;
+        ll.val[i] = view->vrp.val[i] + 0.5 * U.val[i] * view->du - 0.5 * view->vup.val[i] * view->dv;
+        lr.val[i] = view->vrp.val[i] - 0.5 * U.val[i] * view->du - 0.5 * view->vup.val[i] * view->dv;
+        Pij.val[i] = view->vrp.val[i] - 0.5 * U.val[i] * view->du + .5 * view->vup.val[i] * view->dv;
+    }
+
+    // printf("U is at: ");
+    // vector_print(&U, stdout);
+    // printf("first pixel is at: ");
+    // point_print(&Pij, stdout);
+    printf("upper left: ");
+    point_print(&ul, stdout);
+    printf("upper right: ");
+    point_print(&ur, stdout);
+    printf("lower left: ");
+    point_print(&ll, stdout);
+    printf("lower right: ");
+    point_print(&lr, stdout);
+
+    /**
+     * bilateral interpolation
+     *
+     *  P(uv) = (1-u)[(1-v)LL+(v)UL]+(u)[(1-v)LR+(v)UR]
+     */
+
+    vector_copy(&dU, &U);
+    vector_multiplyScalar(&dU, view->du);
+    vector_multiplyScalar(&dU, (1.0 / (float)src->cols)); // pre-scale dU to be per column
+    vector_copy(&dUperCol, &dU);
+
+    vector_copy(&dV, &view->vup);
+    vector_multiplyScalar(&dV, view->dv);
+    vector_multiplyScalar(&dV, (1.0 / (float)src->rows));
+    vector_copy(&dVperRow, &dV);
+
+    u = v = 0.0;
+    uStep = 1.0 / src->cols;
+    vStep = 1.0 / src->rows;
+
+    point_copy(&Pij, &ul);
+    // printf("First point: ");
+    // point_print(&Pij, stdout);
+
+    // for (row = 0; row < src->rows; row++)
+    // {
+    //     v = vStep * row;
+    //     for (col = 0; col < src->cols; col++)
+    //     {
+    for (row = src->rows / 2 - 10; row < src->rows / 2 + 10; row++)
+    {
+        v = vStep * row;
+        for (col = src->cols / 2 - 10; col < src->cols / 2 + 10; col++)
+        {
+            u = uStep * col;
+            // Calculate where the ray intersects view plane. We know VUP, VPN, can calculate U. Know du and dv (view)
+            for (int k = 0; k < 3; k++)
+            {
+
+                Pij.val[k] = ul.val[k] - (col * dUperCol.val[k]) - (row * dVperRow.val[k]);
+
+                Pij2.val[k] = (1 - u) * ((1 - v) * ul.val[k] + v * ll.val[k]) + u * ((1 - v) * ur.val[k] + v * lr.val[k]);
+            }
+            printf("Point 1: ");
+            point_print(&Pij, stdout);
+            printf("Point 2: ");
+            point_print(&Pij2, stdout);
+            // point_print(&Pij, stdout);
+            vector_setPoints(&Vij, &COP, &Pij2); // Determine the vector of the ray going through the view plane
+            vector_normalize(&Vij);
+            // vector_print(&Vij, stdout);
+
+            color = module_rayIntersect(lighting, ds, &COP, &Vij, rt, 1.0);
+            // color_set(&color, 1, 1, 1);
+            image_setColor(src, row, col, color);
+        }
+    }
+
+    // point_copy(&Pij, &view->vrp);
+    // vector_setPoints(&Vij, &COP, &Pij);
+    // color = module_rayIntersect(&COP, &Vij, rt, 1.0);
+    // printf("Final point: ");
+    // point_print(&Pij, stdout);
+}
+
+/**
+ * Driver for the ray tracing program from the COP to the scene. Determines visibility, lighting, and shadows. Returns the color of the specific pixel
+ */
+Color module_rayIntersect(Lighting *l, DrawState *ds, Point *pt, Vector *Vij, RayTracer *rt, float beta)
+{
+    if (!l || !ds || !Vij || !rt)
+    {
+        fprintf(stderr, "Null pointer sent to module_rayIntersect\n");
+        exit(-1);
+    }
+    int i;
+    double t, lt;
+    double cutoff = .01;
+    Color c;
+    Color black, white;
+    Polygon *p, *lp;
+    Vector N, L, V;
+    Point pIntersect, lIntersect;
+    Color Cb = ds->body;
+
+    color_set(&black, 0.0, 0.0, 0.0);
+    color_set(&white, 1.0, 1.0, 1.0);
+    // printf("Entering ray intersect\n");
+    if (beta < cutoff)
+    {
+        printf("cutoff reached\n");
+        return black;
+    }
+    p = rayTracer_closestPolygon(pt, rt, Vij, &pIntersect);
+
+    if (!p)
+    { // No intersection, return background color
+        printf("No polygon\n");
+        return black;
+    }
+    else
+    {
+        printf("Polygon hit: ");
+        polygon_print(p, stdout);
+        printf("Intersects at: ");
+        point_print(&pIntersect, stdout);
+        return white;
+        // exit(-1);
+    }
+
+    vector_calculateNormal(&N, &(p->vertex3D[0]), &pIntersect, &(p->vertex3D[1]));
+    vector_normalize(&N);
+    // printf("normal is: ");
+    // vector_print(&N, stdout);
+    color_copy(&c, &black);
+
+    // printf("closest polygon is: ");
+    // polygon_print(p, stdout);
+
+    for (i = 0; i < l->nLights; i++)
+    {
+        // Determine if ambient or point
+        if (l->light[i].type == LightAmbient)
+        {
+            c.c[0] += l->light[i].color.c[0] * Cb.c[0];
+            c.c[1] += l->light[i].color.c[1] * Cb.c[1];
+            c.c[2] += l->light[i].color.c[2] * Cb.c[2];
+            // printf("Adding ambient component %.2f %.2f %.2f\n", c.c[0], c.c[1], c.c[2]);
+            continue; // Go to next loop
+        }
+        else if (l->light[i].type == LightPoint)
+        {
+            // Cast a ray to the light
+            vector_setPoints(&L, &pIntersect, &(l->light[i].position));
+            // vector_normalize(&L);
+            // Calculate t
+            t = ray_calculateT(&pIntersect, &(l->light[i].position), &L);
+            // Intersect the ray with each polygon in the scene, put the result in lIntersect
+            lp = rayTracer_closestPolygon(&pIntersect, rt, &L, &lIntersect);
+            // printf("\n\nlp: ");
+            // polygon_print(lp, stdout);
+            lt = ray_calculateT(&pIntersect, &lIntersect, &L); // Calculate the t value to the nearest polygon
+            // printf("About to enter shading calc\n");
+            // If no polygon returned, or t of the polygon > t to the light, light is visible
+            if (lt - .5 > 0 && lt < t)
+            {
+                // printf("\n\nlight blocked by: \n");
+                // polygon_print(lp, stdout);
+                // printf("lt: %.5f\n", lt);
+                // printf("t: %.5f\n", t);
+                // exit(-1);
+                // If intersects between the point and the light, light is blocked
+                // Otherwise, add contributions of the light
+                continue;
+            }
+            // printf("Light is visible\n");
+            // polygon_print(p, stdout);
+            // printf("light intersect point: ");
+            // point_print(&pIntersect, stdout);
+            // exit(-1);
+            vector_setPoints(&V, &(ds->viewer), &pIntersect); // get the view vector
+            lighting_shadingSingle(&(l->light[i]), &N, &V, &pIntersect, &(ds->body), &(ds->surface), ds->surfaceCoeff, p->oneSided, &c);
+            // printf("Adding component %.2f %.2f %.2f\n", c.c[0], c.c[1], c.c[2]);
+            // printf("\n\nlight position: ");
+            // point_print(&l->light[i].position, stdout);
+            // printf("view intersect point: ");
+            // point_print(&pIntersect, stdout);
+            // printf("on polygon: ");
+            // polygon_print(p, stdout);
+            // printf("light vector: ");
+            // vector_print(&L, stdout);
+            // printf("Intersects at: ");
+            // point_print(&lIntersect, stdout);
+            // printf("t value: %.5f: ", ray_calculateT(&pIntersect, &lIntersect, &L));
+        }
+    }
+    printf("Final value at pixel %.2f, %.2f, %.2f\n", c.c[0], c.c[1], c.c[2]);
+    return c;
+}
+
+/**
+ * Builds a polygon database in world coordinates to use in the ray tracer draw program
+ *
+ * @param md the module to draw
+ * @param GTM the global transformation matrix
+ * @param rt the ray tracer struct that will hold the database
+ */
+void module_rayBuildDb(Module *md, Matrix *GTM, DrawState *ds, RayTracer *rt)
+{
+    if (!md || !GTM || !rt)
+    {
+        fprintf(stderr, "Null pointer sent to module_rayBuildDb\n");
+        exit(-1);
+    }
+
+    Matrix LTM;
+    matrix_identity(&LTM);
+
+    // int i = 0;
+    Element *e = md->head;
+    while (e)
+    {
+        // printf("element number %d\n", i);
+        switch (e->type)
+        {
+        case ObjModule:
+        {
+            // printf("type: Module\n");
+            Matrix TM;
+            DrawState tempDS;
+            drawstate_copy(&tempDS, ds);
+            matrix_multiply(GTM, &LTM, &TM);
+            module_rayBuildDb(e->obj.module, &TM, &tempDS, rt);
+            break;
+        }
+        case ObjMatrix:
+        {
+            // printf("type: Matrix\n");
+            matrix_multiply(&(e->obj.matrix), &LTM, &LTM);
+            break;
+        }
+        case ObjIdentity:
+        {
+            // printf("type: identity\n");
+            matrix_identity(&LTM);
+            break;
+        }
+        case ObjPolygon:
+        {
+            // printf("type: polygon\n");
+            Polygon p;
+            polygon_init(&p);
+            polygon_copy(&p, &(e->obj.polygon));
+            matrix_xformPolygon(&LTM, &p);
+            matrix_xformPolygon(GTM, &p);
+            polygon_setVertex3D(&p, p.nVertex, p.vertex); // for Phong Shading
+            polygon_setNormalsPhong(&p, p.nVertex, p.normal);
+            rayTracer_add(rt, &p);
+            break;
+        }
+        default:
+            printf("Other\n");
+            break;
+        }
+        e = e->next;
+        // i++;
     }
 }

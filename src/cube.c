@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     view.screenx = 360;
     view.screeny = 360;
 
-    matrix_setView3D(&vtm, &view);
+    // matrix_setView3D(&vtm, &view);
     matrix_identity(&gtm);
 
     cubeFrame = module_create();

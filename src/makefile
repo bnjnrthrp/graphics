@@ -32,7 +32,7 @@ _DEPS = Graphics.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = cube terrain sphere
+EXECUTABLES = cube terrain sphere terrainFlying
 
 # put a list of all the object files here for all executables (with .o endings)
 _OBJ = cube.o terrain.o sphere.o
@@ -57,6 +57,10 @@ all:
 
 
 # put the specific executable rules here
+
+
+terrainFlying: $(ODIR)/terrainFlying.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 terrain: $(ODIR)/terrain.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)

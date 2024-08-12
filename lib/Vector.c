@@ -25,6 +25,61 @@ void vector_set(Vector *v, double x, double y, double z)
 }
 
 /**
+ * Calculates the vector from one point to another. Calculates as v = dest - src
+ *
+ * @param v the resultant vector
+ * @param src the source point
+ * @param dest the destination point
+ */
+void vector_setPoints(Vector *v, Point *src, Point *dest)
+{
+    if (!v || !src || !dest)
+    {
+        fprintf(stderr, "Invalid pointer was provided to vector_setPoints\n");
+        exit(-1);
+    }
+    v->val[0] = dest->val[0] - src->val[0];
+    v->val[1] = dest->val[1] - src->val[1];
+    v->val[2] = dest->val[2] - src->val[2];
+    v->val[3] = 0.0;
+}
+
+/**
+ * Calculates the end point given by the parametric equation of a line.
+ * @param A the anchor point
+ * @param t the distance to travel down the vector
+ * @param V the vector to travel
+ * @param p the resulting point
+ */
+void vector_calcParametric(Point *A, double t, Vector *V, Point *p)
+{
+    // Update this and fix the equation
+    // p = A + tV
+    if (!A || !V || !p)
+    {
+        fprintf(stderr, "Invalid pointer provided to vector_calcParametric\n");
+        exit(-1);
+    }
+    point_set3D(p, A->val[0] + t * V->val[0], A->val[1] + t * V->val[1], A->val[2] + t * V->val[2]);
+}
+
+/**
+ * Multiplies a vector by a scalar value
+ */
+void vector_multiplyScalar(Vector *v, double scalar)
+{
+    if (!v)
+    {
+        fprintf(stderr, "Invalid pointer provided to vector_multiplyScalar\n");
+        exit(-1);
+    }
+
+    v->val[0] *= scalar;
+    v->val[1] *= scalar;
+    v->val[2] *= scalar;
+}
+
+/**
  * Prints the vector out to the desired stream
  * @param v the vector
  * @param fp the output stream
@@ -73,6 +128,9 @@ double vector_length(Vector *v)
     return sqrt(v->val[0] * v->val[0] + v->val[1] * v->val[1] + v->val[2] * v->val[2]);
 }
 
+/**
+ * Subtracts vector a from b and puts the result in c
+ */
 void vector_subtract(Vector *a, Vector *b, Vector *c)
 {
     if (!a || !b || !c)
