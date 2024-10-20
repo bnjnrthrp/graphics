@@ -15,12 +15,8 @@ int main(int argc, char *argv[])
     Module *scene;
     DrawState *ds;
     Image *src;
-    Color Blue, White;
+    Color Blue;
 
-    Lighting *light;
-    Point lpos;
-
-    color_set(&White, 1.0, 1.0, 1.0);
     color_set(&Blue, 0, 0, 1);
     // set up the view
     point_set3D(&(view.vrp), 2, 3, 15);
@@ -36,6 +32,7 @@ int main(int argc, char *argv[])
 
     matrix_setView3D(&vtm, &view);
     matrix_identity(&gtm);
+    point_copy(&(ds->viewer), &(view.vrp));
 
     cubeFrame = module_create();
     module_color(cubeFrame, &Blue);
@@ -61,17 +58,10 @@ int main(int argc, char *argv[])
     // Create the image and drawstate
     src = image_create(360, 360);
     ds = drawstate_create();
-    ds->shade = ShadePhong;
+    ds->shade = ShadeFrame;
     drawstate_setColor(ds, Blue);
-    point_copy(&(ds->viewer), &(view.vrp));
 
-    // module_draw(scene, &vtm, &gtm, ds, NULL, src);
-
-    light = lighting_create();
-    lighting_add(light, LightPoint, &White, NULL, &(view.vrp), 0, 0);
-
-    RayTracer *rt = rayTracer_create();
-    module_drawRay(scene, &view, &vtm, &gtm, light, ds, rt, src);
+    module_draw(scene, &vtm, &gtm, ds, NULL, src);
 
     // Write out the image
     image_write(src, "cube.ppm");

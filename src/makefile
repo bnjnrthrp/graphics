@@ -59,6 +59,9 @@ all:
 # put the specific executable rules here
 
 
+cube: $(ODIR)/cube.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
 terrainFlying: $(ODIR)/terrainFlying.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 

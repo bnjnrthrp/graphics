@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
 	DrawState *ds;
 	Lighting *light;
 	Module *scene;
+	Module *sphere;
 	View3D view;
 	Matrix VTM, GTM;
 	int divisions = 12;
@@ -43,11 +44,31 @@ int main(int argc, char *argv[])
 	// ds->shade = ShadeGouraud;
 	ds->shade = ShadePhong;
 
+	// set up the view
+	point_set3D(&(view.vrp), 1.0, 0.7, 5.0);
+	vector_set(&(view.vpn), -1.0, -0.7, -5.0);
+	vector_set(&(view.vup), 0.0, 1.0, 0.0);
+	view.d = 1.0;
+	view.du = 1.0;
+	view.dv = 1.0 * rows / cols;
+	view.screeny = rows;
+	view.screenx = cols;
+	view.f = 0.0;
+	view.b = 15.0;
+
+	matrix_setView3D(&VTM, &view);
+	matrix_identity(&GTM);
+	point_copy(&(ds->viewer), &(view.vrp));
+
+	matrix_print(&VTM, stdout);
+
 	// create a pyramid with user provided sides
+	scene = module_create();
+
 	scene = module_create();
 	module_bodyColor(scene, &blue);
 	module_surfaceColor(scene, &white);
-	module_surfaceCoeff(scene, 1.5);
+	module_surfaceCoeff(scene, 5.0);
 	module_scale(scene, 0.7, 0.7, 0.7);
 	module_sphere(scene, divisions);
 
@@ -71,26 +92,18 @@ int main(int argc, char *argv[])
 	module_translate(scene, 1.1, -1.1, -0.5);
 	module_sphere(scene, 20);
 
-	// set up the view
-	point_set3D(&(view.vrp), 0.0, 0.7, 5.0);
-	vector_set(&(view.vpn), 0.0, -0.7, -5.0);
-	vector_set(&(view.vup), 0.0, 1.0, 0.0);
-	view.d = 1.0;
-	view.du = 1.0;
-	view.dv = 1.0 * rows / cols;
-	view.screeny = rows;
-	view.screenx = cols;
-	view.f = 0.0;
-	view.b = 30.0;
+	// sphere = module_create();
 
-	matrix_setView3D(&VTM, &view);
-	matrix_identity(&GTM);
+	// module_bodyColor(sphere, &blue);
+	// module_surfaceColor(sphere, &white);
+	// module_surfaceCoeff(sphere, 1.5);
+	// module_sphere(sphere, 5);
 
-	matrix_print(&VTM, stdout);
+	// module_module(scene, sphere);
 
 	light = lighting_create();
-	lighting_add(light, LightAmbient, &gray, NULL, &(view.vrp), 0.0, 0.0);
-	lighting_add(light, LightPoint, &white, NULL, &(view.vrp), 0.0, 0.0);
+	lighting_add(light, LightAmbient, &gray, NULL, NULL, 0, 0);
+	lighting_add(light, LightPoint, &white, NULL, &(view.vrp), 0, 0);
 
 	// module_draw(scene, &VTM, &GTM, ds, light, src);
 	// image_write(src, "spheres.ppm");

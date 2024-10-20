@@ -519,6 +519,7 @@ void polygon_normalize(Polygon *p)
     for (int i = 0; i < p->nVertex; i++)
     {
         point_normalize(&(p->vertex[i]));
+        point_normalize(&(p->vertex3D[i]));
     }
 }
 

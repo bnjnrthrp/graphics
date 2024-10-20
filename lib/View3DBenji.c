@@ -53,10 +53,18 @@ void view_calculateCOP(Point *COP, Point *VRP, double d, Vector *VPN)
 
     // BAM have to normalize the VPN for this to work properly
     Vector v;
-    vector_copy( &v, VPN );
-    vector_normalize( &v );
+    vector_normalize(VPN);
+    vector_copy(&v, VPN);
+    vector_normalize(&v);
     point_set3D(COP,
                 VRP->val[0] - d * v.val[0],
                 VRP->val[1] - d * v.val[1],
                 VRP->val[2] - d * v.val[2]);
+
+    printf("VPN: ");
+    vector_print(VPN, stdout);
+    printf("VRP: ");
+    vector_print(VRP, stdout);
+    printf("COP: ");
+    point_print(COP, stdout);
 }

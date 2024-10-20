@@ -135,7 +135,6 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c1, Color c2,
 		edge->dcPerScan.c[i] = (c2.c[i] / end.val[2] - c1.c[i] / start.val[2]) / dscan;
 		edge->dnPerScan.val[i] = (n2.val[i] / end.val[2] - n1.val[i] / start.val[2]) / dscan;
 	}
-	edge->dnPerScan.val[3] = edge->dzPerScan; // matches dz per scan
 	// edge->dnPerScan.val[3] = 0.0; // matches dz per scan
 
 	// Point dpPerScan = x/z, y/z, 1/z
@@ -156,7 +155,6 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src, Color c1, Color c2,
 			edge->cIntersect.c[i] = (c1.c[i] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dcPerScan.c[i];
 			edge->nIntersect.val[i] = (n1.val[i] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dnPerScan.val[i];
 		}
-		edge->nIntersect.val[3] = (1.0 / edge->z0) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dzPerScan;
 
 		edge->pIntersect.val[0] = (p1.val[0] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dpPerScan.val[0];
 		edge->pIntersect.val[1] = (p1.val[1] / start.val[2]) + (.5 - (edge->y0 - (int)(edge->y0))) * edge->dpPerScan.val[1];
@@ -239,7 +237,6 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 	color_copy(&c1, &(p->color[p->nVertex - 1]));
 	p1 = p->vertex3D[p->nVertex - 1];
 	n1 = p->normalPhong[p->nVertex - 1];
-	// n1 = p->normal[p->nVertex - 1];
 	for (i = 0; i < p->nVertex; i++)
 	{
 
@@ -248,7 +245,6 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src)
 		color_copy(&c2, &(p->color[i]));
 		p2 = p->vertex3D[i];
 		n2 = p->normalPhong[i];
-		// n2 = p->normal[i];
 		// if it is not a horizontal line
 		if ((int)(v1.val[1] + 0.5) != (int)(v2.val[1] + 0.5))
 		{
@@ -301,7 +297,7 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 		p2 = ll_next(active);
 		if (!p2)
 		{
-			printf("bad bad bad (your edges are not coming in pairs)\n");
+			// printf("bad bad bad (your edges are not coming in pairs)\n");
 			break;
 		}
 		currZ = p1->zIntersect;
@@ -322,8 +318,6 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 			dpPerCol.val[j] = (p2->pIntersect.val[j] - p1->pIntersect.val[j]) / (p2->xIntersect - p1->xIntersect);
 			dnPerCol.val[j] = (p2->nIntersect.val[j] - p1->nIntersect.val[j]) / (p2->xIntersect - p1->xIntersect);
 		}
-		dnPerCol.val[3] = (p2->nIntersect.val[2] - p1->nIntersect.val[2]) / (p2->xIntersect - p1->xIntersect);
-		// dnPerCol.val[3] = 0.0;
 
 		// if the xIntersect values are the same, don't draw anything.
 		// Just go to the next pair.
@@ -346,7 +340,7 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 				currPoint.val[j] += (0 - start) * dpPerCol.val[j];
 				currNorm.val[j] += (0 - start) * dnPerCol.val[j];
 			}
-			currNorm.val[3] += (0 - start) * dnPerCol.val[3];
+			// currNorm.val[3] += (0 - start) * dnPerCol.val[3];
 			start = 0;
 		}
 		// identify the ending column
@@ -396,22 +390,21 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 						tn.val[j] = currNorm.val[j] / currZ;
 						tp.val[j] = currPoint.val[j] / currZ;
 					}
-					tn.val[3] = currNorm.val[3] / currZ;
+					// tn.val[3] = currNorm.val[3] / currZ;
 
-					vector_subtract(&tp, &(ds->viewer), &V); // Get view vector from the ds
-					// vector_normalize(&tn);
+					vector_setPoints(&V, &tp, &(ds->viewer)); // Get view vector from the ds
+					vector_normalize(&V);
+					// DEBUG
+					// printf("View is at: ");
+					// point_print(&ds->viewer, stdout);
+					// printf("View vector: ");
+					// vector_print(&V, stdout);
 					// printf("Normal is at: ");
 					// vector_print(&tn, stdout);
+
+					vector_normalize(&tn);
 					lighting_shading(l, &tn, &V, &tp, &ds->body, &ds->surface, ds->surfaceCoeff, p1->oneSided, &tc);
-					// if (tc.c[0] == 0 && tc.c[1] == 0 && tc.c[2] == 0 && i % 10 == 0)
-					// {
-					// 	// printf("Printing black at %d, %d\n", i, scan);
-					// 	// printf("point is: ");
-					// 	// point_print(&tp, stdout);
-					// 	// printf("normal is: ");
-					// 	// vector_print(&tn, stdout);
-					// 	// color_set(&tc, 1.0, 1.0, 1.0);
-					// }
+
 					image_setColor(src, scan, i, tc);
 				}
 				else
@@ -428,7 +421,6 @@ static void fillScan(int scan, LinkedList *active, Image *src, Color c, DrawStat
 				currNorm.val[j] += dnPerCol.val[j];
 				currPoint.val[j] += dpPerCol.val[j];
 			}
-			currNorm.val[3] += dnPerCol.val[3];
 			// printf("Filled in the color at pixel %d, %d\n", scan, i);
 		}
 		// move ahead to the next pair of edges

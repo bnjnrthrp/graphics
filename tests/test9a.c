@@ -59,6 +59,14 @@ int main(int argc, char *argv[])
   printf("view vector:");
   vector_print(&view.vrp, stdout);
 
+  // set the shading to Gouraud
+  ds = drawstate_create();
+
+  point_copy(&(ds->viewer), &(view.vrp));
+  // ds->shade = ShadeGouraud;
+  ds->shade = ShadePhong;
+  // ds->shade = ShadeFrame;
+
   // print out VTM
   printf("Final VTM: \n");
   matrix_print(&VTM, stdout);
@@ -80,15 +88,15 @@ int main(int argc, char *argv[])
   module_color(cube, &White);
 
   // set body and surface color values for ShadeGouraud mode
-  module_bodyColor(cube, &White);
-  module_surfaceColor(cube, &DkGrey);
+  module_bodyColor(cube, &DkGrey);
+  module_surfaceColor(cube, &White);
 
   // the example cube is blue (Y/-Y), red (Z/-Z), yellow (X/-X)
   // these colors should be the body colors
   module_cube(cube, 1);
 
   scene = module_create();
-  // module_module(scene, floor);
+  module_module(scene, floor);
   module_module(scene, cube);
 
   // manually add a light source to the Lighting structure
@@ -97,18 +105,11 @@ int main(int argc, char *argv[])
   lighting_add(light, LightAmbient, &DkGrey, NULL, NULL, 0, 0);
   lighting_add(light, LightPoint, &White, NULL, &(view.vrp), 0, 0);
 
-  // set the shading to Gouraud
-  ds = drawstate_create();
-
-  point_copy(&(ds->viewer), &(view.vrp));
-  // ds->shade = ShadeGouraud;
-  ds->shade = ShadePhong;
-  // ds->shade = ShadeFrame;
-  // rt = rayTracer_create();
+  rt = rayTracer_create();
 
   matrix_identity(&GTM);
-  module_draw(scene, &VTM, &GTM, ds, light, src);
-  // module_drawRay(scene, &view, &VTM, &GTM, light, ds, rt, src);
+  // module_draw(scene, &VTM, &GTM, ds, light, src);
+  module_drawRay(scene, &view, &VTM, &GTM, light, ds, rt, src);
 
   // write out the image
   // image_write(src, "test9aGouraund.ppm");

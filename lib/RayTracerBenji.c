@@ -97,9 +97,15 @@ Polygon *rayTracer_closestPolygon(Point *src, RayTracer *rt, Vector *Vij, Point 
 
     for (i = 0; i < rt->size; i++)
     {
+        vector_normalize(Vij);
+        vector_normalize(&(rt->db[i].normalPhong[0]));
         // If the polygon is nearly parallel to the ray, skip it
         VdotN = vector_dot(Vij, &(rt->db[i].normalPhong[0]));
+        // printf("source: ");
+        // point_print(src, stdout);
+        // printf("Vij:");
         // vector_print(Vij, stdout);
+        // printf("Normal: ");
         // vector_print(&rt->db[i].normalPhong[0], stdout);
         // printf("VdotN is %.5f\n", VdotN);
         if (VdotN > -.001 && VdotN < .001)
@@ -114,7 +120,7 @@ Polygon *rayTracer_closestPolygon(Point *src, RayTracer *rt, Vector *Vij, Point 
         // Adjust the start by a little bit down the vector
         // printf("Original point: ");
         // point_print(src, stdout);
-        point_set3D(src, src->val[0] + 0.05 * Vij->val[0], src->val[1] + 0.05 * Vij->val[1], src->val[2] + 0.05 * Vij->val[2]);
+        point_set(src, src->val[0] + 0.05 * Vij->val[0], src->val[1] + 0.05 * Vij->val[1], src->val[2] + 0.05 * Vij->val[2], src->val[3]);
         // printf("Adjusted point: ");
         // point_print(src, stdout);
 
@@ -122,12 +128,12 @@ Polygon *rayTracer_closestPolygon(Point *src, RayTracer *rt, Vector *Vij, Point 
         // Determine number of sides in the polygon
         if (rt->db[i].nVertex == 3)
         {
-            // printf("testing triangle\n");
+            //   printf("testing triangle\n");
             hit = ray_triIntersect(src, &(rt->db[i]), Vij, &currX);
         }
         else if (rt->db[i].nVertex == 4)
         {
-            // printf("splitting\n");
+            //   printf("splitting\n");
             // Split 4 sided polygon and do ray-triangle intersections on both
             Point pt1[3];
             Point pt2[3];
@@ -181,26 +187,32 @@ Polygon *rayTracer_closestPolygon(Point *src, RayTracer *rt, Vector *Vij, Point 
         {
             p0 = rt->db[i].vertex3D[0];
             vector_setPoints(&anchor, src, &p0);
+            vector_normalize(&anchor);
+            vector_normalize(&(rt->db[i].normalPhong[0]));
             // printf("anchor is: ");
             // vector_print(&anchor, stdout);
             t = vector_dot(&anchor, &(rt->db[i].normalPhong[0])) / VdotN;
             // printf("t is %.5f\n", t);
 
-            if (!closest)
+            // ensure t is positive
+            if (t > 0)
             {
-                closest = &(rt->db[i]);
-                currT = t;
-                point_copy(x, &currX);
-                // printf("Adding closest polygon at t = %.5f: ", currT);
-                // polygon_print(closest, stdout);
-            }
-            else if (t < currT)
-            {
-                closest = &(rt->db[i]);
-                currT = t;
-                point_copy(x, &currX);
-                // printf("Adding closest polygon at t = %.5f: ", t);
-                // polygon_print(closest, stdout);
+                if (!closest)
+                {
+                    closest = &(rt->db[i]);
+                    currT = t;
+                    point_copy(x, &currX);
+                    // printf("Adding closest polygon at t = %.5f: ", currT);
+                    // polygon_print(closest, stdout);
+                }
+                else if (t < currT)
+                {
+                    closest = &(rt->db[i]);
+                    currT = t;
+                    point_copy(x, &currX);
+                    // printf("Adding closest polygon at t = %.5f: ", t);
+                    // polygon_print(closest, stdout);
+                }
             }
             // printf("ray: %d, dist: %.5f\n", hit, currT);
             // polygon_print(closest, stdout);
@@ -216,13 +228,14 @@ Polygon *rayTracer_closestPolygon(Point *src, RayTracer *rt, Vector *Vij, Point 
 
 /**
  * Determines if a ray will intersect a provided polygon. Currently only supports 3 or 4 sided polygons
- * @param COP the anchor of the ray
+ * @param src the anchor of the ray
  * @param p the polygon in question
  * @param Vij the vector from the anchor towards the polygon
+ * @param x the intersection point on the polygon
  */
 int ray_triIntersect(Point *src, Polygon *p, Vector *Vij, Point *x)
 {
-    Vector edgeAB, edgeBC, edgeCA, edgeAX, edgeBX, edgeCX, cross1, cross2, cross3, ray;
+    Vector edgeAB, edgeBC, edgeCA, edgeAX, edgeBX, edgeCX, cross1, cross2, cross3, ray, N, inverseRay, inverseVij;
     double t, dotA, dotB, dotC;
 
     if (!src || !p || !Vij || !x)
@@ -230,23 +243,35 @@ int ray_triIntersect(Point *src, Polygon *p, Vector *Vij, Point *x)
         fprintf(stderr, "Invalid pointer provided to ray_triIntersect\n");
         exit(-1);
     }
+    vector_copy(&N, &(p->normalPhong[0]));
+    vector_normalize(&N);
+
+    vector_normalize(Vij);
+    // Invert the inbound vector
+    vector_inverse(Vij, &inverseVij);
 
     // Assumes the normal is the same through the polygon.
     // polygon_print(p, stdout);
-    vector_setPoints(&ray, src, &p->vertex3D[0]);
+    vector_setPoints(&ray, &p->vertex3D[0], src);
+    vector_normalize(&ray);
+
     // polygon_print(p, stdout);
     // printf("normal: ");
     // printf("%.2f, %.2f, %.2f\n", p->normalPhong[0].val[0], p->normalPhong[0].val[1], p->normalPhong[0].val[2]);
     // printf("Vij: ");
     // vector_print(Vij, stdout);
-    t = vector_dot(&ray, &(p->normalPhong[0])) / vector_dot(Vij, &(p->normalPhong[0]));
+    t = vector_dot(&ray, &N) / vector_dot(&inverseVij, &N);
 
     vector_calcParametric(src, t, Vij, x);
+    // printf("A: ");
+    // point_print(src, stdout);
     // printf("t is %.5f\n", t);
+    // printf("V: ");
+    // vector_print(Vij, stdout);
     // printf("x: ");
-    // vector_print(x, stdout);
+    // point_print(x, stdout);
 
-    // Point intersection = { {src->val[0] + t * Vij->val[0], src->val[1] + t * Vij->val[1], src->val[2] + t * Vij->val[2] } };
+    Point intersection = {{src->val[0] + t * Vij->val[0], src->val[1] + t * Vij->val[1], src->val[2] + t * Vij->val[2]}};
 
     vector_setPoints(&edgeAB, &(p->vertex3D[0]), &(p->vertex3D[1]));
     vector_setPoints(&edgeBC, &(p->vertex3D[1]), &(p->vertex3D[2]));
@@ -282,12 +307,14 @@ int ray_triIntersect(Point *src, Polygon *p, Vector *Vij, Point *x)
     {
         // printf("hit: ");
         // printf("%.5f, %.5f, %.5f\n", dotA, dotB, dotC);
+        // vector_print(&inverseVij, stdout);
         return 0;
     }
     else
     {
         // printf("Miss: ");
         // printf("%.5f, %.5f, %.5f\n", dotA, dotB, dotC);
+        // vector_print(&inverseVij, stdout);
         return 1;
     }
 }

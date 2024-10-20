@@ -222,7 +222,14 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
             vector_setPoints(&L, p, &l->light[i].position);
             // vector_set(&L, (l->light[i].position.val[0] - p->val[0]), (l->light[i].position.val[1] - p->val[1]), (l->light[i].position.val[2] - p->val[2]));
             // Normalize L
+
+            // // DEBUG
+            // printf("Light position: ");
+            // point_print(&l->light[i].position, stdout);
+
             vector_normalize(&L);
+            // printf("L: ");
+            // vector_print(&L, stdout);
             break;
 
         case LightSpot:
@@ -245,7 +252,16 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
         }
         // Universal calculations
         // Calculate theta = L * N
+
         theta = vector_dot(&L, N);
+        // // DEBUG Calculate theta
+        // printf("Calculate Light * Normal\n");
+        // printf("Light: ");
+        // vector_print(&L, stdout);
+        // printf("Norm: ");
+        // vector_print(N, stdout);
+        // printf("Theta: %.5f\n", theta);
+
         // Check if light is on facing side of polygon if polygon is one-sided - skip if true
         if (oneSided == 1 && theta < 0)
         {
@@ -257,10 +273,18 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
         // Determine the view vector
         sigma = vector_dot(V, N);
 
+        // DEBUG
+        // printf("Calculate view * Normal\n");
+        // printf("View: ");
+        // vector_print(V, stdout);
+        // printf("Norm: ");
+        // vector_print(N, stdout);
+        // printf("sigma: %.5f\n", sigma);
+
         // Check if viewer and light source on same side of surface?
         if ((theta < 0 && sigma > 0) || (theta > 0 && sigma < 0))
         {
-            // printf("viewer light on same side of surface sigma: %.5f\n", sigma);
+            // printf("viewer light on opposing side of surface sigma: %.5f, theta: %.5f\n", sigma, theta);
             continue;
         }
 
@@ -283,7 +307,7 @@ void lighting_shading(Lighting *l, Vector *N, Vector *V, Point *p, Color *Cb,
     }
     // Debug only
     // printf("ambient light 0: %.2f, %.2f, %.2f\n", ambR, ambG, ambB);
-    // printf("point light 1: %.2f, %.2f, %.2f\n", tmpR, tmpG, tmpB);
+    // printf("total light: %.2f, %.2f, %.2f\n", tmpR, tmpG, tmpB);
     color_set(c, tmpR, tmpG, tmpB);
 }
 
@@ -373,7 +397,7 @@ void lighting_shadingSingle(Light *l, Vector *N, Vector *V, Point *p, Color *Cb,
     tmpR += (Cb->c[0] * l->color.c[0]) * theta + (l->color.c[0] * Cs->c[0]) * pow(beta, s);
     tmpG += (Cb->c[1] * l->color.c[1]) * theta + (l->color.c[1] * Cs->c[1]) * pow(beta, s);
     tmpB += (Cb->c[2] * l->color.c[2]) * theta + (l->color.c[2] * Cs->c[2]) * pow(beta, s);
-    printf("Setting color c");
+    // printf("Setting color c");
     color_set(c, tmpR, tmpG, tmpB);
     // exit(-1);
 }

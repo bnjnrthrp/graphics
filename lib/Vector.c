@@ -128,6 +128,19 @@ double vector_length(Vector *v)
     return sqrt(v->val[0] * v->val[0] + v->val[1] * v->val[1] + v->val[2] * v->val[2]);
 }
 
+void vector_inverse(Vector *input, Vector *output)
+{
+    if (!input || !output)
+    {
+        fprintf(stderr, "Invalid pointer provided to vector_inverse\n");
+        exit(-1);
+    }
+    for (int i = 0; i < 3; i++)
+    {
+        output->val[i] = -(input->val[i]);
+    }
+}
+
 /**
  * Subtracts vector a from b and puts the result in c
  */

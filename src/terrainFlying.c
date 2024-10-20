@@ -308,11 +308,6 @@ int main(int argc, char *argv[])
     // ds->shade = ShadeFrame;
     ds->shade = ShadePhong;
 
-    // create the triangle endpoints
-    point_set3D(&A, 0.0, 0.0, 0.0); // first row, constant x, even spacing in z
-    point_set3D(&B, 1.0, 0.0, 0.0);
-    point_set3D(&C, 0.0, 0.0, 1.0);
-
     // create a pyramid with user provided sides
     terrain = module_create();
     module_terrain(terrain, ds, iterations, roughness); // Build out the terrain to make copies later
@@ -334,6 +329,7 @@ int main(int argc, char *argv[])
 
     matrix_setView3D(&VTM, &view);
     matrix_identity(&GTM);
+    point_copy(&(ds->viewer), &(view.vrp));
 
     matrix_print(&VTM, stdout);
 
